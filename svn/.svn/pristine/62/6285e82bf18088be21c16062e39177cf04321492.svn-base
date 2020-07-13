@@ -1,0 +1,51 @@
+<!--pages/serveMyDetail/serveMyDetail.wxml-->
+<wxs module="changeStyle">
+  var  format = function(data) {
+    var mobile = data
+    return data.slice(0,3)+' '+data.slice(3,7)+' ' +data.slice(7,11)
+  }
+    module.exports = {
+      format:format
+    }
+</wxs>
+<!-- 服务状态 -->
+<view class="serve-state">
+  <image src="{{isDeal==0?imageProcessed:imageProcessed}}"></image>
+  <view>{{isDeal==0?'未处理':'已处理'}}</view>
+</view>
+<!-- 服务详情概述 -->
+<view>
+  <image src="{{mainImage}}" class="serve-banner"></image>
+  <view class="generalization-text">
+    {{title}}
+  </view>
+</view>
+<!-- 预约信息 -->
+<view class="reserve-information">
+  <view class="datum-item datum-title">
+    <view>预约信息</view>
+  </view>
+  <view class="datum-item">
+    <view class="datum-key">昵称</view>
+    <view class="datum-value">{{memberName}}</view>
+  </view>
+  <view class="datum-item">
+    <view class="datum-key">电话</view>
+    <view class="datum-value">{{changeStyle.format(mobile)}}</view>
+  </view>
+  <view class="datum-item-dis">
+    <view class="remark-detailed">备注</view>
+    <view class="remark-area">{{memberRemark}}</view>
+  </view>
+</view>
+<!-- 预约受理时间 -->
+<view class="accept-time">
+  <view class="datum-item">
+    <view class="datum-key">处理时间</view>
+    <view class="datum-value">{{updateTime}}</view>
+  </view>
+  <view class="datum-item">
+    <view class="datum-key">提交时间</view>
+    <view class="datum-value">{{createTime}}</view>
+  </view>
+</view>

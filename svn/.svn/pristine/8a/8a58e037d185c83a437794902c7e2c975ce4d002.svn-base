@@ -1,0 +1,41 @@
+<!--消息中心页面-->
+
+<!--时间转换过滤-->
+<wxs module="time" src="../../filter/time.wxs"></wxs>
+
+<!--消息列表-->
+<view class="message-view">
+  <block wx:for="{{messageList}}">
+    <!--消息每条-->
+    <view class="message-item-view {{item.count > 0 ? 'color-unread' : 'color-readed'}}" data-id="{{item.goodsId}}" bindtap="toChat">
+      <view class="commodity-img-view">
+        <image class="commodity-img-style" src='{{item.goodsPicUrl}}'></image>
+      </view>
+      <view class="copywriting-view">
+        <!--商品标题-->
+        <view class="commodity-title-style">
+          <text wx:if="{{item.goodsType == 2}}" class="commodity-strict-select">严选</text><text wx:elif="{{item.goodsType == 3}}" class="commodity-our-shop">本店</text> {{item.goodsName}}
+        </view>
+        <!--红点-->
+        <view class="reply-unread">
+          <view wx:if="{{item.count > 0}}" class="red-point"></view>
+        </view>
+        <!--最后一条消息和时间-->
+        <view class="reply-and-time">
+          <view class="reply-text">{{item.type == 1 ? item.message : '[图片]'}}</view>
+          <view class="reply-time">{{time.getDateDiff(item.createTime)}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
+
+<!--没有消息-->
+<block wx:if="{{messageList.length == 0}}">
+  <view class="illustration-view">
+    <view class="illustration-border">
+      <image class="illustration-style" src="../../img/defaultImg/empty.png"></image>
+      <view class="illustration-text">当前暂无消息内容～</view>
+    </view>
+  </view>
+</block>

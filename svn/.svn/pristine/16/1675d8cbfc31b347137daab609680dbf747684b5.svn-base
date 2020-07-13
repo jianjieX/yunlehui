@@ -1,0 +1,592 @@
+/**
+ * 故事编写
+ * 
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+let app = getApp();
+var baseUrl = require("../../utils/base.js");
+import Api from '/../../utils/config/Api/story.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+import upload from '../../utils/tools/uploadFile.js';
+let uploadFile = upload.uploadFile;
+import tools from '../../utils/tools/util.js'
+// emojy 转字符
+let utf16toEntities = tools.utf16toEntities;
+// emojy 转字符
+let uncodeUtf16 = tools.uncodeUtf16;
+
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //全机型适配
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    fixedTop: '',
+    //官方富文本编辑器
+    formats: {},
+    //
+    bottom: 0,
+    //编辑器只读属性
+    readOnly: false,
+    //编辑器默认值
+    placeholder: '开始添加内容吧',
+    //编辑器聚焦
+    _focus: false,
+    //准备编辑故事的id
+    editeId: null,
+    //故事标题
+    storyTitle: '',
+    //标题长度
+    titleLength: 20,
+    //内容头图
+    headImg: '',
+    //富文本内容
+    content: '',
+    //头图type
+    headImgType: false,
+    //button类型
+    buttonType: true,
+    //分类List
+    categoryList: [],
+    linkList: [],
+    //审核状态0草稿，1待审核，2审核通过，3审核驳回
+    reviewStatus: 1,
+    //遮罩层子
+    subMask: false,
+    //关联商品list
+    storyGoodsRes: [],
+    //分类层
+    classionType: false,
+  },
+
+  onLoad(options) {
+    // 头部适配
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      fixedTop: app.data.fixedTop + 46,
+    })
+    let _this = this
+    //授权验证
+    app.accredit().then(() => {
+      //编辑器初始化字体
+      wx.loadFontFace({
+        family: 'Pacifico',
+        source: 'url("https://sungd.github.io/Pacifico.ttf")',
+        success: console.log
+      })
+      if (options.id != null && options.id != undefined) {
+        console.log("获取编辑的详情")
+        _this.data.editeId = options.id;
+        _this.onEditorReady();
+        _this.getDetail(options.id);
+      }
+    })
+
+
+  },
+
+  //富文本插件方法
+  onEditorReady() {
+    const that = this
+    wx.createSelectorQuery().select('#editor').context(function(res) {
+      console.log("初始化富文本插件")
+      that.editorCtx = res.context;
+      //这个是富文本编辑器赋值
+      that.editorCtx.setContents({
+        html: uncodeUtf16(that.data.content),
+        success: (res) => {
+
+        },
+        fail: (res) => {
+
+        }
+      })
+    }).exec()
+  },
+
+  undo() {
+    this.editorCtx.undo()
+  },
+  redo() {
+    this.editorCtx.redo()
+  },
+  format(e) {
+    let {
+      name,
+      value
+    } = e.target.dataset
+    if (!name) return
+    // console.log('format', name, value)
+    this.editorCtx.format(name, value)
+  },
+  onStatusChange(e) {
+    const formats = e.detail
+    this.setData({
+      formats
+    })
+  },
+  insertDivider() {
+    this.editorCtx.insertDivider({
+      success: function() {
+        console.log('insert divider success')
+      }
+    })
+  },
+  clear() {
+    this.editorCtx.clear({
+      success: function(res) {
+        console.log("clear success")
+      }
+    })
+  },
+  removeFormat() {
+    this.editorCtx.removeFormat()
+  },
+  insertDate() {
+    const date = new Date()
+    const formatDate = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
+    this.editorCtx.insertText({
+      text: formatDate
+    })
+  },
+
+  //这个是富文本编辑器插入图片
+  insertImage() {
+    const that = this
+    wx.chooseImage({
+      count: 1,
+      success: function(res) {
+        if (res.tempFiles[0].size > 2097152) {
+          setTimeout(function(){
+            alertModal1("您上传的图片需小于2MB");
+            alertModal1("您上传的图片需小于2MB");
+          },1)
+          return;
+        }
+        let tempFilePaths = res.tempFilePaths
+        uploadFile(tempFilePaths[0], 30).then((res) => {
+          that.editorCtx.insertImage({
+            src: res,
+            data: {
+              id: 'abcd',
+              role: 'god'
+            },
+            success: function() {
+              console.log('insert image success')
+            }
+          })
+        })
+      }
+    })
+  },
+
+  //这个是获取富文本编辑器里的值
+  onInput(e) {
+
+    console.log(e.detail.html)
+    let srcFlag = true
+    let htmlData = e.detail.html
+    if (htmlData.indexOf('src')=='-1'){
+      srcFlag = false
+    }
+    if (e.detail.text.trim() !== '') {
+      this.setData({
+        content: e.detail.html,
+       
+      })
+    }
+    this.data.srcFlag = srcFlag
+    
+  },
+
+  //上传方法（选择图片）
+  updataHeadimg() {
+    let that = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success(res) {
+        if (res.tempFiles[0].size > 2097152) {
+          alertModal1("您上传的图片需小于2MB");
+          alertModal1("您上传的图片需小于2MB");
+          return;
+        }
+        // tempFilePath可以作为img标签的src属性显示图片
+        const tempFilePaths = res.tempFilePaths
+        uploadFile(tempFilePaths[0], 30).then((res) => {
+          that.setData({
+            headImg: res,
+            headImgType: true
+          })
+        })
+      }
+    })
+  },
+
+  //输入标题
+  titleInput(e) {
+    this.setData({
+      storyTitle: e.detail.value.trim(),
+      titleLength: 20 - e.detail.value.length
+    })
+  },
+
+  //校验button
+  checkButton() {
+    let that = this;
+    if (that.data.storyTitle == "" && that.data.headImg == "" && that.data.content == "") {
+      that.setData({
+        buttonType: false
+      })
+    } else {
+      that.setData({
+        buttonType: true
+      })
+    }
+  },
+
+  //发布
+  releasePush() {
+    let that = this;
+    if (that.data.srcFlag){
+      if (that.data.storyTitle == "" || that.data.headImg == "" ) {
+        alertModal1("故事标题，头图或内容不能为空")
+        return;
+      }
+    }else{
+      if (that.data.storyTitle == "" || that.data.headImg == "" || that.data.content == "") {
+        alertModal1("故事标题，头图或内容不能为空")
+        return;
+      }
+    }
+   
+    //id空就是没有id，则为创作新的，有则传入id代表编辑
+    if (that.data.editeId == null) {
+      that.setData({
+        subMask: true
+      })
+      let _parms = {
+        contentBanner: that.data.headImg,
+        contentDetail: utf16toEntities(that.data.content),
+        sourceType: "会员",
+        title: utf16toEntities(that.data.storyTitle),
+        cminiCategoryReqList: that.data.linkList,
+        cminiGoodsIdReqList: that.data.storyGoodsRes,
+        reviewStatus: that.data.reviewStatus
+      }
+      Api.addStoryDetailForC(_parms).then((res) => {
+        console.log("故事发布接口==============,", res)
+        that.setData({
+          subMask: false
+        })
+        if (res.data.status == '0000') {
+          console.log("故事发布接口==============", res)
+          //这段addFlag是后加的，实际上是为了当初防止机器人审核没授权然后后端返的状态
+          if (res.data.data.addFlag == 0) {
+            alertModal1(res.data.data.msg)
+            setTimeout(() => {
+              wx.navigateBack({
+                detal: 1
+              })
+            }, 2000)
+            return;
+          } else {
+            wx.showModal({
+              title: '提示',
+              content: '操作成功',
+              showCancel: false,
+              success(res) {
+                if (res.confirm) {
+                  wx.redirectTo({
+                    url: '../../pages/myHomePage/myHomePage?currentTab=2',
+                  })
+                }
+              }
+            })
+          }
+        }
+        //接口返回状态不是0000提示错误信息
+        else {
+          alertModal(res.data.msg)
+        }
+      }).catch((res) => {
+        alertModal("请求服务失败")
+      })
+    }
+    //有id则代表编辑故事
+    else {
+      that.setData({
+        subMask: true
+      })
+      let _parms = {
+        contentBanner: that.data.headImg,
+        contentDetail: utf16toEntities(that.data.content),
+        sourceType: "会员",
+        title: utf16toEntities(that.data.storyTitle),
+        cminiCategoryReqList: that.data.linkList,
+        cminiGoodsIdReqList: that.data.storyGoodsRes,
+        reviewStatus: that.data.reviewStatus,
+        id: that.data.editeId
+      }
+      Api.updateStoryDetailForC(_parms).then((res) => {
+        console.log("故事发布接口==============", res)
+        that.setData({
+          subMask: false
+        })
+        if (res.data.status == '0000') {
+          console.log("故事发布接口==============", res)
+          //这段addFlag是后加的，实际上是为了当初防止机器人审核没授权然后后端返的状态
+          if (res.data.data.addFlag == 0) {
+            alertModal1(res.data.data.msg)
+            setTimeout(() => {
+              wx.navigateBack({
+                detal: 1
+              })
+            }, 2000)
+            return;
+          } else {
+            wx.showModal({
+              title: '提示',
+              content: '操作成功',
+              showCancel: false,
+              success(res) {
+                if (res.confirm) {
+                  var pages = getCurrentPages(); // 当前页面
+                  var beforePage = pages[pages.length - 2]; // 前一个页面
+                  //返回上一页执行userStory方法
+                  wx.navigateBack({
+                    delta: 1,
+                    success: function() {
+                      beforePage.userStory();
+                    }
+                  })
+                }
+              }
+            })
+          }
+        } else {
+          alertModal(res.data.msg)
+        }
+      }).catch((res) => {
+        alertModal("请求服务失败")
+      })
+    }
+  },
+
+  // 请求分类
+  getClassify() {
+    let _this = this;
+    // 请求分类
+    let params = {
+      shopId: wx.getStorageSync("shopId"),
+    }
+    Api.cateGoryFirstStoryGoodsList(params).then(res => {
+      if (res.data.status === "0000") {
+        let list = res.data.data;
+        let tempList = _this.data.linkList;
+        //判断分类是不是已选择的状态
+        if (tempList.length != 0) {
+          for (let i = 0; i < list.length; i++) {
+            for (let j = 0; j < tempList.length; j++) {
+              if (list[i].id == tempList[j].categoryId) {
+                list[i].selectType = "999";
+              }
+            }
+          }
+        }
+        _this.setData({
+          categoryList: list,
+          classionType: true
+        })
+        wx.hideLoading()
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  //关闭分类层
+  closeClassify() {
+    this.setData({
+      classionType: false
+    })
+  },
+
+  //选择分类
+  selectClass(e) {
+    let that = this;
+    let list = that.data.linkList;
+    if (list.length >= 3) {
+      alertModal1("最多只能选择3个分类");
+      return;
+    }
+    let id = e.currentTarget.dataset.id;
+    let name = e.currentTarget.dataset.name;
+    let index = e.currentTarget.dataset.index;
+    let temp = "categoryList[" + index + "].selectType"
+    list.unshift({
+      categoryId: id,
+      categoryName: name,
+    })
+    this.setData({
+      linkList: list,
+      [temp]: "999"
+    })
+  },
+
+  //取消关联分类
+  unSelectClass(e) {
+    let that = this;
+    let list = that.data.linkList;
+    let id = e.currentTarget.dataset.id;
+    let index = e.currentTarget.dataset.index;
+    let temp = "categoryList[" + index + "].selectType"
+    for (let i = 0; i < list.length; i++) {
+      if (id == list[i].categoryId) {
+        list.splice(i, 1);
+      }
+    }
+    this.setData({
+      linkList: list,
+      [temp]: "0"
+    })
+  },
+
+  //关联分类
+  linkClass(e) {
+    let that = this;
+    let type = e.currentTarget.dataset.type;
+    if (that.data.linkList.length >= 3) {
+      alertModal1("关联分类数量已达上限")
+      return;
+    }
+    //type：0就是跳过创新名字，直接用原分类名
+    if (type == 0) {
+      that.data.linkList.push({
+        categoryId: that.data.classId,
+        categoryName: that.data.className
+      })
+      that.setData({
+        linkList: that.data.linkList,
+        diyType: false,
+      })
+      alertModal1("添加成功")
+    }
+    //1就是自定义的名
+    else if (type == 1) {
+      if (that.data.inputName == "") {
+        alertModal1("请输入分类自定义名称")
+        return
+      }
+      that.data.linkList.push({
+        categoryId: that.data.classId,
+        categoryName: that.data.inputName
+      })
+      that.setData({
+        linkList: that.data.linkList,
+        diyType: false,
+        inputName: "",
+      })
+      alertModal1("添加成功")
+    }
+  },
+
+  //返回页面
+  backPage() {
+    let that = this;
+    //这块得判断有没有三个主要内容，有的话问问是不是保存草稿箱
+    if (that.data.storyTitle != "" && that.data.headImg != "" && that.data.content != "") {
+      wx.showModal({
+        title: '退出发布',
+        content: '您将退出发布，是否保存到未发布？',
+        confirmColor: '#FABE00',
+        success(res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            that.data.reviewStatus = 0;
+            that.releasePush();
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+            wx.navigateBack({
+              detal: 1
+            })
+          }
+        }
+      })
+    }
+    //没有就直接返回上一页 
+    else {
+      wx.navigateBack({
+        detal: 1
+      })
+    }
+  },
+
+  //获取故事详情
+  getDetail(id) {
+    var that = this;
+    let _parms = {
+      storyId: id,
+      shopId: wx.getStorageSync("shopId"),
+      type: 1
+    }
+    Api.searchOneStoryForC(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        if (res.data.data != null) {
+          let headImgType = false;
+          if (res.data.data.contentBanner != "") {
+            headImgType = true
+          }
+          that.setData({
+            headImg: res.data.data.contentBanner,
+            headImgType: headImgType,
+            content: uncodeUtf16(res.data.data.contentDetail),
+            storyTitle: uncodeUtf16(res.data.data.title),
+            linkList: res.data.data.categoryResList,
+          })
+          //这块是官方的富文本编辑器赋值接口
+          if (that.editorCtx != undefined) {
+            that.editorCtx.setContents({
+              html: uncodeUtf16(res.data.data.contentDetail),
+              success: (res) => {
+
+              },
+              fail: (res) => {
+
+              }
+            })
+          }
+        }
+      } else {
+        alertModal(res.data.msg)
+      }
+    })
+  },
+
+  //去关联商品
+  toRelatedGoods() {
+    let temp = JSON.stringify(this.data.storyGoodsRes)
+    wx.navigateTo({
+      url: '../../pages/relatedGoods/relatedGoods?list=' + temp,
+    })
+  },
+
+  //关联商品赋值
+  setGoodsList(list) {
+    this.setData({
+      storyGoodsRes: list
+    })
+  },
+})

@@ -1,0 +1,465 @@
+/**
+ * 好物商品列表页面
+ */
+
+// 全局app对象
+const app = getApp();
+// 请求地址
+const baseUrl = require('../../utils/base.js');
+// 引入systemInfo
+const systemInfo = wx.getSystemInfoSync();
+// 引入请求接口
+import Api from '/../../utils/config/Api/goods.js';
+import commonApi from '/../../utils/config/Api/common.js';
+// 引入封装alert
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let promptModal = alert.promptModal;
+
+Page({
+  data: {
+    // 跳转到的分类锚点
+    scrollTo: '',
+    // 门店id
+    shopId: 0,
+    // 头部适配样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    // 分类列表
+    categoryList: [],
+    // 商品列表
+    goodsList: [],
+    // 当前分类
+    currentTab: 0,
+    // 当前页码
+    currentPage: 1,
+    // 轮播图图片
+    bannerImgs: [],
+    // 是否显示轮播图
+    hasBanner: false,
+    // 是否显示到底部
+    isBottomShow: true,
+    // toast显示状态
+    toastShowStatus: true,
+    // 门店头像
+    shopHeader: '',
+    // 门店名字
+    shopName: '',
+    // 总店分店标识
+    merchantShopFlag: 0,
+    // 页面进入来源
+    source: null,
+    // 分类名称
+    categoryName: '全部',
+    // 菜单高度
+    mHeight: '',
+    // 开卡状态
+    openCardFlag: false
+  },
+
+  onLoad(options) {
+
+    this.init(options)
+
+    this.dealStyle()
+
+    this.checkOpenCardFlag()
+
+  },
+  onShow() {
+    this.enterWayByNormal()
+
+    this.enterWayByStory()
+  },
+
+  /**
+   * 页面分享方法
+   */
+  onShareAppMessage() {
+
+    return app.onShare();
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide() {
+
+    this.setData({
+      source: null
+    })
+
+  },
+
+  /**
+   * 初始化
+   */
+  init(options) {
+
+    let that = this;
+    that.setData({
+      shopId: wx.getStorageSync('shopId'),
+      source: options.source ? options.source : null
+    })
+
+    wx.showLoading({
+      title: '加载中',
+    })
+
+  },
+
+  /**
+   * 处理tab跳转
+   */
+  changeTab() {
+
+    let that = this;
+    let currentTab = app.globalData.currentTab || this.data.currentTab;
+    let categoryName = '全部';
+    this.data.categoryList.map(item => {
+      if (item.id == currentTab) {
+        categoryName = item.categoryName
+      }
+    })
+
+    that.setData({
+      scrollTo: `String${currentTab}`,
+      categoryName
+    })
+
+  },
+  /**
+   * 正常进入
+   */
+  enterWayByNormal() {
+
+    let that = this;
+    if (app.globalData.currentTab) {
+      return
+    }
+    let params = {
+      currentPage: that.data.currentPage,
+      enablePage: true,
+      pageSize: 10,
+      type: 1
+    }
+    if (that.data.currentTab == 0) {
+      // 请求好物商品列表
+      that.getSelectGoodsList(params);
+    } else {
+      // 请求分类列表
+      params.categoryFirstId = that.data.currentTab
+      that.getSelectGoodsList(params);
+    }
+    this.getClassify()
+
+  },
+
+  /**
+   * 故事进入好物列表
+   */
+  enterWayByStory() {
+
+    let that = this;
+    if (!app.globalData.currentTab) {
+      return
+    }
+    // 从故事详情进入,跳转到指定分类
+    let currentTab = app.globalData.currentTab || that.data.currentTab;
+
+    that.setData({
+      shopId: wx.getStorageSync('shopId'),
+      currentTab: currentTab,
+      scrollTo: `String${currentTab}`,
+      currentPage: 1
+    })
+
+    if (app.globalData.currentTab) {
+      // 如果从故事详情进入
+      let params = {
+        currentPage: that.data.currentPage,
+        enablePage: true,
+        pageSize: 10,
+        shopId: that.data.shopId,
+        type: 1
+      }
+      if (that.data.currentTab == 0) {
+        // 严选商品列表
+        that.getSelectGoodsList(params);
+      } else {
+        params.categoryFirstId = that.data.currentTab,
+          that.getSelectGoodsList(params);
+      }
+    }
+    app.globalData.currentTab = null
+
+    this.getClassify()
+  },
+
+  /**
+   * 处理样式
+   */
+  dealStyle() {
+
+    // 计算菜单高度
+    let headHeight = systemInfo.statusBarHeight + 44
+    let visualHeight = systemInfo.windowHeight
+    let mHeight = `height: ${(visualHeight - headHeight - 48)}px`
+
+    // 头部样式适配
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      mHeight
+    })
+
+  },
+
+  /**
+   * 请求分类列表
+   */
+  getClassify() {
+
+    let that = this;
+    let params = {
+      shopId: that.data.shopId
+    }
+    Api.getCateGory().then(res => {
+      if (res.data.status === '0000') {
+        that.setData({
+          categoryList: res.data.data
+        })
+
+        that.changeTab()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal1('请求服务失败')
+    })
+
+  },
+
+  /**
+   * 跳转公益详情
+   */
+  jumpBanner(e) {
+
+    let that = this;
+    let id = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: `../welfareDetail/welfareDetail?welfareId=${id}`,
+    })
+  },
+
+  /**
+   * 点击tab切换分类
+   */
+  handleTab(e) {
+
+    let that = this;
+    that.setData({
+      currentPage: 1,
+      toastShowStatus: true
+    })
+    if (this.data.currentTab === e.target.dataset.current) {
+      return false;
+    } else {
+      let categoryName = '全部'
+      this.data.categoryList.map(item => {
+        if (item.id === e.target.dataset.current) {
+          categoryName = item.categoryName
+        }
+      })
+      that.setData({
+        currentTab: e.target.dataset.current,
+        categoryName
+      })
+    }
+    // 判断是否是本店分类 本店分类请求本店商品
+    let params = {
+      currentPage: 1,
+      enablePage: true,
+      pageSize: 10,
+      type: 1
+    }
+    if (that.data.currentTab === 0) {
+      if (that.data.bannerImgs && that.data.bannerImgs.length !== 0) {
+        that.setData({
+          hasBanner: true
+        })
+      }
+      that.getSelectGoodsList(params);
+    } else {
+      // 分类请求分类商品列表
+      that.setData({
+        hasBanner: false
+      })
+      params.categoryFirstId = that.data.currentTab
+      that.getSelectGoodsList(params)
+    }
+  },
+
+  /**
+   * 请求本店商品列表
+   */
+  getSelectGoodsList(params, nextPage) {
+
+    let that = this;
+    Api.getSelectGoodsList(params).then(res => {
+      if (res.data.status === '0000') {
+        let data = res.data.data
+        if (nextPage == undefined) {
+          if (data) {
+            that.setData({
+              goodsList: data.content,
+              isBottomShow: true
+            })
+            wx.hideNavigationBarLoading();
+            wx.stopPullDownRefresh();
+          } else {
+            that.setData({
+              goodsList: [],
+              isBottomShow: false
+            })
+          }
+        }
+        // 分页
+        if (nextPage === 1) {
+          if (data) {
+            that.setData({
+              goodsList: [...that.data.goodsList, ...data.content],
+              isBottomShow: true
+            })
+          } else {
+            wx.hideLoading()
+            if (that.data.toastShowStatus) {
+              alertModal1('没有更多内容了')
+            }
+            that.setData({
+              toastShowStatus: false
+            })
+            return
+          }
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+
+    }).catch((err) => {
+      alertModal1('请求服务失败')
+    })
+  },
+
+  /**
+   * 跳转商品详情
+   */
+  toGoodsDetail(e) {
+
+    let goodsId = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: `../../pages/shopDetail/shopDetail?goodsId=${goodsId}`
+    })
+  },
+
+  /**
+   * 到达底部加载更多
+   */
+  onReachBottom() {
+    let currentPage = this.data.currentPage;
+    currentPage++;
+    let that = this;
+    this.setData({
+      currentPage: currentPage
+    })
+    if (that.data.currentTab === 0) {
+      // 请求严选列表
+      let params = {
+        currentPage: that.data.currentPage,
+        enablePage: true,
+        pageSize: 10,
+        shopId: that.data.shopId,
+        type: 1
+      }
+      that.getSelectGoodsList(params, 1)
+    } else {
+      // 请求分类列表
+      let params = {
+        categoryFirstId: that.data.currentTab,
+        currentPage: that.data.currentPage,
+        enablePage: true,
+        pageSize: 10,
+        shopId: that.data.shopId,
+        type: 1
+      }
+      that.getSelectGoodsList(params, 1)
+    }
+  },
+
+  /**
+   * 页面下拉刷新
+   */
+  onPullDownRefresh() {
+    let that=this;
+
+    wx.showLoading({
+      title: '加载中',
+    })
+    this.data.currentPage = 1
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    this.getClassify();
+
+    let params = {
+      currentPage: 1,
+      enablePage: true,
+      pageSize: 10,
+      shopId: this.data.shopId,
+      type: 1
+    }
+    if (this.data.currentTab === 0) {
+      this.getSelectGoodsList(params);
+    } else {
+      params.categoryFirstId = that.data.currentTab
+      this.getSelectGoodsList(params)
+    }
+  },
+
+  /**
+   * 跳转搜索商品页面
+   */
+  goSearchPage() {
+
+    wx.navigateTo({
+      url: '../searchGoods/searchGoods',
+    })
+
+  },
+
+  /**
+   * 查询开卡状态
+   */
+  checkOpenCardFlag() {
+
+    let that = this
+
+    Api.checkOpenCardFlag().then(res => {
+      if (res.data.status === '0000') {
+        that.setData({
+          openCardFlag: res.data.data
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal1('请求服务失败')
+    })
+
+  }
+})

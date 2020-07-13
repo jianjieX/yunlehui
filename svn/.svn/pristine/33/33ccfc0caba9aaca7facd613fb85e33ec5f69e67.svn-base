@@ -1,0 +1,39 @@
+/**
+ * 电签成功后跳转页面
+ * 
+ * @author wanghongli
+ * @date 2019-10-31
+ */
+import Api from '/../../utils/config/Api/withdrawal.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {},
+  /**
+   * 完成电签
+   */
+  getSignStatus() {
+    let _parms = {
+      token: wx.getStorageSync("token")
+    }
+    Api.getSignStatus(_parms).then((res) => {
+      if (res.data.status != '0000') {
+        alertModal(res.data.message)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+  //完成
+  complete: function () {
+    this.getSignStatus();
+    wx.redirectTo({
+      url: '../earning/earning',
+    })
+  }
+})

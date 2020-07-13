@@ -1,0 +1,311 @@
+/**
+ * 我的主页
+ * 
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+let app = getApp();
+let baseUrl = require("../../utils/base.js");
+import Api from '/../../utils/config/Api/story.js';
+import commonApi from '/../../utils/config/Api/common.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let sl = alert.showLoading;
+import util from '../../utils/tools/util.js';
+// emojy 转字符
+let uncodeUtf16 = util.uncodeUtf16;
+
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //用户id
+    userId: 0,
+    //故事id
+    storyId: null,
+    //发布状态切换type
+    currentTab: 1,
+    //故事列表
+    commodityList: [],
+    //发布成功当前页
+    currentPage: 1,
+    //发布成功的总页数
+    totalPages: null,
+    //分页的加载数量
+    pageSize: 10,
+    //关注数
+    attentionNumber: 0,
+    //粉丝数
+    fansNumber: 0,
+    //点赞数
+    thumbUpNumberTotal: 0,
+    //用户头像
+    userImg: "../../img/LOGO.png",
+    //用户昵称
+    userName: "暂无",
+    //个人签名
+    signature: "这个人很懒",
+    //用户身份（0是自己）
+    userType: 0,
+    //是否关注
+    isAttention: 0,
+    //背景图高度
+    backgroundTop: app.data.fixedTop + 16
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    if (options.id != null && options.id != undefined) {
+      this.data.userId = options.id;
+    }
+    if (options.storyId != null && options.storyId != undefined) {
+      this.data.storyId = options.storyId;
+    }
+    if (options.currentTab != null && options.currentTab != undefined) {
+      this.setData({
+        currentTab: options.currentTab
+      })
+    }
+    this.userStory();
+  },
+
+  //查询用户的故事
+  userStory() {
+    let that = this;
+    sl("加载中")
+    that.data.currentPage = 1;
+    let _parms = {
+      currentPage: that.data.currentPage,
+      enablePage: true,
+      pageSize: that.data.pageSize,
+      sourceType: "",
+      title: "",
+      editor: "",
+      type: that.data.currentTab,
+      userId: that.data.userId,
+    }
+    Api.search(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        if (res.data.data != null) {
+          let userInfo = res.data.data.cminiStoryMainInfoRes;
+          let list = [];
+          if (res.data.data.cminiStoryDetailConditionsList != null) {
+            list = res.data.data.cminiStoryDetailConditionsList.content
+          }
+          for (let i = 0; i < list.length; i++) {
+            //没有作者头像赋默认
+            if (list[i].editorImg == null || list[i].editorImg == "") {
+              list[i].editorImg = "../../img/LOGO.png"
+            }
+            //作者名表情转码
+            list[i].editor = uncodeUtf16(list[i].editor)
+            list[i].page = that.data.currentPage1
+            //标题表情转码
+            list[i].title = uncodeUtf16(list[i].title)
+          }
+          let userName = "";
+          let signature = "";
+          if (userInfo.userName != null) {
+            userName = uncodeUtf16(userInfo.userName)
+          }
+          if (userInfo.signature != null) {
+            signature = uncodeUtf16(userInfo.signature)
+          }
+          that.setData({
+            attentionNumber: userInfo.attentionNumber,
+            userType: userInfo.type,
+            fansNumber: userInfo.fansNumber,
+            thumbUpNumberTotal: userInfo.thumbUpNumberTotal,
+            userImg: userInfo.userImg,
+            userName: userName,
+            signature: signature,
+            isAttention: userInfo.isAttention,
+          })
+          if (res.data.data.cminiStoryDetailConditionsList == null) {
+            that.data.totalPages = null;
+          } else {
+            that.data.totalPages = res.data.data.cminiStoryDetailConditionsList.totalPages;
+            that.data.currentPage = that.data.currentPage + 1
+          }
+          that.setData({
+            commodityList: list,
+          })
+        } else {
+          alertModal1("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal1("请求服务失败")
+    })
+  },
+
+  /**
+   * tab切换
+   */
+  changeTab(e) {
+    let currentTab = e.currentTarget.dataset.current
+    this.setData({
+      currentTab: currentTab
+    })
+    this.userStory();
+  },
+
+  //关注
+  attention() {
+    let that = this;
+    //先判断是否登录
+    app.accredit().then((res) => {
+      let _parms = {
+        storyId: that.data.storyId,
+      }
+      Api.attentionForC(_parms).then((res) => {
+        if (res.data.status == '0000') {
+          alertModal1("关注成功")
+          that.setData({
+            isAttention: 1,
+            fansNumber: that.data.fansNumber + 1
+          })
+        } else {
+          alertModal(res.data.msg)
+        }
+      }).catch((res) => {
+        alertModal("请求服务失败")
+      })
+    });
+  },
+
+  //取消关注
+  unsubscribe() {
+    let that = this;
+    let _parms = {
+      storyId: that.data.storyId,
+    }
+    Api.deleteAttentionForC(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        alertModal1("取消关注成功")
+        that.setData({
+          isAttention: 0,
+          fansNumber: that.data.fansNumber - 1
+        })
+      } else {
+        alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  //跳转到故事详情 
+  jumpToDetails(e) {
+    let id = e.currentTarget.dataset.id;
+    let index = e.currentTarget.dataset.index;
+    let page = e.currentTarget.dataset.page;
+    let review = e.currentTarget.dataset.review;
+    //review: 0草稿箱，1待审核，2审核成功，3驳回
+    if (review == 0 || review == 1 || review == 3) {
+      wx.navigateTo({
+        url: '../../pages/storyTurnDown/storyTurnDown?id=' + id,
+      })
+    } else if (review == 2) {
+      wx.navigateTo({
+        url: '../../pages/storyDetails/storyDetails?id=' + id + '&page=' + page + "&type=2&edit=0",
+      })
+    }
+  },
+
+  /** 
+   * 页面上拉触底事件的处理函数 
+   */
+  onReachBottom: function() {
+    this.getMore();
+  },
+
+  //获取更多(下一页内容)
+  getMore() {
+    let that = this;
+    sl("加载中")
+    let currentPage = that.data.currentPage;
+    //当前页大于了总页数
+    if (currentPage > that.data.totalPages && that.data.totalPages != null) {
+      wx.hideLoading();
+      return
+    }
+    let _parms = {
+      currentPage: currentPage,
+      enablePage: true,
+      pageSize: that.data.pageSize,
+      sourceType: "",
+      title: "",
+      editor: "",
+      type: that.data.currentTab,
+      userId: that.data.userId,
+    }
+    Api.search(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        if (res.data.data != null) {
+          //用户信息
+          let userInfo = res.data.data.cminiStoryMainInfoRes;
+          let list = [];
+          if (res.data.data.cminiStoryDetailConditionsList != null) {
+            list = res.data.data.cminiStoryDetailConditionsList.content
+          }
+          for (let i = 0; i < list.length; i++) {
+            //没有作者头像给默认
+            if (list[i].editorImg == null || list[i].editorImg == "") {
+              list[i].editorImg = "../../img/LOGO.png"
+            }
+            //作者转码
+            list[i].editor = uncodeUtf16(list[i].editor)
+            list[i].page = that.data.currentPage1
+            //标题转码
+            list[i].title = uncodeUtf16(list[i].title)
+          }
+          let userName = "";
+          let signature = "";
+          //用户名转码
+          if (userInfo.userName != null) {
+            userName = uncodeUtf16(userInfo.userName)
+          }
+          //签名转码
+          if (userInfo.signature != null) {
+            signature = uncodeUtf16(userInfo.signature)
+          }
+          that.setData({
+            attentionNumber: userInfo.attentionNumber,
+            userType: userInfo.type,
+            fansNumber: userInfo.fansNumber,
+            thumbUpNumberTotal: userInfo.thumbUpNumberTotal,
+            userImg: userInfo.userImg,
+            userName: userName,
+            signature: signature,
+            isAttention: userInfo.isAttention,
+          })
+          //后端返回的故事列表，空的话代码没有故事
+          if (res.data.data.cminiStoryDetailConditionsList == null) {
+            that.data.totalPages = null;
+          } else {
+            that.data.totalPages = res.data.data.cminiStoryDetailConditionsList.totalPages;
+            that.data.currentPage = that.data.currentPage + 1
+          }
+          //拼接之前的故事
+          list = that.data.commodityList.concat(list);
+          that.setData({
+            commodityList: list,
+          })
+        } else {
+          alertModal1("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal1("请求服务失败")
+    })
+  },
+})

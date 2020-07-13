@@ -1,0 +1,60 @@
+/**
+ * 提现通知
+ * 
+ * @author wanghongli
+ * @date 2019-11-19
+ */
+import Api from '/../../utils/config/Api/withdrawal.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 电签状态
+    isBind: 0
+  },
+
+  onLoad() {
+    this.checkCminiPrivateBankCard();
+  },
+
+  //重新发送消息
+  resend() {
+    Api.send().then((res) => {
+      if (res.data.status != '0000') {
+        alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal(res.data.msg)
+    })
+  },
+  /**
+   * 判断是否电钱成功
+   */
+  checkCminiPrivateBankCard() {
+    Api.checkCminiPrivateBankCard().then((res) => {
+      if (res.data.status == '0000') {
+        this.setData({
+          isBind: res.data.data.signStatus
+        })
+
+        if (this.data.isBind == 1) {
+          wx.navigateTo({
+            url: '../cashOut/cashOut',
+          })
+        } else if (this.data.isBind == 2) {
+          wx.navigateTo({
+            url: '../cashOutResult/cashOutResult',
+          })
+        } 
+
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+})

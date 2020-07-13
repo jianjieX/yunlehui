@@ -1,0 +1,170 @@
+/**
+ * 优惠卡使用记录详情页
+ * 
+ * @author LYJ
+ * @date 2019.11.14
+ */
+
+// 引入接口api
+import Api from '../../utils/config/Api/enjoyCard';
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 乐享卡信息
+    cardInfo: {
+      description:'开卡即得5000乐享金 消费时，1乐享金抵扣1元人民币 乐享金可用来自动冲抵商品原价与特权价之间的差额 乐享金仅限在云乐汇平台和乐享会员店平台使用，不得转让，不得提现',
+      //标题
+      cardTitle: '乐享权益',
+      //总收益
+      cardAmount: 0,
+      //余额
+      cardBalance: 0,
+      createTime: '',
+      //有效期截止时间
+      validity: '',
+      //余额
+      remainingSum:0,
+      //总金额
+      totalSum:0,
+      //消费金额
+      useSum:0,
+    },
+    // 使用记录列表
+    recordList: [],
+    // 提示框显示状态
+    toastStatus: false,
+    // 当前页码
+    currentPage: 1,
+    // 总页数
+    totalPages: 0
+  },
+
+  onLoad(options) {
+    this.getEnjoyCardDetail()
+    this.getCardRecordList()
+  },
+
+  /**
+   * 开启或关闭提示框
+   */
+  closeToast(e) {
+
+    let status = e.currentTarget.dataset.status;
+    this.setData({
+      toastStatus: status
+    })
+  },
+
+  /**
+   * 请求优惠卡使用详情
+   */
+  getEnjoyCardDetail() {
+
+    let _this = this;
+    Api.getEnjoyCardDetail().then(res => {
+      if (res.data.status === '0000') {
+        let cardInfo = res.data.data;
+        _this.setData({
+          ['cardInfo.cardAmount']: res.data.data.cardAmount,
+          ['cardInfo.cardBalance']: res.data.data.cardBalance,
+          ['cardInfo.createTime']: res.data.data.createTime,
+          ['cardInfo.validity']: res.data.data.validity,
+          ['cardInfo.remainingSum']: res.data.data.remainingSum,
+          ['cardInfo.totalSum']: res.data.data.totalSum,
+          ['cardInfo.useSum']: res.data.data.useSum
+        })
+      }
+    })
+  },
+
+  /**
+   * 请求优惠卡使用记录list
+   */
+  getCardRecordList() {
+
+    let _this = this;
+    let params = {
+      currentPage: this.data.currentPage,
+      pageSize: 10
+    }
+    Api.getEnjoyCardRecordList(params).then(res => {
+      if (res.data.status === '0000') {
+
+        if (res.data.data) {
+          let list = res.data.data.content;
+          for (let i = 0; i < list.length; i++) {
+            list[i].totalDiscountAmount = Math.abs(list[i].totalDiscountAmount)
+          }
+          _this.setData({
+            recordList: [..._this.data.recordList, ...list],
+            totalPages: res.data.data.totalPages
+          })
+        }
+      }
+    })
+  },
+
+  /**
+   * 跳转订单详情
+   */
+  toOrderList(e) {
+
+    let data = e.currentTarget.dataset.item;
+    let orderId = data.miniOutTradeNo;
+    let params = {
+      orderId
+    }
+    cardApi.isAfterSales(params).then(res => {
+      if (res.data.status === '0000') {
+
+        if (res.data.data.length === 0) {
+          // 跳订单详情
+          wx.navigateTo({
+            url: `../orderDetail/orderDetail?orderId=${orderId}`
+          })
+        } else {
+          // 跳转售后详情
+          let returnId = res.data.data[0].id
+          wx.navigateTo({
+            url: `../afterSaleDetail/afterSaleDetail?returnId=${returnId}`
+          })
+        }
+      }
+    })
+
+  },
+
+
+  // 下拉刷新
+  onPullDownRefresh: function() {
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    this.data.recordList = [];
+    this.data.currentPage = 1
+    this.getCardRecordList();
+  },
+
+  /**
+   * 触底加载
+   */
+  onReachBottom() {
+
+    let currentPage = this.data.currentPage;
+    currentPage++;
+    this.setData({
+      currentPage
+    })
+    // 无数据
+    if (currentPage > this.data.totalPages) {
+      wx.showToast({
+        icon: 'none',
+        title: '没有更多内容了',
+      })
+      return
+    }
+    this.getCardRecordList();
+  },
+})

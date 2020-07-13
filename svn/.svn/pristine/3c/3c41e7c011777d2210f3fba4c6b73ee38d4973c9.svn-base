@@ -1,0 +1,66 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="location" src="../../filter/location.wxs"></wxs>
+<!--精选商户-->
+<view class="header">
+
+	<view class="navigate-bar">
+		<view class="search-bar">
+			<view class="input-view" bindtap="goSearchPage">
+				<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200117124933Cn.png"></image>
+				<input placeholder="搜索你想要的商品或商家名称" />
+			</view>
+		</view>
+	</view>
+
+	<!-- menu -->
+	<view>
+		<view wx:if="{{merchantList==0}}"></view>
+		<view wx:else>
+			<view wx:if="{{categoryList.length !== 1}}">
+				<view class="menu">
+					<scroll-view scroll-x="{{true}}" class="scroll-view" scroll-into-view="{{scrollTo}}" scroll-with-animation="{{true}}">
+						<view wx:for="{{categoryList}}" wx:key="{{index}}" wx:if="{{item.key != ''}}" data-current="{{item.key}}" class="category-item {{currentTab == item.key ? 'focus': ''}}" bindtap="handleTab">{{item.value}}</view>
+					</scroll-view>
+				</view>
+			</view>
+		</view>
+	</view>
+</view>
+
+<!--商户-->
+<view>
+	<block wx:for="{{merchantList}}" wx:key="*this">
+		<view class="list" bindtap="jumpDetail" data-id='{{item.merchantShopId}}' data-latitude='{{item.dimension}}' data-longitude='{{item.longitude}}' data-distance="{{location.getDistance(latitudeUser,longitudeUser,item.dimension,item.longitude)}}">
+			<view class="list-top">
+				<view class="left">
+					<image class="logo" src="{{item.shopHeader}}" id="{{item.merchantShopId}}"></image>
+				</view>
+				<view class="right">
+					<block wx:if="{{item.goodsList.length !== 0}}">
+						<text class="name">{{item.shopName}}</text>
+						<view class="address">
+							<text class="place">{{item.provinceName}}{{item.cityName}}{{item.areaName}}{{item.address}}</text>
+							<!-- <text>{{location.getDistance(latitudeUser,longitudeUser,item.dimension,item.longitude)}}</text> -->
+							<text>{{item.distance}}</text>
+						</view>
+             <!-- <view class="enter-btn" catchtap="jumpToC" data-id='{{item.merchantShopId}}' >进入店铺</view> -->
+						<view wx:if="{{item.merchantGoodsResultDo.list.length === 1}}" class="empty"></view>
+						<view wx:for="{{item.merchantGoodsResultDo.list}}" class="bottom">
+							<view class="discount">
+								<text class="coupon">惠</text>
+								<text class="title"><text class="goodsName">{{item.goodsName}}</text></text>
+							</view>
+						</view>
+					</block>
+				</view>
+			</view>
+		</view>
+	</block>
+</view>
+
+<view class="merchant-view" wx:if="{{merchantList==0}}">
+	<view class="merchant-border">
+		<image class="merchant-style" src="../../img/defaultImg/empty.png"></image>
+		<view class="merchant-text">当前暂无商户～</view>
+	</view>
+</view>

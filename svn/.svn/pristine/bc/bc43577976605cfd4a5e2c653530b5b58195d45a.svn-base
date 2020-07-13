@@ -1,0 +1,50 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  addAddress(data) {  // 添加地址
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/address';
+    return result
+  },
+  updateAddress(data) {  // 修改地址
+    let result = {};
+    result.method = "PUT";
+    result.url = '/cmini/address';
+    return result
+  },
+  addressDetail(data) {  // 地址详情
+    let result = {};
+    result.method = "GET";
+    result.url = `/cmini/address/${data.id}`;
+    return result
+  },
+  getAddressList(data) {  // 获取地址列表
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/address/getAddressList';
+    return result
+  },
+  getDefaultAddress(data) {  // 获取默认地址
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/address/getDefaultAddress';
+    return result
+  },
+  setDefaultAddress(data) {  // 设置默认地址
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/address/setDefaultAddress';
+    return result
+  },
+  validateDefaultAddress(data) {  // 设置默认地址前校验
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/address/validateDefaultAddress';
+    return result
+  },
+}
+
+const Api = new MyHttp(ALL_API);
+
+export default Api;

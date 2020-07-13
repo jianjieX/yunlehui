@@ -1,0 +1,51 @@
+var authority = {
+  authorityTitle: function(type) {
+    switch (type) {
+      case 1:
+        return '权益一：专享5000元乐享金';
+      case 2:
+        return '权益二：一卡在手 全域享受';
+      case 3:
+        return '权益三：每月精选福利';
+      case 4:
+        return '权益四：尊享客户服务';
+
+      // case 1:
+      //   return '权益一：开卡赚回会员费';
+      // case 2:
+      //   return '权益二：好物特权专享区';
+      // case 3:
+      //   return '权益三：一卡在手 全域享受';
+      // case 4:
+      //   return '权益四：精准获客营销方案';
+      // case 4:
+      //   return '权益四：每月精选福利';
+      // case 6:
+      //   return '权益六：特训营特权服务';
+      // case 5:
+      //   return '权益五：尊享客户服务';
+    }
+  }
+}
+
+
+var time = {
+  dealTime: function(time) {
+    if(time){
+      var array = time.split(' ')
+      return array[0]
+    }else{
+      return
+    }
+    
+  }
+
+}
+
+
+
+
+module.exports = {
+  authorityTitle: authority.authorityTitle,
+  deal: time.dealTime
+}

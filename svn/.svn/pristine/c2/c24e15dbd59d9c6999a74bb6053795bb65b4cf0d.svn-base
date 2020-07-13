@@ -1,0 +1,125 @@
+<!--故事详情页面-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-------------标头------------->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view bindtap='backPage' class='arrow-view'>
+        <view class='arrow'></view>
+      </view>
+      <view style="margin-left:16rpx;color:black;">故事详情</view>
+    </view>
+  </view>
+</view>
+<view style="height:{{fixedTop}}px;"></view>
+<!--故事头图-->
+<view class="top-img">
+  <image bindtap="previewImage" mode="widthFix" src="{{data.contentBanner}}"></image>
+</view>
+
+<!--作者头像-->
+<view class="author-view" bindtap="toMyhome">
+  <view class="avatar-view">
+    <image class="avatar-style" src="{{data.editorImg}}"></image>
+  </view>
+  <view class="name-and-signature">
+    <view class="text-style">{{editor}}</view>
+    <view class="text-style text-color">{{signature}}</view>
+  </view>
+  <view wx:if="{{data.type == 1 && data.isAttention == 0}}" class="attention-style" catchtap="attention">
+    <view>+</view>
+    <view style="margin-left:2rpx;">关注</view>
+  </view>
+  <view wx:elif="{{data.type == 1 && data.isAttention == 1}}" class="attention-style" catchtap="unsubscribe">
+    <view style="margin:auto;">已关注</view>
+  </view>
+</view>
+
+<!-- 内容区 -->
+<view class="content">
+  <view class="article-title">
+    {{data.title}}
+  </view>
+  <!-- 富文本 -->
+  <view class="article">
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+  </view>
+</view>
+<!----关联分类--->
+<view class="tip-view">
+  <block wx:for="{{data.categoryResList}}">
+    <view data-id="{{item.categoryId}}" bindtap="toClassion" class="tip-text">#{{item.categoryName}}</view>
+  </block>
+</view>
+<!--关联商品-->
+<view class="related-goods-view" wx:if="{{data.storyGoodsRes.length != 0}}">
+  <swiper interval="{{interval}}" next-margin="34rpx" >
+    <block wx:for="{{data.storyGoodsRes}}">
+      <swiper-item>
+        <!--消息每条-->
+        <view class="message-item-view">
+          <view class="commodity-img-view">
+            <image class="commodity-img-style" src='{{item.goodsUrl}}'></image>
+          </view>
+          <view class="copywriting-view" data-id="{{item.id}}" bindtap="toPay" >
+            <!--商品标题-->
+            <view class="commodity-title-style">
+              <text wx:if="{{item.goodsType == 2}}" class="commodity-strict-select">严选</text>
+              <text wx:elif="{{item.goodsType == 3}}" class="commodity-our-shop">本店</text> {{item.goodsName}}
+            </view>
+            <!--商品价格-->
+            <view class="commodity-price-view">
+              <view>￥{{numFr.getNum(item.selectedPrice)}}</view>
+              <view class="pay-button">去购买</view>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+    </block>
+  </swiper>
+</view>
+<!---------------相关内容------------------>
+<view class='related-information-view' wx:if="{{data.cminiRelateStoryResList.length != 0}}">
+  <image class="relaContainer" src='/img/story/relaContainer.png'></image>
+</view>
+<!-------------瀑布流------------->
+<view wx:if='{{data.cminiRelateStoryResList.length != 0}}' class="content">
+  <view class="left">
+    <block wx:for="{{data.cminiRelateStoryResList}}" wx:key="b{{index}}">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==0}}"></template>
+    </block>
+  </view>
+  <view class="right">
+    <block wx:for="{{data.cminiRelateStoryResList}}" wx:key="b{{index}}">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==1}}"></template>
+    </block>
+  </view>
+</view>
+
+<!--底部tab-->
+<view class='bottom-tab-view' animation="{{animationData}}">
+  <view class='favorite-num' bindtap="{{data.status == 2 ? 'likeFave' : ''}}" data-is="{{data.isThumbUp}}">
+    <view style="display: flex;margin: auto;align-items:center">
+      <image wx:if="{{data.isThumbUp == 0}}" class="favorite-img" src='../../img/homeImg/favorite2.png'></image>
+      <image wx:elif="{{data.isThumbUp == 1}}" class="favorite-img" src='../../img/homeImg/favorite1.png'></image>
+      <view class="num-style">{{data.thumbUpNumber}}</view>
+    </view>
+  </view>
+  <button class='share-button' open-type='share'>立即分享</button>
+</view>
+<!--占位-->
+<view style='height:130rpx;'></view>
+<!-------------相关内容模块------------->
+<template name="item">
+  <view class="item" data-id="{{item.id}}" bindtap="jumpToAnother">
+    <image class="item-img" src="{{item.contentBanner}}" mode="widthFix"></image>
+    <view class="item-title-box">
+      <view class="item-title">{{item.title}}</view>
+    </view>
+  </view>
+</template>

@@ -1,0 +1,31 @@
+import Api from '/../../utils/config/Api/foods.js';
+// 引入app对象
+const app = getApp();
+Page({
+  data: {
+    //订单id
+    orderId:''
+  },
+  onLoad: function (options) {
+    this.setData({
+      orderId: options.orderId
+    });
+  },
+  /**
+   * 返回菜单
+   */
+  backToHome(){
+    wx.navigateBack({
+      delta: 1
+    })
+  },
+
+  /**
+   * 查看订单
+   */
+  goToOrder(){
+    wx.redirectTo({
+      url: '../foodsOrderDetail/foodsOrderDetail?orderId=' + this.data.orderId,
+    })
+  }
+});

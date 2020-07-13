@@ -1,0 +1,229 @@
+/**
+ * 精选商户
+ *
+ * @author sunsahnshan
+ * @date 2019-11-05
+ */
+
+let app = getApp();
+let baseUrl = require("../../utils/base.js");
+import Api from '/../../utils/config/Api/shopMerchant.js';
+// 引入封装alert
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 跳转到的分类锚点
+    scrollTo: '',
+    // 分类列表
+    categoryList: [],
+    //当前页
+    currentPage: 1,
+    //每页多少条
+    pageSize: 10,
+    //总页数
+    totalPage: null,
+    // 商户列表
+    merchantList: [],
+    // 当前分类
+    currentTab: '全部',
+    // toast显示状态
+    toastShowStatus: true,
+    // 经度
+    latitude: '',
+    // 纬度
+    longitude: '',
+    // 距离
+    distance: '',
+    // 点击当前
+    tag: '',
+    // 用户当前纬度
+    latitudeUser: '',
+    // 用户当前经度
+    longitudeUser: ''
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onLoad(options) {
+    var that = this;
+    that.setData({
+      latitudeUser: options.latitude,
+      longitudeUser: options.longitude
+    })
+    this.getMerchant();
+    // 查询分类
+    this.getCategoryList();
+  },
+
+  /**
+   * 分类列表
+   */
+  getCategoryList() {
+
+    let that = this;
+    Api.getCategory().then((res) => {
+      if (res.data.status == '0000') {
+        //有查询结果情况
+        if (res.data.data != null) {
+          that.setData({
+            categoryList: res.data.data
+          })
+        }
+        //无查询结果情况
+        else {
+          that.setData({
+            categoryList: []
+          })
+          alertModal("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  /**
+   * 搜索跳转
+   */
+  goSearchPage() {
+
+    wx.navigateTo({
+      url: '../searchMerchantGoods/searchMerchantGoods?latitudeUser=' + this.data.latitudeUser + '&longitudeUser=' + this.data.longitudeUser
+    })
+  },
+
+  /**
+   * 跳转详情页
+   */
+  jumpDetail(e) {
+
+    let distance = e.currentTarget.dataset.distance;
+    wx.navigateTo({
+      url: '../merchantDetail/merchantDetail?merchantShopId=' + e.currentTarget.dataset.id + '&latitude=' + e.currentTarget.dataset.latitude + '&longitude=' + e.currentTarget.dataset.longitude + '&distance=' + distance,
+    })
+  },
+
+  /** 
+   * 点击tab切换分类
+   */
+  handleTab(e) {
+
+    var that = this;
+    that.setData({
+      currentPage: 1,
+      toastShowStatus: true
+    })
+    that.data.merchantList = []
+    if (that.data.currentTab === e.target.dataset.current) {
+      return false;
+    } else {
+      that.setData({
+        tag: e.target.dataset.current,
+        currentTab: e.target.dataset.current
+      })
+    }
+    that.getMerchant();
+  },
+  /**
+   * 跳转到c段
+   */
+  jumpToC(e){
+    console.log('_++++',e)
+    
+      let _that = this;
+      wx.navigateToMiniProgram({
+          appId: 'wx8d499275d8fc3c71',
+          extraData: {
+            merchantShopId: e.currentTarget.dataset.id
+          },
+          envVersion: 'base.envVersion',
+          success(res) {
+              console.log('打开结果', res)
+          }
+      })
+  },
+  /**
+   * 请求分类商品列表
+   */
+  getMerchant() {
+
+    let that = this;
+    // 查询商户
+    let params = {
+      tag: that.data.tag,
+      currentPage: that.data.currentPage,
+      enablePage: true,
+      pageSize: 10,
+      type: 1,
+      longitude:that.data.longitudeUser,
+      dimension:that.data.latitudeUser
+    }
+    Api.getMerchant(params).then((res) => {
+      if (res.data.status == '0000') {
+        //有查询结果情况
+        if (res.data.data != null) {
+          that.setData({
+            merchantList: [...that.data.merchantList, ...res.data.data.content],
+            totalPages: res.data.data.totalPages,
+            totalElements: res.data.data.totalElements,
+            latitude: res.data.data.dimension,
+            longitude: res.data.data.longitude
+          })
+          wx.setNavigationBarTitle({
+            title: `精选商户(${that.data.totalElements})`
+          })
+        }
+        //无查询结果情况
+        else {
+          that.setData({
+            merchantList: []
+          })
+          alertModal("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function () {
+
+    let that = this;
+    let currentPage = that.data.currentPage;
+    currentPage++;
+    that.setData({
+      currentPage
+    })
+    if (currentPage > that.data.totalPages) {
+      return
+    }
+    that.getMerchant();
+  },
+
+  // 上拉刷新
+  onPullDownRefresh() {
+
+    let that = this;
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    that.data.merchantList = [];
+    that.data.currentPage = 1;
+    that.getMerchant()
+    that.getCategoryList();
+  },
+})

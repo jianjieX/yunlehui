@@ -1,0 +1,73 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  //获取乐享卡id
+  getEnjoyCardId(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/interest/detailsInterest';
+    return result
+  },
+  findProductForId(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/giftGoodsList';
+    return result
+  },
+  checkUserAuthority(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/interest/findInterestsByUserId';
+    return result
+  },
+  findEnjoyProductList() {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/preferGoodsListForOpenCar';
+    return result
+  },
+  //获取优惠卡使用记录
+  getEnjoyCardRecordList(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/interest/expensesRecordById';
+    return result
+  },
+  getEnjoyCardDetail(data){
+    let result = {};
+    result.method = "GET";
+    result.url = '/interest/interestsUserDetail';
+    return result
+  },
+  getExistOrder(){
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/order/isExistWaittingForPay';
+    return result
+  },
+  getPriceEnjoy(){
+    let result = {};
+    result.method = "GET";
+    result.url = '/interest/detailsInterest';
+    return result
+  },
+  //新开卡
+  openOrder(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/OpenOrder';
+    return result
+  },
+  queryPay(data) { // 查询支付
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/queryPay/' + data.id;
+    return result
+  },
+}
+
+
+
+const Api = new MyHttp(ALL_API);
+
+export default Api;

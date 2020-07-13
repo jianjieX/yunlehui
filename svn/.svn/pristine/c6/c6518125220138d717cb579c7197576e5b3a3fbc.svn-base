@@ -1,0 +1,699 @@
+page {
+  background-color: #f0f0f0;
+}
+
+/* .navigation-bar {
+  position: fixed;
+  width: 100%;
+  height: 64px;
+  background-color: white;
+  z-index: 10;
+  box-shadow:0px 1px 0px 0px rgba(0,0,0,0.06);
+}
+
+.navigation-bar .back {
+  position: relative;
+  width: 30px;
+  font-size: 20px;
+  top: 32px;
+  left: 12px;
+}
+
+.navigation-bar .title {
+  width: 150px;
+  position: relative;
+  top: 10px;
+  left: 40px;
+  font-size: 16px;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  line-height: 22px;
+} */
+
+.order-wapper {
+  border-top: 1rpx solid #dcdcdc;
+  position: relative;
+  width: 100%;
+  padding: 24rpx;
+  box-sizing: border-box;
+  height: auto;
+  margin-bottom: 88rpx;
+}
+
+.order-wapper .mode {
+  width: 100%;
+  height: 88rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+}
+
+.order-wapper .mode .mode-title {
+  width: 116rpx;
+  height: 40rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.order-wapper .mode .mode-check .radio-group {
+  margin-top: -2rpx;
+  line-height: 40rpx;
+  margin-left: 80rpx;
+}
+
+.order-wapper .mode .mode-check .radio-group .radio {
+  line-height: 24rpx;
+  transform: scale(0.7);
+  margin-left: 56rpx;
+}
+
+.order-wapper .mode .mode-check .radio-group .radio .text {
+  margin-left: 10rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  font-size: 40rpx;
+  color: rgba(51, 51, 51, 1);
+  line-height: 34rpx;
+}
+
+.order-wapper .content {
+  width: 100%;
+  min-height: 320rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+  margin-bottom: 16rpx;
+}
+
+.order-wapper .content .shopcard {
+  width: 100%;
+  height: 40rpx;
+  line-height: 40rpx;
+  display: flex;
+  flex-direction: row;
+}
+
+.order-wapper .content .shopcard .shop {
+  font-size: 28rpx;
+  line-height: 40rpx;
+}
+
+.order-wapper .content .shopcard .shop-name {
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  margin-left: 18rpx;
+  margin-top: -2rpx;
+  line-height: 40rpx;
+}
+
+.order-wapper .content .goods {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.order-wapper .content .goods .detail {
+  margin: 30rpx 0 30rpx 0;
+  width: 100%;
+  height: 104rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.order-wapper .content .goods .detail .foods {
+  display: flex;
+  flex-direction: row;
+}
+
+.order-wapper .content .goods .detail .foods .image {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 4rpx;
+}
+
+.order-wapper .content .goods .detail .foods .name {
+  display: flex;
+  flex-direction: column;
+  margin-left: 24rpx;
+}
+
+.order-wapper .content .goods .detail .foods .name .title {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+}
+
+.order-wapper .content .goods .detail .foods .name .number {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+}
+
+.order-wapper .content .goods .detail .foods .name .spec {
+  margin-top: 4rpx;
+  height: 16px;
+  font-size: 12px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 17px;
+}
+
+.order-wapper .content .goods .detail .price {
+  display: flex;
+  flex-direction: column;
+  font-size: 32rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+}
+
+.order-wapper .content .goods .detail .price .benefitPrice {
+  text-align: right;
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  text-decoration: line-through;
+}
+
+.order-wapper .content .sum {
+  width: 100%;
+  height: 44rpx;
+  margin-top: 20rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.order-wapper .content .sum .title {
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+  margin-right: 32rpx;
+}
+
+.order-wapper .content .sum .total {
+  font-size: 32rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+}
+
+input {
+  height: 104rpx;
+  line-height: 104rpx;
+  text-align: right;
+  color: #222;
+}
+
+.order-wapper .benefit {
+  margin-top: 16rpx;
+  width: 100%;
+  height: 92rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 0 24rpx 0 24rpx;
+  box-sizing: border-box;
+}
+
+.order-wapper .benefit .item {
+  width: 100%;
+  height: 92rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  line-height: 82rpx;
+}
+
+.order-wapper .benefit .item .title {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 92rpx;
+}
+
+.order-wapper .benefit .item .title .arrow {
+  width: 16rpx;
+  height: 16rpx;
+  border-bottom: 2rpx solid #666;
+  border-left: 2rpx solid #666;
+  display: inline-block;
+  transform: rotate(225deg);
+  margin-bottom: 0rpx;
+  margin-left: 2px;
+}
+
+.order-wapper .contact {
+  margin-top: 16rpx;
+  width: 100%;
+  height: 164rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 0 24rpx 0 24rpx;
+  box-sizing: border-box;
+}
+
+.order-wapper .contact .person, .mobile {
+  width: 100%;
+  height: 82rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  line-height: 82rpx;
+}
+
+.order-wapper .contact  .person:first-of-type {
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.order-wapper .contact .person .title, .mobile .title {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 82rpx;
+}
+
+.order-wapper .contact  .person .name, .mobile .num {
+  height: 82rpx;
+  font-size: 26rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(153, 153, 153, 1);
+  line-height: 82rpx;
+}
+
+.settlement {
+  position: fixed;
+  left: 0rpx;
+  bottom: 0rpx;
+  z-index: 50;
+  width: 100%;
+  height: 88rpx;
+  display: flex;
+  flex-direction: row;
+}
+
+.settlement .content-left {
+  width: 558rpx;
+  height: 88rpx;
+  background-color: #000;
+  line-height: 88rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.settlement .content-left .total {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  margin-right: 16rpx;
+  color: rgba(255, 255, 255, 1);
+}
+
+.settlement .content-left .price {
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  margin-right: 48rpx;
+}
+
+.settlement .content-right {
+  flex: 1;
+  height: 88rpx;
+  border: 0rpx;
+  background-color: #fabe00;
+  border-radius: 0rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  text-align: center;
+  line-height: 88rpx;
+}
+
+button[disabled] {
+  background-color: #fabe00 !important;
+  color: rgba(51, 51, 51, 1) !important;
+  border: 0rpx !important;
+  border-radius: 0rpx !important;
+}
+
+button::after {
+  border: 0rpx solid #fabe00;
+  border-radius: 0rpx;
+}
+
+.pay-mask {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  opacity: 0.5;
+  z-index: 9000;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+@font-face {
+  font-family: "iconfont";
+  src: url('iconfont.eot?t=1576204110895'); /* IE9 */
+  src: url('iconfont.eot?t=1576204110895#iefix') format('embedded-opentype'),
+         /* IE6-IE8 */ url('data:application/x-font-woff2;charset=utf-8;base64,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') format('woff2'),
+         url('iconfont.woff?t=1576204110895') format('woff'),
+         url('iconfont.ttf?t=1576204110895') format('truetype'),
+         /* chrome,
+         firefox,
+         opera,
+         Safari,
+         Android,
+         iOS 4.2+ */ url('iconfont.svg?t=1576204110895#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-fanhui:before {
+  content: "\e618";
+}
+
+.icon-xuanze:before {
+  content: "\e627";
+}
+
+.icon-icon-test:before {
+  content: "\e69a";
+}
+
+.icon-dianpu:before {
+  content: "\e60b";
+}
+
+.icon-jiantoushang:before {
+  content: "\e62d";
+}
+
+.icon-jiantouxia:before {
+  content: "\e62e";
+}
+
+.icon-tianjia:before {
+  content: "\e668";
+}
+
+.icon-guanbi:before {
+  content: "\e608";
+}
+
+.icon-jianshao:before {
+  content: "\e615";
+}
+
+.dialog {
+  width: 750rpx;
+  height: 790rpx;
+  background: rgba(255, 255, 255, 1);
+  position: fixed;
+  bottom: 0;
+  z-index: 999;
+  left: 0;
+}
+
+.dialog .closeDislog {
+  width: 100%;
+  height: 40rpx;
+  padding: 24rpx 24rpx 0 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog .closeDislog .closeDislogIcon {
+  width: 22rpx;
+  height: 22rpx;
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.deductionDialogTitle {
+  width: 750rpx;
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.folding-view-status {
+  display: inline-block;
+  height: 14rpx;
+  width: 14rpx;
+  border-width: 4rpx 0rpx 0rpx 4rpx;
+  margin-top: -7rpx;
+  border-color: #000;
+  border-style: solid;
+  -webkit-transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+  transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+}
+
+.deduction-total {
+  height: 40rpx;
+  padding: 0 24rpx;
+  display: flex;
+  justify-content: space-between;
+}
+
+.deduction-total-left {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.deduction-total-right {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+}
+
+.deduction-total-right-text {
+  width: 112rpx;
+  height: 40rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(255, 88, 80, 1);
+  line-height: 40rpx;
+}
+
+.folding-view-big {
+  height: 40rpx;
+  text-align: right;
+  line-height: 40rpx;
+  display: inline-block;
+}
+
+.shouqi {
+  font-size: 28rpx;
+  color: #c7c7cc;
+  margin-left: 16rpx;
+}
+
+.deductionFormItem {
+  height: 188rpx;
+  margin: 32rpx 24rpx;
+  background: rgba(255, 251, 235, 1);
+  border-radius: 8rpx;
+  border: 2rpx solid rgba(250, 190, 0, 1);
+  box-sizing: border-box;
+  display: flex;
+  position: relative;
+}
+
+.undeductionFormItem {
+  height: 188rpx;
+  margin: 32rpx 24rpx;
+  background: #dcdcdc;
+  border-radius: 8rpx;
+  border: 2rpx solid #d3d3d3;
+  box-sizing: border-box;
+  display: flex;
+  position: relative;
+}
+
+.list-content {
+  max-height: 490rpx;
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.deductionFormItem-left {
+  width: 110rpx;
+  height: 112rpx;
+  margin: 34rpx 56rpx 42rpx 54rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.deductionFormItem-left-money {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: auto;
+  height: 80rpx;
+  text-align: center;
+  line-height: 100rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(141, 72, 10, 1);
+}
+
+.deductionFormItem-left-money-value {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  font-size: 56rpx;
+  line-height: 80rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  text-align: center;
+  font-weight: 500;
+  color: rgba(141, 72, 10, 1);
+  letter-spacing: -2px;
+}
+
+.deductionFormItem-left-text {
+  width: 110rpx;
+  height: 32rpx;
+  font-size: 22rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(183, 117, 58, 1);
+  line-height: 32rpx;
+  text-align: center;
+}
+
+.deductionFormItem-middle {
+  margin: 36rpx 56rpx 35rpx 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dedutionFormItem-middle-title {
+  width: 300rpx;
+  height: 44rpx;
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dedutionFormItem-middle-data {
+  display: inline-block;
+  margin-top: 35rpx;
+  width: auto;
+  height: 32rpx;
+  font-size: 22rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  line-height: 32rpx;
+}
+
+.deductionFormItem-right {
+  margin-top: 34rpx;
+  display: inline-block;
+}
+
+.deductionFormItem-right-img {
+  position: absolute;
+  width: 42rpx;
+  height: 42rpx;
+  top: 74rpx;
+  right: 34rpx;
+}
+
+.deductionForm-button {
+  width: 702rpx;
+  height: 88rpx;
+  position: fixed;
+  bottom: 32rpx;
+  left: 24rpx;
+  background: rgba(250, 190, 0, 1);
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.deductionForm-button .title {
+  text-align: center;
+  font-size: 36rpx;
+  margin-left: 154rpx;
+}
+
+.deductionForm-button .detail {
+  min-width: 154rpx;
+  height: 88rpx;
+  font-size: 24rpx;
+  margin-top: 6rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  line-height: 88rpx;
+}
+
+.list-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 40;
+  /*backdrop-filter: blur(10px);*/
+  -webkit-backdrop-filter: 1;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.list-mask :fade-enter-active, :fade-leave-active {
+  opacity: 1;
+  transition: all 0.5s;
+  background: rgba(7, 17, 27, 0.6);
+}

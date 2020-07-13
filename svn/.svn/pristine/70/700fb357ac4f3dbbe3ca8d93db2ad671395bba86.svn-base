@@ -1,0 +1,221 @@
+<!--我的页面-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!--顶部背景颜色-->
+<!-- <view class="top-back-view" style="height:{{backHeight}}px;"></view> -->
+<!-- 个人资料 -->
+<!-- <view class="user" bindtap="toPersonalData">
+  <image src="{{userAvatar?userAvatar:defaultImage}}" class="user-image"></image>
+  <view>
+    <view>
+      <text class="user-text">{{nickName?nickName:defaultName}}</text>
+    </view>
+    <view>
+      <text class="user-description">{{nickName?nickName:defaultDescription}}</text>
+    </view>
+  </view>
+</view> -->
+
+<!--消息列表-->
+
+<view bindtap="toMessage" class="option-view" style="top:{{optionTop}}px">
+	<image class="option-img" style="top:{{optionTop}}px" src="../../img/mine/message.png"></image>
+	<view class="red-point" style="top:{{redTop}}px;" wx:if="{{messageCount > 0}}"></view>
+</view>
+<!-- 背景图 -->
+<image src="../../img/mine/background.png" class="user-background" style="top:{{backgroundTop}}px"></image>
+<!--用户头像-->
+<image bindtap="accountInform" class='avatar-view' style="top:{{avatarTop}}px;" src='{{userAvatar?userAvatar:defaultImage}}'></image>
+
+
+<!--用户昵称-->
+<view class='user-name-view' style="top:{{userNameTop}}px;" bindtap="accountInform">
+	<view class="name-and-ranking">
+		<view class="user-name-style">{{nickName}}</view>
+		<view class="user-point"></view>
+	</view>
+</view>
+<view class="personal-profile" style="top:{{profileHeight}}px;" bindtap="accountInform">{{signature}}</view>
+<!--高度占位-->
+<view style="height:{{orderTop}}px; background:#ffffff"></view>
+<view class="enjoyCard">
+	<image src="../../img/mine/mineEnjoy.png"></image>
+	<view class="enjoyCard-botton">
+		<view class="enjoyCard-botton-text">乐享权益卡</view>
+		<view class="openNow">
+			<view class="openNow-text" bindtap="toEnjoyCard">{{haveAuthority?'查看详情':'限时免费开通'}}</view>
+			<view class="arrow"></view>
+		</view>
+	</view>
+</view>
+
+
+
+
+<!--我的收益-->
+<view class="padding-income-view"></view>
+<view class="my-income-view">
+	<!--总收入-->
+	<view class="item-income-view" bindtap='goEarning'>
+		<view class="income-money-style">{{numFr.getNum(income)}}
+			<text class="rmb-style">元</text>
+		</view>
+		<view class="income-type-style">总收入</view>
+	</view>
+	<view class="dividing-line"></view>
+	<!--待结算-->
+	<view class="item-income-view" bindtap='goClearing'>
+		<view class="income-money-style">{{numFr.getNum(clearing)}}
+			<text class="rmb-style">元</text>
+		</view>
+		<view class="income-type-style">待结算</view>
+	</view>
+	<view class="dividing-line"></view>
+	<!--可提现-->
+	<view class="item-income-view" bindtap='cashOut'>
+		<view class="income-money-style">{{numFr.getNum(withdraw)}}
+			<text class="rmb-style">元</text>
+		</view>
+		<view class="income-type-style">已结算</view>
+	</view>
+</view>
+<!--我的订单-->
+<view class="my-order-view">
+	<view class="my-order-see-all-order">
+		<view class="my-order-title">我的订单</view>
+		<view class="see-all-order" bindtap='goOrderList' data-currentTab='{{0}}'>查询全部订单></view>
+	</view>
+	<!--订单各个状态-->
+	<view class="order-type-view">
+		<!--待付款-->
+		<view class="order-type-item" bindtap='goOrderList' data-currentTab='{{1}}'>
+			<view class="order-type-image-view">
+				<view wx:if="{{orderNum.paidCount != 0}}" class="order-type-num">{{orderNum.paidCount}}</view>
+				<image class="order-type-image" src="../../img/mine/order1.png"></image>
+			</view>
+			<view class="order-type-text">待付款</view>
+		</view>
+		<!--待发货-->
+		<view class="order-type-item" bindtap='goOrderList' data-currentTab='{{2}}'>
+			<view class="order-type-image-view">
+				<view wx:if="{{orderNum.shipCount != 0}}" class="order-type-num">{{orderNum.shipCount}}</view>
+				<image class="order-type-image" src="../../img/mine/order2.png"></image>
+			</view>
+			<view class="order-type-text">待发货</view>
+		</view>
+		<!--待收货-->
+		<view class="order-type-item" bindtap='goOrderList' data-currentTab='{{3}}'>
+			<view class="order-type-image-view">
+				<view wx:if="{{orderNum.receivedCount != 0}}" class="order-type-num">{{orderNum.receivedCount}}</view>
+				<image class="order-type-image" src="../../img/mine/order3.png"></image>
+			</view>
+			<view class="order-type-text">待收货</view>
+		</view>
+		<!--已收货-->
+		<view class="order-type-item" bindtap='goOrderList' data-currentTab='{{4}}'>
+			<view class="order-type-image-view">
+				<view wx:if="{{orderNum.signedCount != 0}}" class="order-type-num">{{orderNum.signedCount}}</view>
+				<image class="order-type-image" src="../../img/mine/order4.png"></image>
+			</view>
+			<view class="order-type-text">已收货</view>
+		</view>
+		<!--退款/售后-->
+		<view class="order-type-item" bindtap='goOrderList' data-currentTab='{{8}}'>
+			<view class="order-type-image-view">
+				<view wx:if="{{orderNum.returnCount != 0}}" class="order-type-num">{{orderNum.returnCount}}</view>
+				<image class="order-type-image" src="../../img/mine/order5.png"></image>
+			</view>
+			<view class="order-type-text">退款/售后</view>
+		</view>
+	</view>
+</view>
+<!-- 我的活动 -->
+<view class="activity">
+	<view class="activity-item" bindtap="toActivityMy" data-index='0'>
+		<image src="../../img/mine/activityMy.png"></image>
+		<text>我的活动</text>
+	</view>
+	<image class="activity-line" src="../../img/mine/stick.png"></image>
+	<view class="activity-allState">
+		<view class="activity-state" bindtap="toActivityMy" data-index='1'>
+			<image src="../../img/mine/noStart.png"></image>
+			<text>未开始</text>
+		</view>
+		<view class="activity-state" bindtap="toActivityMy" data-index='2'>
+			<image src="../../img/mine/underWay.png"></image>
+			<text>进行中</text>
+		</view>
+		<view class="activity-state" bindtap="toActivityMy" data-index='3'>
+			<image src="../../img/mine/finished.png"></image>
+			<text>已结束</text>
+		</view>
+	</view>
+
+</view>
+<!-- 我的服务 -->
+<view class="my-serve">
+	<view class="my-serve-item" bindtap="toServeMy" data-index='0' data-isdeal="">
+		<image src="../../img/mine/serveMy.png"></image>
+		<text>我的服务</text>
+	</view>
+	<image class="activity-line" src="../../img/mine/stick.png"></image>
+	<view class="my-serve-allState" bindtap="toServeMy" data-index='2' data-isdeal="1">
+		<view class="my-serve-state">
+			<image src="../../img/mine/processed.png"></image>
+			<text>已处理</text>
+		</view>
+		<view class="my-serve-state" bindtap="toServeMy" data-index='1' data-isdeal="0">
+			<image src="../../img/mine/untreated.png"></image>
+			<text>未处理</text>
+		</view>
+	</view>
+</view>
+<!--必备工具-->
+<view class="my-utils-view">
+	<view class="my-order-see-all-order">
+		<view class="my-order-title">必备工具</view>
+	</view>
+	<!--工具-->
+	<view class="my-item-util" bindtap="{{!buttonClicked?'openShop':''}}">
+		<image class="img-open-shop" src="../../img/mine/open_shop.png"></image>
+		<text class="util-name">我要开店</text>
+	</view>
+	<view class="my-item-util" bindtap="toStory" data-tab="1">
+		<image class="img-open-shop" src="../../img/mine/mine_page.png"></image>
+		<text class="util-name">个人主页</text>
+	</view>
+	<view class="my-item-util" bindtap="toPsdManage">
+		<image class="img-open-shop" src="../../img/mine/customer_service.png"></image>
+		<text class="util-name">客服中心</text>
+	</view>
+	<view class="my-item-util" bindtap="toEnjoyCard">
+		<image class="img-open-shop" src="../../img/mine/enjoyAuthority.png"></image>
+		<text class="util-name">乐享权益</text>
+	</view>
+</view>
+<view class="goods-wrap" wx:if="enjoyProList.length!=0">
+	<view class="goods-header">
+		<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200103093421vv.png" class="privilege-decorate"></image>
+		<text class="title">好物特权专属区</text>
+		<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200103093230Km.png" class="privilege-decorate"></image>
+	</view>
+	<view class="goods-content">
+		<view class="goods-row">
+			<block wx:for="{{enjoyProList}}" wx:key="{{item.key}}">
+				<view class='item' data-id="{{item.goodsId}}" bindtap="toGoodsDetail">
+					<image class='goodsImg' src="{{item.goodsPicUrl}}" />
+					<view class="name">
+						<text class="tag">严选</text>{{item.goodsName}}
+					</view>
+					<view class="bottom">
+						<text class="price"><text class="font-size:20rpx;">¥</text>{{numFr.getNum(item.enjoymentPrice)}}<text style="font-size:20rpx;margin-left:4rpx;">特权价</text></text>
+						<view class="enjoy-wrap">
+							<text style="color:rgba(245, 35, 64, 1);margin-left:4rpx;" >售价</text>
+							<text style="color:rgba(245, 35, 64, 1);margin-right:4rpx;" >¥{{numFr.getNum(item.selectedPrice)}}</text>
+						</view>
+					</view>
+				</view>
+			</block>
+		</view>
+	</view>
+</view>

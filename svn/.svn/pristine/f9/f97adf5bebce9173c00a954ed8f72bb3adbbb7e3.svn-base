@@ -1,0 +1,87 @@
+<view class="top-view">
+	<view class="top-box">
+		<view class="top-title-view">让合作方效益倍增</view>
+		<view class="top-title-bar"></view>
+	</view>
+	<view class="n-title">美克集团旗下新零售专属会员营销平台</view>
+</view>
+
+<!-- 顶部提示文案1 -->
+<view class="tips-view">
+	<view class="s-title">
+		<view class="s-title-text">为您(合伙人异业联盟会员单位)提供特权服务</view>
+	</view>
+	<view class="tips" wx:for="{{topTips1}}">
+		<view class="tips-title">
+			<view class="tips-title-text">
+				<image class="tips-title-num" src="/img/openImg/num{{item.id}}.png"></image>{{item.title}}
+			</view>
+		</view>
+		<view class="tips-content">{{item.content}}</view>
+	</view>
+	<!-- 客服按钮 -->
+	<view class="service-view" bindtap="makePhoneCall">
+		<image src="/img/mine/customer_service.png" class="service-icon"></image>
+		<view class="service-text">联系客服</view>
+	</view>
+</view>
+
+<view class="tips-bottom">
+	<view class="s-title">
+		<view class="s-line-left"></view>
+		<view class="s-title-text">分享、互利、共赢，携手共同成长</view>
+		<view class="s-line-right"></view>
+	</view>
+</view>
+
+<view class="store">
+
+	<!--开店信息-->
+	<view class="store-message">开店信息</view>
+	<view class="form-item"></view>
+	<form class="list-form" bindsubmit="formSubmit" bindreset="formReset">
+
+		<!-- 公司头像 -->
+		<view class="form-item">
+			<view class="form-item-title">店铺头像</view>
+			<view class="form-item-content">
+				<view></view>
+				<image class="company-header" src="{{listForm.shopHeader}}" bindtap="uploadMerchantHeader" wx:if="{{listForm.shopHeader}}"></image>
+				<image class="company-header" src="/img/openImg/openshop.png" bindtap="uploadMerchantHeader" wx:else></image>
+			</view>
+		</view>
+
+		<!-- 店铺名称 -->
+		<view class="form-item">
+			<view class="form-item-title">店铺名称</view>
+			<view class="form-item-content">
+				<textarea name="shopName" value="{{listForm.shopName}}" class="form-item-input" auto-height maxlength="60" minlength="2" placeholder="请输入" placeholder-class="placeholder-style"></textarea>
+			</view>
+		</view>
+
+		<!-- 统一社会信用代码 -->
+		<view class="form-item">
+			<view class="form-item-title">统一社会信用代码</view>
+			<view class="form-item-content">
+				<input name="uniformSocialCreditCode" value="{{listForm.uniformSocialCreditCode}}" class="form-item-input" maxlength="18" placeholder="请输入" placeholder-class="placeholder-style"></input>
+			</view>
+		</view>
+
+		<!-- 店长手机号 -->
+		<view class="form-item">
+			<view class="form-item-title">手机号</view>
+			<view class="form-item-content">
+				<input class="form-item-input" name="legalPersonPhone" value="{{listForm.legalPersonPhone}}" type="number" maxlength="11" placeholder="请输入" placeholder-class="placeholder-style"></input>
+			</view>
+		</view>
+		<view class="form-blank"></view>
+		<!-- 协议 -->
+		<view class="agreement">
+			<label>
+				<checkbox checked="{{agreementStatus}}" bindtap="changeAgreementStatus" />
+			</label>
+			<view class="agreement-text" bindtap="goAgreementPage">异业联盟会员章程</view>
+		</view>
+		<button style="background:  {{ agreementStatus? 'rgba(250,190,0,1)' :  'rgba(250,190,0,0.4)' }}" class="submit-btn" formType="submit">立即开店</button>
+	</form>
+</view>

@@ -1,0 +1,32 @@
+var income = {
+  trxType: function (trxType) {
+    switch (trxType) {
+      case 7:
+        return '排位晋级奖励';
+      case 8:
+        return '排位推广奖励';
+      case 10:
+        return '会员提现金额';
+      case 15:
+        return '会员提现失败';
+      case 21:
+        return '邀请注册';
+      case 22:
+        return '内容创作';
+      case 23:
+        return '创客招商';
+      case 30:
+        return '退款-会员卖赚';
+      case 32:
+        return '退款-会员源头';
+      case 33:
+        return '退款-排位躺赚-会员推广';
+      case 36:
+        return '退款-内容创作奖励';
+    }
+  },
+}
+
+module.exports = {
+  trxType: income.trxType,
+}

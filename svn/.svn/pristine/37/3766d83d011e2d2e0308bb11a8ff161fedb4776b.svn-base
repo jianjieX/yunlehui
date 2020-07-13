@@ -1,0 +1,490 @@
+@import "../../wxParse/wxParse.wxss";
+
+/* page {
+  background-color: #f3f6fd;
+} */
+
+button {
+  padding: 0;
+  border-radius: 0;
+}
+
+/**自定义头**/
+
+.header {
+  width: 750rpx;
+  background: #f4bb2e;
+  color: #fff;
+  font-size: 32rpx;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
+.header .navigation {
+  padding-top: 12rpx;
+  padding-left: 30rpx;
+  display: flex;
+}
+
+.header .logo {
+  width: 60rpx;
+  height: 60rpx;
+  vertical-align: middle;
+  border-radius: 50%;
+  border: 1px solid #eee;
+}
+
+.header .menu {
+  padding-top: 20rpx;
+}
+
+.header .menu .tab {
+  width: 750rpx;
+  display: flex;
+}
+
+.header .menu .tab .category-item {
+  flex: 1;
+  text-align: center;
+}
+
+.header .menu .tab .focus {
+  color: #333;
+}
+
+.header .menu .tab .focus::after {
+  content: '';
+  display: block;
+  width: 40%;
+  height: 6rpx;
+  background: #333;
+  transform: translateX(-50%);
+  margin-left: 50%;
+}
+
+.arrow-view {
+  width: 5%;
+  height: 100%;
+  left: 0;
+  z-index: 999;
+  position: relative;
+}
+
+.arrow {
+  width: 22rpx;
+  height: 22rpx;
+  border-bottom: 2px solid black;
+  border-left: 2px solid black;
+  position: absolute;
+  transform: rotate(45deg);
+  top: 18rpx;
+  left: 2rpx;
+}
+
+/**关联故事**/
+
+.related-information-view {
+  align-items:center;
+  width: 100%;
+  height: 104rpx;
+  margin-top: 28rpx;
+  display: flex;
+  flex-flow: row;
+  font-size: 40rpx;
+  font-family: SourceHanSerifCN;
+  font-weight: bold;
+  color: rgba(36, 40, 39, 1);
+}
+
+.related-inform-outer {
+  width: 718rpx;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.related-inform-body {
+  width: 340rpx;
+  height: 450rpx;
+  margin: 24rpx 8rpx 10rpx 8rpx;
+  border-radius: 15rpx;
+  background-color: white;
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.related-inform-img {
+  width: 340rpx;
+  height: 340rpx;
+  border-radius: 15rpx 15rpx 0 0;
+}
+
+.related-inform-text {
+  font-size: 28rpx;
+  margin-left: 10rpx;
+}
+
+/* 相关内容 */
+
+.relaContainer {
+  width: 164rpx;
+  height: 56rpx;
+  margin-left:24rpx;
+}
+
+/**底部**/
+
+.bottom-tab-view {
+  width: 100%;
+  height: 110rpx;
+  position: fixed;
+  bottom: 0;
+  background-color: white;
+  display: flex;
+  flex-flow: row;
+}
+
+.yellow-block {
+  width: 8rpx;
+  height: 48rpx;
+  margin-top: 20rpx;
+  background-color: #f4bb2e;
+}
+
+.share-button {
+  width: 50%;
+  height: 110rpx;
+  background: rgba(250, 190, 0, 1);
+  line-height: 110rpx;
+  font-size: 28rpx;
+  font-family: PingFang-SC;
+  font-weight: bold;
+  color: rgba(51, 51, 51, 1);
+}
+
+.favorite-num {
+  width: 50%;
+  height: 110rpx;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  background: rgba(0, 0, 0, 1);
+}
+
+.favorite-img {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.num-style {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium, PingFangSC;
+  margin-left: 10rpx;
+}
+
+
+
+.item {
+  background-color: #fff;
+  margin-top: 0rpx;
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  box-shadow: 0px 4rpx 8rpx 0px rgba(0, 0, 0, 0.1);
+}
+
+.item-ava {
+  width: 40rpx;
+  height: 40rpx;
+  border: 1px solid #eee;
+  border-radius: 50%;
+}
+
+.heart {
+  width: 30rpx;
+  height: 26rpx;
+  margin-right: 8rpx;
+}
+
+.heart_ {
+  display: flex;
+  align-items: center;
+}
+
+.item-img {
+  width: 100%;
+}
+
+.item-title {
+  font-size: 28rpx;
+  font-family: 'PingFang SC-Medium';
+  color: #1e1e1e;
+  margin: 10rpx 8rpx 24rpx 8rpx;
+  line-height: 30rpx;
+  width: 90%;
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.left, .right {
+  display: inline-block;
+  vertical-align: top;
+  width: 342rpx;
+}
+
+.right {
+  float: right;
+}
+
+.top-img {
+  width: 100%;
+}
+
+.top-img image {
+  width: 100%;
+  height: 480rpx;
+}
+
+.author-view {
+  width: 100%;
+  height: 100rpx;
+  display: flex;
+  flex-flow: row;
+  margin-top: 40rpx;
+}
+
+.avatar-view {
+  width: 20%;
+}
+
+.avatar-style {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 1px solid #eee;
+  display: block;
+  margin: auto;
+}
+
+.name-and-signature {
+  width: 60%;
+}
+
+.text-style {
+  color: #222;
+  font-size: 30rpx;
+  margin-top: 12rpx;
+}
+
+.text-color {
+  color: #999;
+  font-size: 26rpx;
+}
+
+.attention-style {
+  width: 130rpx;
+  height: 50rpx;
+  /* line-height: 50rpx;
+  text-align: center; */
+  color: #666;
+  border-radius: 50rpx;
+  background: linear-gradient(149deg, rgba(253, 224, 0, 1) 0%, rgba(250, 190, 0, 1) 100%);
+  margin: auto 0;
+  font-size: 24rpx;
+  font-family: PingFang-SC-Medium, PingFang-SC;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attention-style view {
+  height: 50rpx;
+  line-height: 50rpx;
+  display: flex;
+  align-items: center;
+}
+
+/**关联分类**/
+
+.tip-view {
+  padding: 0 30rpx;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tip-text {
+  height: 52rpx;
+  line-height: 52rpx;
+  background: rgba(250, 190, 0, 1);
+  box-shadow: 0px -2rpx 4rpx 0px rgba(255, 255, 255, 0.4);
+  border-radius: 12rpx 0;
+  font-size: 32rpx;
+  font-family: PingFangSC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  margin-right: 20rpx;
+  text-align: center;
+  padding: 0 16rpx;
+}
+
+/**关联商品**/
+
+.related-goods-view {
+  box-sizing: border-box;
+  width: 100%;
+  height: 184rpx;
+  margin-top: 40rpx;
+  padding-left:24rpx;
+}
+
+.message-item-view {
+  width: 676rpx;
+  height: 184rpx;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 4rpx 16rpx 0px rgba(0, 0, 0, 0.1);
+  border-radius: 4rpx;
+  margin-top: 2rpx;
+  display: flex;
+}
+
+.commodity-img-view {
+  width: 208rpx;
+  height: 208rpx;
+  display: flex;
+  align-items: center;
+}
+
+.commodity-img-style {
+  width: 160rpx;
+  height: 160rpx;
+  display: block;
+  margin: auto;
+  position: relative;
+  top: -10rpx;
+}
+
+.copywriting-view {
+  width: 518rpx;
+  margin: 24rpx 24rpx 24rpx 0;
+}
+
+.commodity-title-style {
+  height: 80rpx;
+  font-size: 26rpx;
+  font-family: PingFang-SC;
+  font-weight: 500;
+  line-height: 38rpx;
+}
+
+.commodity-price-view {
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 26rpx;
+  font-family: PingFang-SC;
+  font-weight: 500;
+  position: relative;
+}
+
+.pay-button {
+  width: 128rpx;
+  height: 52rpx;
+  line-height: 52rpx;
+  text-align: center;
+  background: rgba(250, 190, 0, 1);
+  border-radius: 4rpx;
+  font-size: 26rpx;
+  font-family: PingFangSC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  position: absolute;
+  right: 0;
+  bottom: 14rpx;
+}
+button::after{
+  border:none;
+}
+
+.commodity-strict-select {
+  width: 64rpx;
+  height: 32rpx;
+  background: rgba(255, 88, 80, 1);
+  border-radius: 0px 4px 0px 4px;
+  text-align: center;
+  font-size: 22rpx;
+  font-family: PingFangSC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  padding: 0 10rpx;
+}
+
+.commodity-our-shop {
+  width: 64rpx;
+  height: 32rpx;
+  background: rgba(250, 190, 0, 1);
+  border-radius: 0px 4px 0px 4px;
+  text-align: center;
+  font-size: 22rpx;
+  font-family: PingFangSC;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 1);
+  padding: 0 10rpx;
+}
+
+/**标题和内容**/
+
+.content {
+  padding:0rpx 24rpx ;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.article-title {
+  padding: 20rpx;
+  font-size: 40rpx;
+  font-family: PingFangSC-Medium, PingFangSC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  margin-top: 40rpx;
+}
+
+.article {
+  margin: 30rpx 0;
+}
+
+.wxParse-img {
+  margin-top: 20rpx;
+  display: block;
+  position: relative;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.wxParse-p {
+  /* text-indent: 2em; */
+  margin-top: 20rpx;
+  color: #0c0c0c;
+  line-height: 50rpx;
+  font-size: 34rpx;
+  padding: 0 30rpx 30rpx;
+  text-align: justify;
+}
+.swiper{
+  height:184rpx;
+
+}

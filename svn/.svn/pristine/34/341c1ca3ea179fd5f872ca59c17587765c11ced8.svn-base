@@ -1,0 +1,90 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  getCateGory(data) { //获取商品分类
+    let result = {};
+    result.method = "GET";
+    result.url = `/cmini/goods/factoryGoodsCats`;
+    return result
+  },
+
+  getGoodsTypeById(data) { //获取商品类型
+    let result = {};
+    result.method = "GET";
+    result.url = `/cmini/goods/getGoodsTypeById`;
+    return result
+  },
+
+    getBanner(data) { //广告
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/index/banner?shopId=' + data.shopId;
+    return result
+  },
+  getSelectGoodsList(data) { //获取严选商品列表
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/factoryGoodsList';
+    return result
+  },
+  getCateGoryGoodsList(data) { //获取分类商品列表
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/merchantCateGoryGoodsList';
+    return result
+  },
+  getGoodsDetail(data) { // 请求商品详情
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/detail';
+    return result
+  },
+  /**
+   * 请求商品详情页的故事
+   */
+  getStoryDetail(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/getStoryList';
+    return result
+  },
+  /**
+   * 请求会员礼包
+   */
+  getMemberGoodsList(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/memberGoodsList';
+    return result
+  },
+
+  /**
+   *添加故事时选择商品的列表
+   */
+  getAddstoryGoods(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/getCloudAddstoryGoods';
+    return result
+  },
+
+  /**
+   * 查询是否开卡
+   */
+  checkOpenCardFlag() {
+    let result = {};
+    result.method = "POST";
+    result.url = '/interest/findInterestsByUserId';
+    return result
+  },
+  getwxacodeunlimit(data){
+    let result = {};
+    result.method = "POST";
+    result.url = '/wxa/getwxacodeunlimit';
+    return result
+  }
+}
+
+const Api = new MyHttp(ALL_API);
+
+export default Api;

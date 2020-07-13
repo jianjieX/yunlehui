@@ -1,0 +1,130 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="handleGoodsTag" src="../../filter/handleGoodsTag.wxs"></wxs>
+<view>
+  <!-- 商品图片轮播 -->
+  <swiper indicator-dots="{{true}}" indicator-color="#fff" autoplay="{{true}}" circular="{{true}}" interval="{{3000}}" class="swiper">
+    <block wx:for="{{goodsPicList}}" wx:key="{{item.id}}">
+      <swiper-item class="swiper-item">
+        <image src="{{item.goodsPicUrl}}" mode="aspectFit" class="slide-image" bindtap="previewSwipe" data-src="{{item.goodsPicUrl}}" />
+      </swiper-item>
+    </block>
+  </swiper>
+
+  <!-- 商品标题价格等信息 -->
+  <view class="content">
+    <!-- 商品标签 -->
+    <image wx:if="{{goodsTag}}" class="goods-tag" src="{{handleGoodsTag.getTagNum(goodsTag)}}"></image>
+    <!-- 商品价格 -->
+    <view class='goodsPrice'>
+      <text style='font-size:30rpx; color: rgba(245, 35, 64, 1);'>特权价￥</text>
+      <text style=" color: rgba(245, 35, 64, 1);">{{numFr.getNum(enjoymentPrice)}}</text>
+      <text class="goodsPrice-saveMoney">￥{{numFr.getNum(selectedPriceShow)}}</text>
+    </view>
+
+
+    <!-- 商品名称 -->
+    <view class="goods-name-main">
+      <text wx:if="{{goodsType === 2}}" class="select">严选</text> {{goodsName}}
+    </view>
+  </view>
+
+  <view class="sell-bar">
+    <view class="freight">运费：{{numFr.getNum(freight)}}</view>
+    <view wx:if="{{totalSale}}" class="sell-count">已售{{totalSale}}</view>
+  </view>
+
+  <!-- tab切换 -->
+  <view class="tabbar">
+    <view class="tab-item {{currentTab == 1 ? 'focus' : ''}}" bindtap="changeTab" data-current="1">商品详情</view>
+  </view>
+
+  <!-- 商品详情和故事 -->
+  <view class='goodsDesc'>
+    <!-- 故事 -->
+    <view class='story' wx:if="{{currentTab == 2}}">
+      <view class="story-item" wx:for="{{goodsStoryList}}" wx:key="{{index}}">
+        <view class="story-banner">
+          <image src="{{item.contentBanner}}"></image>
+        </view>
+        <!-- 内容区 -->
+        <view class="story-detail">
+          <view class="story-title">{{item.storyTitle}}</view>
+          <!-- 富文本 -->
+          <view class="story-content">
+            <import src="../../wxParse/wxParse.wxml" />
+            <template is="wxParse" data="{{wxParseData:storyArticle.nodes}}" />
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 商品详情富文本解析 -->
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" wx:if="{{currentTab == 1}}" />
+  </view>
+
+  <!-- footer 底部按钮-->
+</view>
+
+<!-- 规格弹层 -->
+<view class='mask' wx:if="{{showSpecModalStatus}}" bindtap='hideDialog' catchtouchmove='{{true}}'></view>
+<view class='dialog' animation="{{animationData}}" wx:if="{{showSpecModalStatus}}" catchtouchmove='{{true}}'>
+  <!-- 弹窗头部 -->
+  <view class="goods">
+    <image class='spec-img' src='{{specPic}}' bindtap="previewSpecPic"></image>
+    <view class="dialog-goods-info">
+      <view class="dialog-spec-price">￥{{numFr.getNum(specPrice)}}
+        <text class="buy-view" wx:if="{{dialogType===1 && buyPrice}}">买省￥{{numFr.getNum(buyPrice)}}</text>
+        <text wx:if="{{specialPrice}}">特权价￥ {{numFr.getNum(specialPrice)}}</text>
+      </view>
+      <view class="dialog-spec">
+        <text wx:if="{{mainSpecValue}}">{{mainSpecValue}}</text>；
+        <text wx:if="{{subSpecValue}}">{{subSpecValue}}</text>
+      </view>
+    </view>
+    <!-- 关闭按钮 -->
+    <image src="/img/detailImg/close.png" class="cancel-icon" wx:if="{{searchValue !== ''}}" catchtap="hideDialog" />
+  </view>
+
+  <!-- 规格 -->
+  <view class="spec">
+    <view class="spec-main">
+      <view class="spec-title">{{mainSpecNameList[0]}}</view>
+      <view class="spec-value">
+        <view wx:for="{{mainSpecValueList}}" wx:key="{{index}}" class="spec-value-item {{mainSpecValue === item.goodsSpecsValue? 'checked': ''}} {{invalidmainSpec === item.goodsSpecsValue? 'disabled': ''}}" bindtap="changeMainSpecName" data-disabled="{{invalidmainSpec === item.goodsSpecsValue? true : false}}"
+          data-current="{{item}}">{{item.goodsSpecsValue}}</view>
+      </view>
+    </view>
+
+    <view class="spec-sub" wx:for="{{subSpecNameList}}" wx:key="{{index}}" wx:if="{{subSpecNameList}}">
+      <view class="spec-title">{{subSpecNameList[0]}}</view>
+      <view class="spec-value">
+        <view class="spec-value-item" wx:for="{{subSpecValueList}}" wx:key="{{index}}" class="spec-value-item {{subSpecValue === item.subSpecsValue? 'checked': ''}} {{item.selectedPrice ? '': 'disabled'}} {{item.stock === 0? 'disabled': ''}}" bindtap="changeSubSpecName"
+          data-current="{{item}}" data-index="{{index}}">{{item.subSpecsValue}}</view>
+      </view>
+    </view>
+  </view>
+  <!-- 购买数量组件 -->
+  <view class='num'>
+    <view>购买数量</view>
+    <view class="stepper" style='display:inline-block'>
+      <!-- 减号 -->
+      <text class="{{minusStatus}}" bindtap="bindMinus">-</text>
+      <!-- 数值 -->
+      <input type="number" bindinput="bindManual" value="{{num}}" />
+      <!-- 加号 -->
+      <text class="normal" bindtap="bindPlus">+</text>
+    </view>
+  </view>
+  <!-- 底部按钮 -->
+  <view class="button" wx:if="{{dialogType === 0}}">
+    <view class="add-shopcar" bindtap='addShopcar'>加入购物车</view>
+  </view>
+  <view class="button" wx:if="{{dialogType === 1}}">
+    <view class="add-shopcar" bindtap='confirmOrder'>确定</view>
+  </view>
+</view>
+
+<!-- 立即开卡 -->
+<view class="openCardBackground">
+  <button class="openCardFormSubmit" bindtap="confirmOrder">立即开卡，抢先享特权</button>
+</view>

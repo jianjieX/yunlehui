@@ -1,0 +1,408 @@
+/**
+ * 商品详情页面
+ */
+
+// 引入全局app对象
+const app = getApp();
+// 引入wxParse
+import WxParse from '../../wxParse/wxParse.js'
+// 引入分享朋友圈 canvas相关
+import Poster from '../../components/miniprogram_dist/poster/poster';
+// import drawQrcode from '../../components/miniprogram_dist/qrcode/weapp.qrcode.esm.js'
+import canvasData from '../../lib/canvasData.js'
+import getPriceDetail from '../../utils/config/Api/enjoyCard.js'
+// 引入接口api
+import Api from '/../../utils/config/Api/goods.js';
+import shopCarApi from '../../utils/config/Api/shopCar.js'
+import orderApi from '../../utils/config/Api/order.js'
+// 引入toast相关方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+// 引入解码表情方法
+let utils = require('../../utils/tools/util.js')
+let uncodeUtf16 = utils.uncodeUtf16
+
+Page({
+  data: {
+    // 头部自适应样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    // 商品id
+    goodsId: 0,
+    // 用户id
+    userId: null,
+    // 门店id
+    shopId: 1,
+    // 购物车数量
+    shopCarCount: 0,
+    // 要预览的故事图片list
+    imglist: [],
+    swipeList: [],
+    list: [],
+    // 商品图片列表
+    goodsPicList: [],
+    // 商品价格列表
+    goodsPriceList: [],
+    // 商品名
+    goodsName: '',
+    // 商品描述富文本
+    goodsDesc: '',
+    // 推荐文案
+    goodsRecommend: '',
+    // 商品类型 1:普通2:严选3：本店  
+    goodsType: '',
+    // 是否会员礼包 1:是2：否
+    memberGoodsflag: 0,
+    // 供应商id
+    merchantId: 1,
+    // 供应商名
+    merchantName: '',
+    // 商品来源 1:供应商2：门店
+    sourceType: 0,
+    // 已售
+    totalSale: 0,
+    // 商品标签
+    goodsTag: null,
+    // 故事详情
+    goodsStoryList: [],
+    isBlack: false,
+    // 底部弹窗显示状态
+    isDialogHidden: true,
+    // 弹窗类型 0 分享 1 购买
+    dialogType: 0,
+    // 副规格值index
+    subSpecIndex: 0,
+    // 主规格名
+    mainSpecNameList: [],
+    // 副规格名
+    subSpecNameList: [],
+    // 主规格值
+    mainSpecValueList: [],
+    // 副规格值
+    subSpecValueList: [],
+    // 选中主规格值
+    mainSpecValue: '',
+    // 失效的主规格值
+    invalidmainSpec: '',
+    // 选中副规格值
+    subSpecValue: '',
+    // 规格值图片
+    specPic: '',
+    // 规格值图片list
+    specPicList: [],
+    // 规格对应价格
+    specPrice: '',
+    // 买省金额
+    buyPrice: 0,
+    // 卖赚金额
+    sellPrice: 0,
+    // input默认是1
+    num: 1,
+    // 使用data数据对象设置样式名  
+    minusStatus: 'disabled',
+    // 画布配置,分享
+    posterConfig: {},
+    // 分享的图片
+    shareImage: '',
+    localImg: '',
+    //弹出动画
+    animationPlus: {},
+    showModalStatus: false,
+    showSpecModalStatus: false,
+    isGoTopShow: false,
+    // tab切换
+    currentTab: 1,
+    // 是否分享进入
+    shareType: 0,
+    // 页面遮罩层
+    pageMask: false,
+    // 开卡对话框
+    openCardDialogFlag: false,
+    // 开卡对话窗动画
+    openCardDialogAnimation: {},
+    // 优惠价
+    economicalMoney: 0,
+    // 乐享价
+    specialPrice: 0,
+    // 是否开卡
+    flag: false,
+    // 预计乐享价
+    specialPriceEstimate: 0,
+    // 预计可省
+    economicalMoneyEstimate: 0,
+    //乐享价
+    enjoymentPrice: 0
+  },
+
+  onLoad(options) {
+    this.init(options)
+    this.checkLoginForSearch()
+
+  },
+
+  onShow() {
+
+    this.setData({
+      pageMask: false
+    })
+
+  },
+
+  /**
+   * 初始化
+   */
+  init(options) {
+
+
+    let enjoyCardId
+    if (options.enjoyCardId) {
+      enjoyCardId = options.enjoyCardId
+    } else {
+      enjoyCardId = null
+    }
+    let that = this
+    wx.showLoading({
+      title: '加载中',
+    })
+
+    console.log('----', options)
+    let goodsId = options.goodsId;
+    let selectedPriceShow = options.selectedPrice
+    that.data.shopId = options.shopId;
+    this.setData({
+      goodsId: goodsId,
+      userId: app.data.userId,
+      shopId: wx.getStorageSync('shopId'),
+      enjoyCardId,
+      selectedPriceShow
+    })
+  },
+
+
+
+  /**
+   * 验证登录并查询详情
+   */
+  checkLoginForSearch() {
+
+    let that = this;
+    app.userLogin().then(res => {
+      that.getGoodsDetail(that.data.goodsId, that.data.shopId)
+    })
+
+  },
+
+
+
+  /**
+   * 请求商品详情
+   */
+  getGoodsDetail(goodsId, shopId) {
+
+    let that = this;
+    let params = {
+      id: goodsId,
+      shopId: shopId
+    }
+    Api.getGoodsDetail(params).then(res => {
+      let selectedPrice
+      if (res.data.status === '0000') {
+        //请求商品规格
+        let imgList = []
+        res.data.data.goodsPicList.map(item => {
+          imgList.push(item.goodsPicUrl)
+        })
+        let economicalMoneyEstimate = res.data.data.economicalMoney
+        let flag = res.data.data.flag
+        let specialPriceEstimate = res.data.data.specialPrice
+        that.setData({
+          goodsPicList: res.data.data.goodsPicList,
+          goodsPriceList: res.data.data.goodsPriceList,
+          swipeList: imgList,
+          economicalMoneyEstimate,
+          flag,
+          specialPriceEstimate
+        })
+
+        if (this.data.enjoyCardId) {
+          getPriceDetail.getPriceEnjoy().then((res) => {
+            if (res.data.status == "0000") {
+              console.log(res, '111111111111111111111111111111111')
+
+              that.setData({
+                selectedPrice: res.data.data[0].salePrice,
+                enjoymentPrice:res.data.data[0].salePrice
+
+              })
+            
+            }
+          })
+        }
+
+        that.setData({
+          goodsName: res.data.data.goodsName,
+          goodsRecommend: res.data.data.goodsRecommend,
+          goodsType: res.data.data.goodsType,
+          memberGoodsflag: res.data.data.memberGoodsflag,
+          totalSale: res.data.data.totalSale,
+          merchantId: res.data.data.merchantId,
+          merchantName: res.data.data.merchantName,
+          sourceType: res.data.data.sourceType,
+          goodsDesc: res.data.data.goodsDesc,
+          goodsTag: res.data.data.goodsTag,
+          freight: 0,
+          payAmount: res.data.data.goodsPriceList[0].selectedPrice + res.data.data.freight,
+          totalAmount: res.data.data.goodsPriceList[0].selectedPrice,
+          spec: res.data.data.goodsPriceList[0].goodsSpecs,
+          grossProfit: res.data.data.goodsPriceList[0].grossProfit,
+          //严选价格展示
+          selectedPriceShow:this.data.selectedPriceShow
+
+        })
+        console.log(res.data.data.goodsPriceList[0].selectedPrice)
+        wx.hideLoading()
+        let article = uncodeUtf16(that.data.goodsDesc);
+        // wxParse解析html富文本
+        WxParse.wxParse('article', 'html', article, that, 5);
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+
+  /**
+   * 分享
+   */
+  share() {
+
+    let that = this
+    // 检查授权和绑定手机状态
+    let status = app.accredit().then((res) => {
+      if (status) {
+        that.showModal()
+      }
+    });
+  },
+
+  /**
+   * 图片预览
+   */
+  // 故事图片
+  previewImage(e) {
+
+    let that = this;
+    let current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.imglist
+    })
+  },
+  // 轮播图片
+  previewSwipe(e) {
+
+    let that = this;
+    let current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.swipeList
+    })
+  },
+
+
+  /**
+   * 回到顶部
+   */
+  goTop: function(e) {
+
+    if (wx.pageScrollTo) {
+      wx.pageScrollTo({
+        scrollTop: 0
+      })
+    } else {
+      wx.showModal({
+        title: '提示',
+        content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
+      })
+    }
+  },
+
+
+  /**
+   * 富文本超链接
+   */
+  wxParseTagATap(e) {
+
+    let href = e.currentTarget.dataset.src;
+    //我们可以在这里进行一些路由处理
+    //跳转的方法根据项目需求的不同自己替换，也可以加参数，
+    wx.navigateTo({
+      url: `../webviewPage/webviewPage?url=${href}`
+    })
+  },
+
+
+
+  /**
+   * 立即开卡
+   */
+  confirmOrder() {
+
+    let that = this
+    this.setData({
+      pageMask: true
+    })
+    // 检查授权和绑定手机状态
+    let type = app.accredit().then((res) => {
+      if (!type) {
+        return
+      }
+
+      let spec = this.data.mainSpecValue;
+
+      let cminiShopCarList = [{
+        buyToProvinceValue: that.data.buyPrice,
+        goodsId: that.data.goodsId,
+        goodsName: that.data.goodsName,
+        goodsType: that.data.goodsType,
+        mainUrl: that.data.goodsPicList[0].goodsPicUrl,
+        merchantId: that.data.merchantId,
+        merchantName: that.data.merchantName,
+        num: that.data.num,
+        price: that.data.selectedPrice,
+        shareId: app.data.shareId,
+        contUserId: app.data.contUserId,
+        spec: that.data.spec,
+        sourceType: that.data.sourceType,
+        userId: that.data.userId,
+        specialPrice: that.data.specialPrice,
+        economicalMoney: that.data.economicalMoney,
+        grossProfit: that.data.grossProfit
+      }]
+
+
+      let cartsList = [{
+        merchantId: that.data.merchantId,
+        merchantName: that.data.merchantName,
+        goodsType: that.data.goodsType,
+        cminiShopCarList: cminiShopCarList,
+        freightAmount: 0,
+        payAmount: that.data.selectedPrice,
+        totalAmount: that.data.selectedPrice
+      }]
+      // 去结算
+      app.data.chooseAddressFlag = false
+      let tempStr = JSON.stringify(cartsList).replace(/\&/g, '@')
+      wx.navigateTo({
+        url: `/pages/shopSubmitOrder/shopSubmitOrder?orderInfo=${tempStr}&enjoyCardId=${that.data.enjoyCardId}`
+      })
+      that.setData({
+        pageMask: false
+      })
+    });
+  },
+
+})

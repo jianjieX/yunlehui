@@ -1,0 +1,104 @@
+var handleOrder = {
+  getOrder: function(orderType) {
+
+    switch (orderType) {
+      case 0:
+        return '待付款';
+      case 1:
+        return '待发货';
+      case 2:
+        return '待收货';
+      case 3:
+        return '已收货';
+      case 4:
+        return '已完成';
+      case 5:
+        return '已关闭';
+      case 6:
+        return '已取消';
+    }
+  },
+  returnStatus: function(orderType) {
+    switch (orderType) {
+      case 1:
+        return '待商家审核';
+      case 2:
+        return '待客户退货';
+      case 3:
+        return '待商家收货';
+      case 4:
+        return '待商家退款';
+      case 5:
+        return '售后完成';
+      case 6:
+        return '商家拒绝';
+      case 7:
+        return '待平台解冻';
+      case 8:
+        return '售后关闭';
+    }
+  },
+  returnReason: function(reasonCode) {
+    switch (reasonCode) {
+
+    }
+  },
+
+  returnDetailStatus: function(orderType) {
+    switch (orderType) {
+      case 1:
+        return '请等待商家审核';
+      case 2:
+        return '请退货并填写物流信息';
+      case 3:
+        return '请等待商家收货并退款';
+      case 4:
+        return '请等待商家收货并退款';
+      case 5:
+        return '售后完成';
+      case 6:
+        return '商家拒绝';
+      case 7:
+        return '待平台解冻';
+      case 8:
+        return '售后关闭';
+    }
+  },
+
+  foodCanAfterSale: function(time) {
+
+    if (!time) {
+      return
+    }
+    //目前时间戳
+    var timestamp = Date.parse(getDate());
+    //收货时间
+    var thisTime = time;
+    // 为了兼容把'-'替换成'/'
+    var reg = getRegExp("-", "g");
+    thisTime = thisTime.replace(reg, '/');
+    //收货时间戳
+    var receiveTime = getDate(thisTime);
+
+    receiveTime = receiveTime.getTime();
+
+    //认定收货两小时内可以售后
+    var totime = receiveTime / 1000 + 7200;
+    console.log('截止时间', totime)
+    console.log('当前时间', timestamp)
+    //当前时间戳
+    timestamp = timestamp / 1000;
+    var surplus = totime - timestamp;
+    if (surplus >= 0) {
+      return true
+    }
+  }
+}
+
+module.exports = {
+  getOrder: handleOrder.getOrder,
+  returnStatus: handleOrder.returnStatus,
+  returnReason: handleOrder.returnReason,
+  returnDetailStatus: handleOrder.returnDetailStatus,
+  foodCanAfterSale: handleOrder.foodCanAfterSale
+}

@@ -1,0 +1,53 @@
+<wxs module="checkTrx" src="../../filter/time.wxs"></wxs>
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<template name='logistics'>
+  <view class="dialog-view" catchtouchmove='{{true}}'>
+    <view class="dialogAllView">
+      <view class="dialog">
+        <view class="message" wx:if="{{stepList}}">
+          <view class="left">
+            <text class="title">发货信息</text>
+            <text class="expressMessage">快递公司：{{stepList.expName}}</text>
+            <text class="expressMessage">快递单号：{{stepList.number}}</text>
+            <text class="expressMessage">发货时间：{{numFr.dateFormat(stepList.deliveryTime) || ''}}</text>
+          </view>
+          <view class="right">
+            <text wx:if="{{stepList.confirmStatus === 0}}">已发货</text>
+            <text wx:if="{{stepList.confirmStatus === 1}}">已签收</text>
+          </view>
+        </view>
+        <view class="message" wx:if="{{!stepList}}">
+          <view class="no-msg">暂无物流信息</view>
+        </view>
+
+        <scroll-view scroll-y='true' class="messageDetail">
+          <view class="messageDetail1">
+            <view class='item-view' wx:key='' wx:for='{{stepList.list}}'>
+              <view class="date-view">
+                <view class='time'>{{checkTrx.dateFormat1('HM',item.time)}}</view>
+                <view class='date'>{{checkTrx.dateFormat1('MD',item.time)}}</view>
+              </view>
+              <view style="flex: 0.5;">
+                <view wx:if='{{index != 0}}' class='point-view'></view>
+                <view wx:else class='point-view1'></view>
+                <view wx:if='{{index != stepList.list.length-1}}' class='line-view'></view>
+              </view>
+              <view wx:if='{{index != 0}}' class='content-view'>
+                <view>{{item.status}}</view>
+              </view>
+              <view wx:else class='content-view' style='color:#222222'>
+                <view>{{item.status}}</view>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+      <view class="delete">
+        <icon type="cancel" size="28" color="#fff" bindtap="cancelClick"></icon>
+        <!-- <image bindtap="cancelClick"></image> -->
+      </view>
+    </view>
+
+  </view>
+</template>

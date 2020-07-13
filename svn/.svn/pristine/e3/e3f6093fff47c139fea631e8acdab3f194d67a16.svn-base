@@ -1,0 +1,122 @@
+{
+  "pages": [
+    "pages/shopHome/shopHome",
+    "pages/merchantDetail/merchantDetail",
+    "pages/searchMerchantGoods/searchMerchantGoods",
+    "pages/openShopResult/openShopResult",
+    "pages/enjoyCardRecord/enjoyCardRecord",
+    "pages/activityCategory/activityCategory",
+    "pages/relatedGoods/relatedGoods",
+    "pages/messageList/messageList",
+    "pages/utilPage/utilPage",
+    "pages/storyTurnDown/storyTurnDown",
+    "pages/confirmation/confirmation",
+    "pages/storyWriter/storyWriter",
+    "pages/accountInform/accountInform",
+    "pages/shopAddAddress/shopAddAddress",
+    "pages/shopMy/shopMy",
+    "pages/payPassword/payPassword",
+    "pages/agreement/agreement",
+    "pages/storyDetails/storyDetails",
+    "pages/strictShop/strictShop",
+    "pages/shopCart/shopCart",
+    "pages/shopFood/shopFood",
+    "pages/shopMerchant/shopMerchant",
+    "pages/activityHome/activityHome",
+    "pages/activityDetail/activityDetail",
+    "pages/activityMy/activityMy",
+    "pages/shopDetail/shopDetail",
+    "pages/shopSubmitOrder/shopSubmitOrder",
+    "pages/orderPaySuccess/orderPaySuccess",
+    "pages/shopOrderList/shopOrderList",
+    "pages/orderDetail/orderDetail",
+    "pages/shopAddressList/shopAddressList",
+    "pages/shopEditAddress/shopEditAddress",
+    "pages/shopApplication/shopApplication",
+    "pages/shopopen/shopopen",
+    "pages/shopOpenTemp/shopOpenTemp",
+    "pages/addBankCard/addBankCard",
+    "pages/earning/earning",
+    "pages/clearing/clearing",
+    "pages/cashOut/cashOut",
+    "pages/cashOutRecord/cashOutRecord",
+    "pages/cashOutNotice/cashOutNotice",
+    "pages/cashOutResult/cashOutResult",
+    "pages/phoneVerification/phoneVerification",
+    "pages/memberLevel/memberLevel",
+    "pages/rankLevel/rankLevel",
+    "pages/shareImg/shareImg",
+    "pages/center/center",
+    "pages/center/upload",
+    "pages/center/upload1",
+    "pages/webviewPage/webviewPage",
+    "pages/applyAfterSale/applyAfterSale",
+    "pages/afterSaleDetail/afterSaleDetail",
+    "pages/welfareDetail/welfareDetail",
+    "pages/myHomePage/myHomePage",
+    "pages/inviteMember/inviteMember",
+    "pages/customerService/customerService",
+    "pages/searchGoods/searchGoods",
+    "pages/settled/settled",
+    "pages/withdrawalRecord/withdrawalRecord",
+    "pages/serveMy/serveMy",
+    "pages/serveMyDetail/serveMyDetail",
+    "pages/serveDetail/serveDetail",
+    "pages/activityMyDetail/activityMyDetail",
+    "pages/confirmFoodsOrder/confirmFoodsOrder",
+    "pages/foodsPaymentRes/foodsPaymentRes",
+    "pages/foodsOrderDetail/foodsOrderDetail",
+    "pages/foodsAfterSaleDetail/foodsAfterSaleDetail",
+    "pages/enjoyCard/enjoyCard",
+    "pages/enjoyCardDetail/enjoyCardDetail",
+    "pages/activity/activity",
+    "pages/activityBanner/activityBanner"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f7f7"
+  },
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#333",
+    "backgroundColor": "#fff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/shopHome/shopHome",
+        "text": "首页",
+        "iconPath": "img/tabbarImg/home.png",
+        "selectedIconPath": "img/tabbarImg/homeSelect.png"
+      },
+      {
+        "pagePath": "pages/strictShop/strictShop",
+        "text": "好物",
+        "iconPath": "img/tabbarImg/strict.png",
+        "selectedIconPath": "img/tabbarImg/strictSelect.png"
+      },
+      {
+        "pagePath": "pages/shopCart/shopCart",
+        "text": " 购物车",
+        "iconPath": "img/tabbarImg/shopCar.png",
+        "selectedIconPath": "img/tabbarImg/shopCarSelect.png"
+      },
+      {
+        "pagePath": "pages/shopMy/shopMy",
+        "text": " 我的",
+        "iconPath": "img/tabbarImg/me.png",
+        "selectedIconPath": "img/tabbarImg/meSelect.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示" 
+    }
+  },
+  "sitemapLocation": "sitemap.json",
+  "navigateToMiniProgramAppIdList": [
+    "wxfbd3548ba615c8dc",
+    "wx8d499275d8fc3c71"
+  ]
+}

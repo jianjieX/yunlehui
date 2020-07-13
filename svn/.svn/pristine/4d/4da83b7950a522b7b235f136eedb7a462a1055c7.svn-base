@@ -1,0 +1,165 @@
+.dialog-view {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0rpx;
+  left: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.dialog-view .dialogAllView {
+  height: 80%;
+  margin-bottom: 112rpx;
+}
+
+.dialog-view .dialog {
+  height: 100%;
+  background: #fff;
+  margin: 34rpx;
+  border-radius: 20rpx;
+}
+
+.dialog-view .dialog .message {
+  color: #fff;
+  border-top-left-radius: 20rpx;
+  border-top-right-radius: 20rpx;
+  background: linear-gradient(to left, #fadf5b, #f4bb2e);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 30rpx 0 30rpx 26rpx;
+}
+
+.dialog-view .dialog .message .left {
+  display: flex;
+  flex-direction: column;
+  font-size: 24rpx;
+  line-height: 34rpx;
+}
+
+.dialog-view .dialog .message .left .title {
+  font-size: 28rpx;
+  margin-bottom: 8rpx;
+}
+
+.dialog-view .dialog .message .right {
+  margin-top: 30rpx;
+}
+
+.dialog-view .dialog .message .right text {
+  font-size: 24rpx;
+  color: #ff5850;
+  line-height: 24rpx;
+  padding: 24rpx 42rpx;
+  background: #fff;
+  opacity: 0.8;
+  border-top-left-radius: 50rpx;
+  border-bottom-left-radius: 50rpx;
+}
+
+/* pages/auditRecord/auditRecord.wxss */
+
+.messageDetail {
+  height: 75%;
+}
+
+.messageDetail1 {
+  padding: 48rpx 36rpx;
+  background: #fff;
+  /* height: 100%; */
+}
+
+.item-view {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 40rpx;
+}
+
+.point-view {
+  border-radius: 50%;
+  width: 32rpx;
+  height: 32rpx;
+  background: #d6d6d6;
+  border: 4rpx solid #d6d6d6;
+}
+
+.point-view::after {
+  content: " ";
+  display: inline-block;
+  height: 12rpx;
+  width: 12rpx;
+  border-width: 4rpx 0px 0rpx 4rpx;
+  border-color: #fff;
+  border-style: solid;
+  -webkit-transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+  transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+  position: absolute;
+  margin-top: 14rpx;
+  margin-left: 10rpx;
+}
+
+.point-view1 {
+  border-radius: 50%;
+  width: 32rpx;
+  height: 32rpx;
+  background: #f4bb2e;
+  border: 4rpx solid #f4bb2e;
+}
+
+.line-view {
+  width: 4rpx;
+  height: 100%;
+  background: #eee;
+  margin-left: 18rpx;
+}
+
+.content-view {
+  flex: 5;
+  margin-left: 24rpx;
+  color: #999;
+  font-size: 24rpx;
+  /* line-height: 24rpx; */
+}
+
+.date-view {
+  flex: 0.6;
+  color: #999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 12rpx;
+}
+
+.date-view .time {
+  font-size: 22rpx;
+  line-height: 22rpx;
+  margin-bottom: 12rpx;
+}
+
+.date-view .date {
+  font-size: 16rpx;
+  line-height: 16rpx;
+}
+
+.dialog-view .delete {
+  display: flex;
+  justify-content: center;
+  bottom: 44rpx;
+}
+
+.dialog-view .delete image {
+  width: 60rpx;
+  height: 60rpx;
+  background: #fadf5b;
+  border-radius: 50%;
+}
+
+.no-msg {
+  font-size: 28rpx;
+  text-align: center;
+  height: 160rpx;
+  line-height: 160rpx;
+}

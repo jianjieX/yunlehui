@@ -1,0 +1,544 @@
+@import "../../components/dialog/dialog.wxss";
+
+page {
+  background: rgba(240, 240, 240, 1);
+}
+
+.dialogAllView {
+  margin-top: 150rpx;
+  height: 75% !important;
+}
+
+.header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 99;
+}
+
+.header-bg {
+  width: 100%;
+}
+
+.status-bar, .navigation-bar, .navigation, .menu {
+  position: fixed;
+  z-index: 10;
+}
+
+.status-bar {
+  background: #fff;
+}
+
+.navigation-bar {
+  background: #fff;
+  color: #000;
+  line-height: 88rpx;
+}
+
+.page-title-text {
+  display: inline-block;
+  margin-left: 8rpx;
+  font-size: 26rpx;
+}
+
+.navigation image {
+  width: 24rpx;
+  height: 40rpx;
+  background: #fff;
+}
+
+/* 中间内容区域 */
+
+.page-content-view {
+  padding-bottom: 160rpx;
+}
+
+.page-content-view .orderStatus-view {
+  padding-top: 20rpx;
+  background: linear-gradient(to left, #fba900, #fde500);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 124px;
+}
+
+.orderStatus-view .orderStatus-view-image {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.orderStatus-view .orderStatus-view-image image {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+}
+
+.orderStatus-view .orderStatus-view-text {
+  font-size: 28rpx;
+  line-height: 28rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.orderStatus-view .orderStatus-view-text view {
+  margin-top: 16rpx;
+}
+
+.goodMssage-view {
+  padding: 32rpx 0;
+  background: #fff;
+}
+
+.shop {
+  background: rgba(240, 240, 240, 1);
+  border-radius: 16rpx;
+  padding: 20rpx 0;
+  margin: 0 24rpx;
+}
+
+.shop .shop-title {
+  padding: 0 30rpx;
+  line-height: 70rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 28rpx;
+}
+
+.shop .orderStatus {
+  color: #ff5850;
+  font-size: 24rpx;
+}
+
+.shop .shop-title image {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 16rpx;
+  vertical-align: middle;
+}
+
+.goods-item {
+  height: 166rpx;
+  display: flex;
+  padding: 10rpx 30rpx;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+.goods-item .goods-item-left {
+  display: flex;
+  flex-direction: row;
+}
+
+.goods-item .imgBox {
+  width: 140rpx;
+  height: 140rpx;
+  overflow: hidden;
+}
+
+.goods-item image {
+  border-radius: 4rpx;
+  width: 140rpx;
+  height: 140rpx;
+}
+
+.goods-item .goods-info {
+  width: 380rpx;
+  margin-left: 30rpx;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.goods-item .goods-info .goods-title {
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 22rpx;
+  color: #333333;
+}
+
+.goods-item .goods-info .spec {
+  font-size: 22rpx;
+  color: #666666;
+  margin-top: 20rpx;
+  border-radius: 4rpx;
+}
+
+.goods-item .goods-info .spec text {
+  /* background: #f4f4f4; */
+  padding: 6rpx 16rpx;
+}
+
+.goods-item .price {
+  font-size: 12px;
+  margin-bottom: 60rpx;
+}
+
+.total-view {
+  font-size: 20rpx;
+  color: #999;
+  text-align: right;
+  margin-right: 24rpx;
+}
+
+.total-view .total-title {
+  font-size: 24rpx;
+  color: #222;
+}
+
+.total-view .payAmount {
+  font-size: 20rpx;
+  color: #ff5850;
+}
+
+/* 拒绝理由 */
+
+.cancelAfterSale .reason {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 24rpx;
+}
+
+/* 审核通过的操作信息 */
+
+.auditMessage .messageAudit {
+  margin-top: 0;
+}
+
+/* 物流退货信息 */
+
+.logistics-view, .afterSales-view, .orderMessage-view, .address-view,
+.cancelAfterSale, .auditMessage, .platformDeal, .logistics {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin: 0 24rpx;
+  margin-top: 24rpx;
+  overflow: hidden;
+}
+
+.logistics-view .lookLogistics {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 16rpx;
+}
+
+.logistics-view .lookLogistics text {
+  color: #fabe00;
+  font-size: 28rpx;
+  border: 2rpx solid #fabe00;
+  border-radius: 34rpx;
+  padding: 10rpx 34rpx;
+}
+
+.title {
+  font-size: 28rpx;
+  line-height: 28rpx;
+  color: #fabe00;
+  display: flex;
+  justify-content: space-between;
+}
+
+.folding-view {
+  display: inline-block;
+  height: 14rpx;
+  width: 14rpx;
+  border-width: 0px 4rpx 4rpx 0;
+  border-color: #ccc;
+  border-style: solid;
+  -webkit-transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+  transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+}
+
+.folding-view1 {
+  display: inline-block;
+  height: 14rpx;
+  width: 14rpx;
+  border-width: 4rpx 0rpx 0rpx 4rpx;
+  border-color: #ccc;
+  border-style: solid;
+  -webkit-transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+  transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+}
+
+.message {
+  font-size: 24rpx;
+  color: #222;
+  margin-top: 24rpx;
+  display: flex;
+}
+
+.message1 {
+  flex: 1;
+  margin-top: 18rpx;
+}
+
+.message .name {
+  font-size: 24rpx;
+  color: #666666;
+  flex: 1;
+}
+
+.message .content {
+  flex: 4;
+  color:#666666;
+}
+
+.content-image {
+  flex: 4;
+  background: white;
+  overflow: hidden;
+}
+
+.addPicPic {
+  margin-right: 18rpx;
+  float: left;
+  margin-bottom: 16rpx;
+  text-align: center;
+  width: 150rpx;
+  height: 150rpx;
+  /* background: #fff000; */
+  position: relative;
+}
+
+.slide-pic {
+  width: 150rpx;
+  height: 150rpx;
+}
+
+/* 退货地址 */
+
+.address {
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  margin: 24rpx 0;
+}
+
+.address .address-img-view {
+  width: 48rpx;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.address .address-img-view image {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.address .address-info {
+  flex: 1;
+  height: 100%;
+  margin-left: 24rpx;
+}
+
+.address .address-info .top {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.address .address-info text {
+  margin-right: 24rpx;
+}
+
+.address .address-info .bottom {
+  font-size: 24rpx;
+  color: #999;
+  margin: 12rpx 0;
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.view-logistics {
+  width: 180rpx;
+  height: 60rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 34rpx;
+  border: 1px solid rgba(250, 190, 0, 1);
+  font-size: 28rpx;
+  font-family: PingFang-SC-Medium;
+  font-weight: 500;
+  color: rgba(250, 190, 0, 1);
+  float: right;
+}
+
+/* 底部按钮 */
+
+.footer {
+  width: 100%;
+  height: 140rpx;
+  background: #f9f9f9;
+  position: fixed;
+  bottom: 0rpx;
+  display: flex;
+  align-items: center;
+  z-index: 999;
+}
+
+.footer button {
+  color: #fff;
+  font-size: 36rpx;
+  flex: 1;
+  margin: 0 24rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 8rpx;
+  background: rgba(250, 190, 0, 1);
+}
+
+.footer button::after {
+  border: none;
+}
+
+.footer .double {
+  font-size: 30rpx;
+}
+
+.footer .double:last-of-type {
+  background: #ff5850;
+}
+
+.radioGroup {
+  padding: 32rpx 24rpx 8rpx 24rpx;
+  font-size: 30rpx;
+  color: #999;
+}
+
+.radioGroupAudit {
+  padding-bottom: 0;
+}
+
+.radioGroupAudit label {
+  display: flex;
+}
+
+/* 单选钮样式 */
+
+radio {
+  transform: scale(0.8);
+}
+
+.radioGroup .refuse {
+  margin-left: 96rpx;
+}
+
+.radioIsChend {
+  color: #fabe00;
+}
+
+.arrow {
+  width: 18rpx;
+  height: 18rpx;
+  border-bottom: 2px solid #000;
+  border-left: 2px solid #000;
+  display: inline-block;
+  transform: rotate(45deg);
+}
+
+.log-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  margin: 0 24rpx;
+  margin-top: 24rpx;
+}
+
+.log-item .message,  {
+  margin: 12rpx 0;
+}
+
+.m-logistics .message {
+  margin: 12rpx 0;
+  height: 70rpx;
+  line-height: 70rpx;
+}
+
+.m-logistics input {
+  height: 70rpx;
+  color: #222;
+}
+
+.m-logistics .name {
+  line-height: 70rpx;
+}
+
+.sweep-position {
+  position: relative;
+}
+
+.sweep {
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+  right: 0;
+  top: 10rpx;
+  z-index: 99;
+}
+
+.log-item .content {
+  color: #222;
+}
+
+.folding-view-big {
+  width: 50rpx;
+  height: 50rpx;
+  text-align: right;
+}
+
+.return-status {
+  width: 100%;
+  height: 200rpx;
+  box-sizing: border-box;
+  padding: 36rpx 40rpx;
+  background: rgba(250, 190, 0, 1);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-text {
+  font-size: 36rpx;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+}
+
+.count-down-time {
+  font-size: 28rpx;
+  font-family: PingFang-SC-Regular;
+  font-weight: 400;
+}
+
+.tips {
+  color: #222;
+  font-size: 22rpx;
+  box-sizing: border-box;
+  padding: 0 36rpx 30rpx;
+  background: #fff;
+}
+
+.tips-title {
+  color: #ff5850;
+  font-size: 28rpx;
+  padding: 30rpx 0;
+}
+
+.page-title {
+  font-size: 32rpx;
+  font-family: PingFang-SC-Medium;
+  font-weight: 500;
+  color: rgba(34, 34, 34, 1);
+  padding: 24rpx 24rpx 0;
+  background: #fff;
+}

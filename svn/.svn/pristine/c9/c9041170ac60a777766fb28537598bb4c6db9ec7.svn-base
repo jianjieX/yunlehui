@@ -1,0 +1,216 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<view class="navigation-bar">
+  <view class="imm">
+    <image src="https://ylhdev.oss-cn-beijing.aliyuncs.com/goodsSpecs/20191217154050.png" style="width:100%;height:136rpx;"></image>
+  </view>
+</view>
+
+<!--shop-card -->
+<view class='shop-card'>
+  <view class='wapper'>
+    <image src='https://ylhdev.oss-cn-beijing.aliyuncs.com/goodsSpecs/20191217154020.jpg' class='shop-logo'></image>
+    <view class='wapper-right'>
+      <view class='title'>云端马语</view>
+      <view class='desc'>欢迎光临云端马语，很高兴为您服务！</view>
+    </view>
+  </view>
+</view>
+<!--shop-card -->
+
+<!--tab -->
+<view class="tab border-1px">
+
+  <view class="tab-item ">
+    <a class="{{status==0 ? 'textActive':''}}" bindtap="tabChange" data-type="0">商品</a>
+    <view class="{{status==0 ? 'active':'textUnActive'}}"></view>
+  </view>
+  <view class="tab-item">
+    <a class="{{status==1 ? 'textActive':''}}" bindtap="tabChange" data-type="1">商家</a>
+    <view class="{{status==1 ? 'active':'textUnActive'}}"></view>
+  </view>
+</view>
+<!--tab -->
+
+<view class="goods" wx:if="{{status==0||item.status==status}}">
+  <view class="menu-wrapper">
+    <scroll-view scroll-y="true" style="height: 100%;">
+      <view wx:for="{{goods}}" wx:key="index" class="menu-item border-1px {{menuIndex== index ? 'menu-item-selected' : ''}}" bindtap="selectMenu" data-item-index="{{index}}">
+        <view class="text">
+          {{item.categoryName}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+  <scroll-view scroll-y="true" style="min-height: {{goodsHeight}}px;" scroll-into-view="{{toView}}" class="foods-wrapper" bindscroll="menuCurrentIndex">
+    <view wx:for="{{goods}}" wx:key="index" class="food-list food-list-hook" wx:for-index="parentIndex">
+      <view id="order{{parentIndex}}" class="title">{{item.categoryName}}</view>
+      <view wx:for="{{item.goodsList}}" wx:key="key" class="food-item" wx:for-item="food" data-food="{{food}}">
+        <view class="icon">
+          <image src="{{food.mainUrl}}" mode="aspectFit" style="width: 100%;"></image>
+        </view>
+        <view class="content">
+          <view class="name">{{food.goodsName}}</view>
+          <view class="extra">
+            <text wx:if="{{food.sumSale > 0}}" class="count">已售{{food.sumSale}}</text>
+            <!-- <text class="count">好评1</text> -->
+          </view>
+          <view wx:if="{{food.economicalMoney}}" class="price {{food.economicalMoney ? 'benefit-h':'benefit-l'}}">
+            <view class="now">￥{{numFr.getNum(food.specialPrice)}}特权价</view>
+          </view>
+          <view wx:if="{{!food.economicalMoney}}" class="price benefit-l}}">
+            <view class="now">￥{{numFr.getNum(food.selectedPrice)}}</view>
+          </view>
+          <view wx:if="{{food.economicalMoney}}" class="benefit">
+          售价￥{{numFr.getNum(food.selectedPrice)}}
+          </view>
+
+          <!--cartControl-->
+          <view class="cartControl-wrapper">
+            <view class="cartControl">
+              <image class='font' wx:if="{{food.num > 0}}" data-type="1" data-item-index="{{index}}" data-parentIndex="{{parentIndex}}" catchtap="decreaseCart" src="/img/foods/jianshao.png"></image>
+              <view class="cart-count" wx:if="{{food.num > 0 }}">{{food.num}}</view>
+              <image class='font' data-item-index="{{index}}" data-parentIndex="{{parentIndex}}" catchtap="addCart" src="/img/foods/tianjia.png"></image>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!--shopCart-->
+  <view>
+    <view>
+      <view class="shopCart">
+        <view class="content" bindtap="toggleList">
+          <view class="content-left">
+            <view class="logo-wrapper">
+              <view class="logo highlight">
+                <image class='img' src='/img/foods/gouwuche.png'></image>
+                <!-- <view class="iconfont icon-gouwuche highlight"></view> -->
+              </view>
+              <view class="num" wx:if="{{totalCount> 0}}">{{totalCount}}</view>
+            </view>
+            <view class="price highlight">
+              <text wx:if="{{specialStutas}}">￥{{totalSpecialPrice}}</text>
+              <text class=" {{specialStutas ? 'specialPrice':''}}">￥{{totalPrice}}</text>
+            </view>
+          </view>
+          <view class="content-right" catchtap="pay">
+            <view class="pay enough">
+              去结算
+            </view>
+          </view>
+        </view>
+        <view class="shopcart-list" style="display:{{cartShow}}">
+          <view wx:if="{{specialStutas}}" class="special-header">
+            乐享权益共抵扣-￥{{ numFr.getNum(totalSaveMoney) }}
+          </view>
+          <view class="list-header">
+            <view class="line">
+              <view class="title">已选商品</view>
+              <text class="empty" catchtap="empty">清空</text>
+            </view>
+          </view>
+
+          <scroll-view scroll-y="true" class="list-content">
+            <view class="shopcart-food" wx:for="{{carArray}}" wx:key="index">
+              <view class="img">
+                <image mode="widthFix" style="width: 100%;" src="{{item.mainUrl}}"></image>
+              </view>
+              <view class="itemDetail">
+                <text class="name">{{item.goodsName}}</text>
+                <text class="spec">{{item.spec}}</text>
+                <view class="price" wx:if="{{item.num > 0}}">
+                  <span wx:if="{{item.specialPrice>=0 && item.economicalMoney && openCards && (numFr.getNum(item.specialPrice*item.num) != numFr.getNum(item.price*item.num))}}" style="color:#F52340;font-size:22rpx;">特权价￥
+                    <text style="color:#F52340;font-size:28rpx;">{{numFr.getNum(item.specialPrice*item.num)}}</text>
+                  </span>
+                  <span class="{{item.specialPrice>=0 && item.economicalMoney  && openCards && (numFr.getNum(item.specialPrice*item.num) != numFr.getNum(item.price*item.num))? 'special':''}}">￥{{numFr.getNum(item.price*item.num)}}</span>
+                  <!--cartControl-->
+                  <view class="cartControl-wrapper" wx:if="{{item.num > 0}}">
+                    <view class="cartControl">
+                      <image class='font' data-item-info="{{item}}" data-type="2" data-item-index="{{index}}" catchtap="decreaseCart" src="/img/foods/jianshao.png"></image>
+                      <view class="cart-count">{{item.num}}</view>
+                      <image class='font' data-item-info="{{item}}" data-type="2" data-item-index="{{index}}" catchtap="confirmShop" src="/img/foods/tianjia.png"></image>
+                    </view>
+                  </view>
+                  <!--cartControl-->
+                </view>
+              </view>
+
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view name="fade">
+    <view class="list-mask" wx:if="{{!fold}}" bindtap="hideList"></view>
+  </view>
+</view>
+
+<scroll-view scroll-y="true" style="height: {{shopHeight}}px;" class="shop" wx:if="{{status==1||item.status==status}}">
+  <image style="width:100%;" mode="widthFix" src="https://ylhdev.oss-cn-beijing.aliyuncs.com/goodsSpecs/20191218104937.jpg"></image>
+  <view class="shopInfo">
+    <view class="title">云端马语简介</view>
+    <view class="text">
+      {{shopDetail}}
+    </view>
+  </view>
+</scroll-view>
+
+
+<!-- 规格弹层 -->
+<view class='mask' wx:if="{{showSpecModalStatus}}" bindtap='hideDialog' catchtouchmove='{{true}}'></view>
+<view class='dialog' animation="{{animationData}}" wx:if="{{showSpecModalStatus}}" catchtouchmove='{{true}}'>
+  <!-- 弹窗头部 -->
+  <view class="good">
+    <image class='spec-img' src='{{specPic}}' bindtap="previewSpecPic"></image>
+    <view class="dialog-goods-info">
+      <view class="dialog-spec-price">
+        <text wx:if="{{specialPrice>=0 && economicalMoney && openCards && specialPrice!=specPrice}}" class="dialog-spec-yprice">特权价￥{{numFr.getNum(specialPrice)}}</text>
+        <text class="{{specialPrice>=0 && economicalMoney && openCards && specialPrice!=specPrice?'dialog-spec-xprice':''}}">￥{{numFr.getNum(specPrice)}}</text>
+      </view>
+      <view class="dialog-spec">
+        <text wx:if="{{mainSpecValue}}">{{mainSpecValue}}</text>;
+        <text wx:if="{{subSpecValue}}">{{subSpecValue}}</text>
+      </view>
+    </view>
+    <!-- 关闭按钮 -->
+    <image src="/img/detailImg/close.png" class="cancel-icon" catchtap="hideDialog" />
+  </view>
+
+  <!-- 规格 -->
+  <view class="spec">
+    <view class="spec-main">
+      <view class="spec-title">{{mainSpecNameList[0]}}</view>
+      <view class="spec-value">
+        <view wx:for="{{mainSpecValueList}}" wx:key="*this" class="spec-value-item {{mainSpecValue === item.goodsSpecsValue? 'checked': ''}}" bindtap="changeMainSpecName" data-current="{{item}}">{{item.goodsSpecsValue}}</view>
+      </view>
+    </view>
+
+    <view class="spec-sub" wx:for="{{subSpecNameList}}" wx:key="*this" wx:if="{{subSpecNameList}}">
+      <view class="spec-title">{{subSpecNameList[0]}}</view>
+      <view class="spec-value">
+        <view class="spec-value-item" wx:for="{{subSpecValueList}}" wx:key="*this" class="spec-value-item {{subSpecValue === item.subSpecsValue? 'checked': ''}} {{item.stock === 0? 'disabled': ''}}" bindtap="changeSubSpecName" data-current="{{item}}">{{item.subSpecsValue}}</view>
+      </view>
+    </view>
+  </view>
+  <!-- 购买数量组件 -->
+  <view class='num'>
+    <view>购买数量</view>
+    <view class="stepper" style='display:inline-block'>
+      <!-- 减号 -->
+      <text class="{{minusStatus}}" bindtap="bindMinus">-</text>
+      <!-- 数值 -->
+      <input type="number" bindchange="bindManual" value="{{num}}" disabled />
+      <!-- 加号 -->
+      <text class="normal" bindtap="bindPlus">+</text>
+    </view>
+  </view>
+  <!-- 底部按钮 -->
+  <view class="button">
+    <view class="add-shopcar" data-type="1" bindtap='confirmShop'>确定</view>
+  </view>
+</view>
+<view class="pay-mask" wx:if="{{payMask}}"></view>

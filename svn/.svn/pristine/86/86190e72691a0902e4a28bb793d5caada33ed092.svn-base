@@ -1,0 +1,1029 @@
+/**
+ * 提交订单页面
+ */
+
+// 引入全局app对象
+const app = getApp();
+// 引入api
+import addressApi from '/../../utils/config/Api/address.js';
+import orderApi from '../../utils/config/Api/order.js'
+import goodsApi from '../../utils/config/Api/goods.js'
+import commonApi from '../../utils/config/Api/common.js'
+
+// 引入toast等提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+// 引入编码和解码表情方法
+import tools from '../../utils/tools/util.js'
+// emojy 转字符
+let utf16toEntities = tools.utf16toEntities
+//字符转emojy
+let uncodeUtf16 = tools.uncodeUtf16
+Page({
+  data: {
+    // 路由参数
+    option: {},
+    // 门店id
+    shopId: 0,
+    // 结算商品列表
+    cartsList: [],
+    // 是否有默认地址
+    hasDefaultAddress: true,
+    initAddress: false,
+    // 用户地址选择picker
+    region: [],
+    regionCode: [],
+    // 收货人
+    name: '',
+    // 有地址收货人电话
+    phone: '',
+    // 无地址用户输入电话
+    userPhone: '',
+    // 详细地址
+    address: '',
+    // 是否是默认地址
+    isDefault: false,
+    // 选择支付方式
+    payTypeSelected: true,
+    // 支付方式 2:微信支付
+    payType: 2,
+    // 订单总金额
+    totalAmount: 0,
+    // 运费总金额
+    totalFreightAmount: 0,
+    // 实际支付
+    totalPayAmount: 0,
+    // 总计买省金额
+    buyToProvinceValue: 0,
+    // 是否是请求的地址
+    isRequest: false,
+    // 商品sourceType
+    sourceType: 0,
+    checkAddressStatus: true,
+    payMask: false,
+    // 发票类型  1 普通发票 2 不开发票
+    invoiceType: 1,
+    // 发票信息  1 个人 2 企业单位
+    invoiceInfo: 1,
+    // 发票抬头
+    invoiceTitle: '',
+    // 发票税号
+    invoiceNumber: '',
+    // 是否有地址列表
+    addressListFlag: false,
+    // 折叠状态
+    hiddenafterSales: false,
+    // 优惠卡
+    cardList: [],
+    // 已选优惠卡
+    choosedCardList: [],
+    // 优惠金额
+    discount: 0,
+    // 限定优惠价
+    limitPrice: 0,
+    // 活动日期
+    limitDate: '',
+    // 没有优惠卡弹窗
+    noDeductionDialogFlag: false,
+    // 没有优惠卡弹窗动画
+    openDialogAnimation: {},
+    // 是否可用优惠卡
+    discountFlag: false,
+    // 开卡状态
+    openCardFlag: false,
+    // 活动时间限制卡
+    activityLimitData: false,
+    belongOwnFlag:true,
+  },
+
+  onLoad(option) {
+    let that = this;
+    console.log('---option-----',option)
+    let orderInfo = option.orderInfo&&JSON.parse(option.orderInfo);
+    if (orderInfo){
+      console.log('---option11-----', orderInfo[0].cminiShopCarList[0].goodsId)
+      goodsApi.getGoodsTypeById({ goodsId: orderInfo[0].cminiShopCarList[0].goodsId}).then(res => {
+        console.log('-------+++++',res.data.data)
+        if (!res.data.data){
+          that.setData({
+            belongOwnFlag: res.data.data,
+          })
+        }else{
+          that.setData({
+            belongOwnFlag: res.data.data,
+            name: '-',
+            phone: '-',
+            address: '-',
+            hasDefaultAddress: true,
+            chooseAddressFlag: true
+          })
+        }
+      })
+    }
+    
+    //疫情活动标识
+    this.data.sarsMark = option.sarsMark;
+    this.init(option)
+
+    this.getUserPhone();
+
+    this.getDefaultAddress()
+
+    this.checkOpenCardFlag()
+
+  },
+
+  onShow() {
+    //this.getDefaultAddress()
+    this.checkAddressListForGo()
+  },
+
+  /**
+   * 初始化
+   */
+  init(option) {
+
+    this.setData({
+      shopId: wx.getStorageSync('shopId'),
+      option
+    })
+
+  },
+  /**
+   * 检查地址列表决定跳转
+   */
+  checkAddressListForGo() {
+
+    let that = this
+    addressApi.getAddressList({}).then(res => {
+      if (res.data.status === "0000") {
+        let data = res.data.data;
+        if (data.length === 0) {
+          that.setData({
+            addressListFlag: false
+          })
+        } else {
+          that.setData({
+            addressListFlag: true
+          })
+          that.dealAddress()
+        }
+      }
+    })
+  },
+
+  /**
+   * 处理结算商品列表
+   */
+  dealCartsList() {
+    let cartsList = JSON.parse(this.data.option.orderInfo.replace(/\@/g, '&'))
+    cartsList.map(item => {
+      item.note = ''
+    })
+    this.setData({
+      cartsList
+    })
+    this.calculatePrice()
+    this.dealCardList(cartsList)
+
+  },
+
+  /**
+   * 处理优惠卡
+   */
+  dealCardList(cartsList) {
+
+    let cardList = []
+    let that = this
+    let discount = 0
+
+    if (cartsList[0].cminiShopCarList[0].economicalMoney == null) {
+      return false
+    }
+
+    cartsList[0].cminiShopCarList.map(item => {
+      for (let i = 1; i <= item.num; i++) {
+        let PriceNum = app.getPriceNum(item.economicalMoney)
+        let selectPriceInteger = PriceNum.split(".")[0]
+        let selectPriceDecimal = PriceNum.split(".")[1]
+        let id = `${item.priceId }${ i }`
+        cardList.push({
+          id: id,
+          goodsId: item.goodsId,
+          goodsName: item.goodsName,
+          economicalMoney: item.economicalMoney,
+          selectPriceInteger: selectPriceInteger,
+          selectPriceDecimal: selectPriceDecimal,
+          priceId: item.priceId,
+          specsCont: item.spec,
+          checked: false,
+          disabled: false
+        })
+      }
+    })
+
+    if (that.data.activityLimitData) {
+      cardList = []
+    }
+
+    that.setData({
+      cardList
+    })
+
+    this.autoChoose()
+
+  },
+
+  /**
+   * 处理自动选择
+   */
+  autoChoose() {
+
+    let that = this
+    let totalPayAmount = 0
+    let flag = 0
+    let discount = 0
+    let discountFlag = false
+    let cardList = that.data.cardList.sort(function(a, b) {
+      return a.economicalMoney - b.economicalMoney
+    });
+
+    for (let i = 0; i < cardList.length; i++) {
+
+      flag += cardList[i].economicalMoney
+      cardList[i].disabled = true
+
+      if (flag <= that.data.limitPrice) {
+        cardList[i].checked = true
+        discount += cardList[i].economicalMoney
+        cardList[i].disabled = false
+      }
+
+    }
+
+    totalPayAmount = that.data.totalPayAmount - discount
+
+    if (discount > 0) {
+      discountFlag = true
+    }
+
+    console.log(cardList)
+
+    that.setData({
+      cardList,
+      discount,
+      totalPayAmount,
+      discountFlag
+    })
+
+  },
+
+  /**
+   * 选卡逻辑
+   */
+  chooseCard(e) {
+
+    let that = this
+    let totalPayAmount = 0
+    let limitPrice = that.data.limitPrice
+    let currentChoose = e.currentTarget ? e.currentTarget.dataset.item : e
+    let discount = that.data.discount
+
+    if (currentChoose.disabled) {
+      return
+    }
+
+    let cardList = that.data.cardList.map(cardListItem => {
+
+      if (cardListItem.id == currentChoose.id) {
+
+        if (cardListItem.checked) {
+          cardListItem.checked = false
+          discount += -cardListItem.economicalMoney
+          totalPayAmount = that.data.totalPayAmount + cardListItem.economicalMoney
+        } else {
+          cardListItem.checked = true
+          discount += cardListItem.economicalMoney
+          totalPayAmount = that.data.totalPayAmount - cardListItem.economicalMoney
+        }
+
+      }
+      return cardListItem
+    })
+
+    cardList = cardList.map(cardListItem => {
+
+      if (!cardListItem.checked && cardListItem.economicalMoney <= (limitPrice - discount)) {
+        cardListItem.disabled = false
+      } else if (cardListItem.checked) {
+        cardListItem.disabled = false
+      } else {
+        cardListItem.disabled = true
+      }
+      return cardListItem
+
+    })
+
+
+    that.setData({
+      cardList,
+      discount,
+      totalPayAmount
+    })
+
+  },
+
+  /**
+   * 查询限额
+   */
+  getLimitPrice() {
+
+    let that = this
+
+    let activityLimitData = false
+
+    if (!this.data.openCardFlag) {
+      that.dealCartsList()
+      return
+    }
+
+    orderApi.getLimitPrice().then(result => {
+      if (result.data.status === '0000') {
+        let data = result.data.data
+        let limitPrice = data.totalSum
+        let createTime = data.createTime.substring(0, 9)
+        let validity = data.validity.substring(0, 9)
+        let limitDate = `${createTime} 至 ${validity}`
+        let nowTime = new Date().getTime()
+        let startTime = new Date(data.createTime).getTime()
+        let endTime = new Date(data.validit).getTime()
+
+        if (nowTime < startTime || nowTime > endTime) {
+          activityLimitData = true
+        }
+
+        that.setData({
+          limitPrice,
+          limitDate,
+          activityLimitData
+        })
+
+        that.dealCartsList()
+      } else {
+        alertModal(result.data.msg)
+      }
+    })
+
+  },
+
+  /**
+   *  处理后端优惠卡请求数据
+   */
+  dealCardListArray(array) {
+
+    let object = {};
+    let result = [];
+    for (let i = 0; i < array.length; i++) {
+      let current = array[i];
+      if (current.checked == false) {
+        break
+      }
+      if (!object[current.goodsId]) {
+        result.push({
+          goodsId: current.goodsId,
+          discountAmount: current.economicalMoney,
+          priceId: current.priceId,
+          specs: current.specsCont,
+          goodsIdSpecs: `${current.goodsId}${current.specsCont}`,
+          data: [current]
+        })
+        object[current.id] = current.id;
+      } else {
+        for (let j = 0; j < result.length; j++) {
+          let currentSon = result[j]
+          if (current.id == currentSon.id) {
+            result[j].data.push(current);
+            break;
+          }
+        }
+      }
+    }
+
+    result.map(item => {
+      item.num = item.data.length
+      delete item.data
+    })
+    return result;
+
+  },
+  /**
+   * 处理地址
+   */
+  dealAddress() {
+   if (!wx.getStorageSync('address')) {
+      return
+    }
+    let checkedAddress = JSON.parse(wx.getStorageSync('address'));
+    this.setData({
+      hasDefaultAddress: true,
+      name: checkedAddress.receiver,
+      region: [checkedAddress.provinceName, checkedAddress.cityName, checkedAddress.areaName],
+      regionCode: [checkedAddress.province, checkedAddress.city, checkedAddress.area],
+      phone: checkedAddress.mobile,
+      address: checkedAddress.address,
+      isDefault: checkedAddress.isDefault === 1 ? true : false
+    })
+
+  },
+
+  /**
+   * 计算金额
+   */
+  calculatePrice() {
+
+    let totalPayAmount = 0;
+    let totalFreightAmount = 0;
+    let totalAmount = 0;
+    let buyToProvinceValue = 0;
+    let goodsAmount = 0;
+    let cartsList = JSON.parse(JSON.stringify(this.data.cartsList));
+    for (let i = 0; i < cartsList.length; i++) {
+      console.log(cartsList[i].payAmount)
+      // 总应付
+      totalPayAmount += cartsList[i].payAmount
+      // 总运费
+      totalFreightAmount += cartsList[i].freightAmount
+      // 小计总金额
+      totalAmount += cartsList[i].totalAmount
+      // 商品总金额
+      goodsAmount = totalPayAmount - totalFreightAmount
+    }
+    // 计算买省
+    buyToProvinceValue = totalAmount - totalPayAmount;
+
+    this.setData({
+      totalPayAmount,
+      totalFreightAmount,
+      totalAmount,
+      buyToProvinceValue,
+      goodsAmount
+    })
+
+  },
+
+  /**
+   * 输入给商家的留言
+   */
+  inputMessage(e) {
+
+    let message = utf16toEntities(e.detail.value.trim());
+    let shopIndex = e.currentTarget.dataset.shop;
+    let list = this.data.cartsList
+    list[shopIndex].note = message
+    this.setData({
+      cartsList: list
+    })
+
+  },
+
+  /**
+   * 选择支付方式
+   */
+  selectPayType() {
+
+    let selected = this.data.payTypeSelected;
+    selected = !selected;
+    this.setData({
+      payTypeSelected: selected
+    })
+
+  },
+
+  /**
+   * picker选择地址方法
+   */
+  bindRegionChange(e) {
+
+    this.setData({
+      region: e.detail.value,
+      regionCode: e.detail.code
+    })
+
+  },
+
+  /**
+   * 输入姓名
+   */
+  handleName(e) {
+
+    this.setData({
+      name: e.detail.value.trim()
+    })
+
+  },
+
+  /**
+   * 输入手机号
+   */
+  handlePhone(e) {
+
+    this.setData({
+      phone: e.detail.value,
+      userPhone: e.detail.value
+    })
+
+  },
+
+  /**
+   * 输入地址
+   */
+  handleAddress(e) {
+
+    this.setData({
+      address: e.detail.value.trim()
+    })
+
+  },
+
+  /**
+   * 选择是否默认
+   */
+  switchChange(e) {
+
+    this.setData({
+      isDefault: e.detail.value
+    })
+
+  },
+
+  /**
+   * 请求默认地址
+   */
+  getDefaultAddress() {
+
+    let that = this;
+    addressApi.getDefaultAddress({}).then(res => {
+      if (res.data.status === '0000') {
+        if (res.data.data.length === 0) {
+          that.setData({
+            hasDefaultAddress: false,
+            initAddress: false,
+          })
+        } else {
+          that.setData({
+            isRequest: true,
+            hasDefaultAddress: true,
+            initAddress: true,
+            name: uncodeUtf16(res.data.data[0].receiver),
+            region: [res.data.data[0].provinceName, res.data.data[0].cityName, res.data.data[0].areaName],
+            regionCode: [res.data.data[0].province, res.data.data[0].city, res.data.data[0].area],
+            phone: res.data.data[0].mobile,
+            address: uncodeUtf16(res.data.data[0].address),
+            isDefault: res.data.data[0].isDefault === 1 ? true : false
+          })
+          wx.setStorageSync('address', JSON.stringify(res.data.data[0]))
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+
+  },
+
+  /**
+   * 去选择地址
+   */
+  selectAddressList() {
+
+    if (this.data.addressListFlag) {
+      wx.navigateTo({
+        url: `../shopAddressList/shopAddressList`,
+      })
+    } else {
+      wx.navigateTo({
+        url: `../shopAddAddress/shopAddAddress`,
+      })
+    }
+
+  },
+
+  /**
+   * 提交订单
+   */
+  submit(e) {
+    console.log('hasDefaultAddress=',this.data.hasDefaultAddress,'chooseAddressFlag=',this.data.chooseAddressFlag,'regionCod=',this.data.regionCod,'region=',this.data.region);
+    let that = this;
+    let phone = ''
+    if (this.data.hasDefaultAddress == true && this.data.initAddress == true) {
+      phone = this.data.phone
+    } else {
+      phone = this.data.userPhone
+    }
+    if (!this.data.hasDefaultAddress && !this.data.chooseAddressFlag) {
+      wx.showToast({
+        title: '请选择收货地址',
+        icon: 'none'
+      })
+      return;
+    }
+
+    if (this.data.name === '') {
+      wx.showToast({
+        title: '收货人不能为空',
+        icon: 'none'
+      })
+      return;
+    }
+
+    if (!/^1[3456789]\d{9}$/.test(phone) && (!that.data.belongOwnFlag)) {
+      alertModal1("请输入正确的手机号")
+      return;
+    }
+    if (this.data.address === '') {
+      wx.showToast({
+        title: '地址信息不能为空',
+        icon: 'none'
+      })
+      return;
+    }
+    // 如果没有默认地址  默认新增一条
+    // if (!this.data.hasDefaultAddress&&!this.data.chooseAddressFlag) {
+    //   let params = {
+    //     address: utf16toEntities(this.data.address),
+    //     province: this.data.regionCode[0],
+    //     city: this.data.regionCode[1],
+    //     area: this.data.regionCode[2],
+    //     provinceName: this.data.region[0],
+    //     cityName: this.data.region[1],
+    //     areaName: this.data.region[2],
+    //     isDefault: 1,
+    //     mobile: phone,
+    //     receiver: utf16toEntities(this.data.name)
+    //   }
+    //   addressApi.validateDefaultAddress({}).then(res => {
+    //     if (res.data.status === "0000") {
+    //       addressApi.addAddress(params).then(result => {
+    //         if (res.data.status === "0000") {
+    //           this.data.hasDefaultAddress = true
+    //         }
+    //       })
+    //     } else {
+    //       alertModal1(res.data.msg)
+    //     }
+    //   })
+    // }
+    if (!this.data.payTypeSelected) {
+      wx.showToast({
+        title: '请选择付款方式',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+
+    wx.showToast({
+      title: '正在下单',
+      icon: 'loading',
+      mask: true
+    })
+    this.setData({
+      payMask: true
+    })
+    // 校验库存
+    let checkCartsList = []
+    let cartsList = this.data.cartsList
+    for (let i = 0; i < cartsList.length; i++) {
+      cartsList[i].billFlag = 0
+      for (let j = 0; j < cartsList[i].cminiShopCarList.length; j++) {
+        checkCartsList.push(cartsList[i].cminiShopCarList[j])
+      }
+    }
+    this.setData({
+      sourceType: checkCartsList[0].sourceType,
+      cartsList: cartsList
+    })
+    let shopId = that.data.shopId
+    if (this.data.option.enjoyCardId) {
+      shopId = app.data.activeCardShopId
+    }
+    // 订单信息
+    let orderInfo = {
+      payType: this.data.payType, // 微信支付
+      receiverCity: this.data.regionCode[1],
+      receiverCityName: this.data.region[1],
+      receiverDetailAddress: utf16toEntities(this.data.address),
+      receiverName: utf16toEntities(this.data.name),
+      receiverPhone: phone,
+      receiverProvince: this.data.regionCode[0],
+      receiverProvinceName: this.data.region[0],
+      receiverRegion: this.data.regionCode[2],
+      receiverRegionName: this.data.region[2],
+      shopCarOrderList: this.data.cartsList,
+      totalAmount: this.data.totalAmount,
+      totalFreightAmount: this.data.totalFreightAmount, //总运费
+      totalPayAmount: this.data.totalPayAmount, //实际支付
+      shopId: shopId, // 门店id
+      sourceType: this.data.sourceType,
+      sarsMark: this.data.sarsMark
+    }
+
+    let benefitCoupon = []
+
+    if (that.data.openCardFlag) {
+      if (that.data.limitPrice < that.data.discount) {
+        wx.hideToast()
+        alertModal1("优惠卡超额")
+        that.setData({
+          payMask: false
+        })
+        return false
+      }
+      benefitCoupon = that.dealCardListArray(that.data.cardList)
+    }
+
+    let params = {
+      tranList: [orderInfo],
+      enjoyCardId: this.data.option.enjoyCardId,
+      sourceBindingType: app.data.sourceBindingType,
+      benefitCoupon: benefitCoupon
+    }
+    // 下单
+    orderApi.placeOrder(params).then(result => {
+      if (result.data.status === '0000') {
+        wx.hideToast()
+        // 显示支付遮罩层
+        that.setData({
+          payMask: false
+        })
+        app.data.orderId = result.data.data.tranId
+        let isZeroPty = result.data.data.isZeroPty
+
+        if (isZeroPty) {
+          // 跳转支付成功页面
+          wx.redirectTo({
+            url: `../orderPaySuccess/orderPaySuccess?totalPayAmount=${that.data.totalPayAmount}`,
+          })
+
+        } else {
+          wx.requestPayment({
+            timeStamp: result.data.data.timeStamp,
+            nonceStr: result.data.data.nonceStr,
+            package: result.data.data.packAge,
+            signType: result.data.data.signType,
+            paySign: result.data.data.paySign,
+            success(res) {
+              // 跳转支付成功页面
+              wx.redirectTo({
+                url: `../orderPaySuccess/orderPaySuccess?totalPayAmount=${that.data.totalPayAmount}`,
+              })
+            },
+            fail(res) {
+              alertModal("支付取消")
+              that.setData({
+                payMask: false
+              })
+              // 取消支付跳转订单列表页面
+              setTimeout(() => {
+                wx.redirectTo({
+                  url: `../shopOrderList/shopOrderList?currentTab=1`,
+                })
+              }, 800)
+            }
+          })
+        }
+
+      } else {
+        alertModal(result.data.msg)
+        that.setData({
+          payMask: false
+        })
+        setTimeout(() => {
+          wx.navigateBack({
+            detal: 1
+          })
+        }, 2000)
+      }
+    })
+  },
+
+  checkAddress() {
+    this.setData({
+      checkAddressStatus: false
+    })
+  },
+
+  /**
+   * 获取用户手机号
+   */
+  getUserPhone() {
+
+    let that = this
+    commonApi.getUserPhone({}).then(res => {
+      if (res.data) {
+        that.setData({
+          userPhone: res.data.data
+        })
+      }
+    })
+
+  },
+
+  /**
+   * 切换发票类型
+   */
+  changeTabType(e) {
+
+    let no = e.currentTarget.dataset.no;
+    let type = e.currentTarget.dataset.type;
+    switch (no) {
+      case 1: // 是否开发票
+        if (type == 2) {
+          this.setData({
+            invoiceTitle: '',
+            invoiceNumber: ''
+          })
+        }
+        this.setData({
+          invoiceType: type
+        })
+        break
+      case 2: // 发票类型
+        if (type == 1) {
+          this.setData({
+            invoiceNumber: ''
+          })
+        }
+        this.setData({
+          invoiceInfo: type
+        })
+        break
+    }
+  },
+
+  /**
+   * 输入发票信息
+   */
+  invoiceInput(e) {
+
+    let value = e.detail.value;
+    let type = e.currentTarget.dataset.type;
+
+    switch (type) {
+      case 1:
+        //  发票抬头
+        this.setData({
+          invoiceTitle: value
+        })
+        return
+      case 2:
+        //  发票税号
+        this.setData({
+          invoiceNumber: value
+        })
+        return
+    }
+  },
+  /**
+   * 打开折扣对话窗函数
+   */
+  showOpenCardDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(600).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+      deductionDialogFlag: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      that.setData({
+        openDialogAnimation: animation.export()
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 打开没有折扣对话窗函数
+   */
+  noOpenCardDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(600).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+      noDeductionDialogFlag: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      that.setData({
+        openDialogAnimation: animation.export()
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 关闭折扣对话窗函数
+   */
+  closedeductionDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(600).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      that.setData({
+        openDialogAnimation: animation.export(),
+        deductionDialogFlag: false
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 关闭没有优惠卡的折扣对话窗
+   */
+  closeNoDeductionDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(600).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      that.setData({
+        openDialogAnimation: animation.export(),
+        noDeductionDialogFlag: false
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 是否折叠
+   */
+  foldingClick(e) {
+
+    var type = e.currentTarget.dataset.type;
+    var that = this;
+    that.data.hiddenafterSales = !that.data.hiddenafterSales; //隐藏物流信息
+
+    this.setData({
+      hiddenafterSales: that.data.hiddenafterSales,
+    })
+  },
+
+  /**
+   * 查询开卡状态
+   */
+  checkOpenCardFlag() {
+
+    let that = this
+
+    commonApi.checkOpenCardFlag().then(res => {
+      if (res.data.status === '0000') {
+        that.setData({
+          openCardFlag: res.data.data
+        })
+
+        that.getLimitPrice()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal1('请求服务失败')
+    })
+
+  }
+
+})

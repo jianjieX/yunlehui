@@ -1,0 +1,100 @@
+<!--原因-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!--未发布提示-->
+<view class="the-reason-view">
+  <block wx:if="{{data.reviewStatus == 0}}">
+    <view class="the-reason-title">草稿箱</view>
+    <view class="the-reason-inform">您的故事已经保存至草稿箱！</view>
+  </block>
+  <block wx:elif="{{data.reviewStatus == 1}}">
+    <view class="the-reason-title">待审核</view>
+    <view class="the-reason-inform">小编正全力审核中，请耐心等待！</view>
+  </block>
+  <block wx:elif="{{data.reviewStatus == 3}}">
+    <view class="the-reason-title">驳回原因</view>
+    <view class="the-reason-inform">{{data.dismissReason}}</view>
+  </block>
+</view>
+
+<!--故事头图-->
+<view class="top-img">
+  <image bindtap="previewImage" mode="widthFix" src="{{data.contentBanner}}"></image>
+</view>
+
+<!-- 内容区 -->
+<view class="content">
+  <view class="article-title">
+    {{data.title}}
+  </view>
+  <!-- 富文本 -->
+  <view class="article">
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+  </view>
+</view>
+<!----关联分类--->
+<view class="tip-view">
+  <block wx:for="{{data.categoryResList}}">
+    <view data-id="{{item.categoryId}}" bindtap="toClassion" class="tip-text">#{{item.categoryName}}</view>
+  </block>
+</view>
+<!--关联商品-->
+<view class="related-goods-view" wx:if="{{data.storyGoodsRes.length != 0}}">
+  <swiper interval="{{interval}}" next-margin="20rpx">
+    <block wx:for="{{data.storyGoodsRes}}">
+      <swiper-item>
+        <!--消息每条-->
+        <view class="message-item-view">
+          <view class="commodity-img-view">
+            <image class="commodity-img-style" src='{{item.goodsUrl}}'></image>
+          </view>
+          <view class="copywriting-view">
+            <!--商品标题-->
+            <view class="commodity-title-style">
+              <text wx:if="{{item.goodsType == 2}}" class="commodity-strict-select">严选</text>
+              <text wx:elif="{{item.goodsType == 3}}" class="commodity-our-shop">本店</text> {{item.goodsName}}
+            </view>
+            <!--商品价格-->
+            <view class="commodity-price-view">
+              <view>￥{{numFr.getNum(item.selectedPrice)}}</view>
+              <view class="pay-button" data-id="{{item.id}}" bindtap="toPay">去购买</view>
+            </view>
+          </view>
+        </view>
+      </swiper-item>
+    </block>
+  </swiper>
+</view>
+<!---------------相关内容------------------>
+<view class='related-information-view' wx:if="{{data.cminiRelateStoryResList.length != 0}}">
+  <view class='yellow-block'></view>
+  <view style='margin-left:16rpx;'>相关内容</view>
+</view>
+<!-------------瀑布流------------->
+<view wx:if='{{data.cminiRelateStoryResList.length != 0}}' class="content">
+  <view class="left">
+    <block wx:for="{{data.cminiRelateStoryResList}}" wx:key="b{{index}}">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==0}}"></template>
+    </block>
+  </view>
+  <view class="right">
+    <block wx:for="{{data.cminiRelateStoryResList}}" wx:key="b{{index}}">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==1}}"></template>
+    </block>
+  </view>
+</view>
+<!--底部tab-->
+<view class='bottom-tab-view' wx:if="{{data.reviewStatus == 0 || data.reviewStatus == 3}}">
+  <view class="bottom-button" bindtap="editStory">编辑</view>
+</view>
+<!--占位-->
+<view style='height:120rpx;'></view>
+<!-------------单一故事模块------------->
+<template name="item">
+  <view class="item" data-id="{{item.id}}">
+    <image class="item-img" src="{{item.contentBanner}}" mode="widthFix"></image>
+    <view class="item-title-box">
+      <view class="item-title">{{item.title}}</view>
+    </view>
+  </view>
+</template>

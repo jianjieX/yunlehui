@@ -1,0 +1,71 @@
+<!-- 搜索商品页面 -->
+
+<!-- 格式化金钱 -->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 处理商品标签 -->
+<wxs module="handleGoodsTag" src="../../filter/handleGoodsTag.wxs"></wxs>
+<wxs module="location" src="../../filter/location.wxs"></wxs>
+
+<view class="fix">
+	<!-- 搜索框 -->
+	<view class="navigate-bar">
+		<view class="search-bar">
+			<view class="input-view">
+				<input placeholder="搜索你想要的商品或商家名称" bindinput="inputSearchValue" value="{{searchValue}}" focus="{{true}}" maxlength="30" bindconfirm="searchGoods" confirm-type="search" />
+				<image src="/img/homeImg/search.png" class="search-icon" />
+				<view class="cancle-view">
+					<image src="/img/detailImg/close.png" class="cancel-icon" wx:if="{{searchValue !== ''}}" catchtap="cancelInput" />
+				</view>
+			</view>
+		</view>
+	</view>
+
+	<!--商户列表-->
+	<view>
+		<block wx:for="{{merchantList}}" wx:key="*this">
+			<view class="list" bindtap="jumpDetail" data-id='{{item.merchantShopId}}' data-latitude='{{item.dimension}}' data-longitude='{{item.longitude}}'
+		data-distance="{{location.getDistance(latitudeUser,longitudeUser,item.dimension,item.longitude)}}">
+				<view class="list-top">
+					<view class="left">
+						<image class="logo" src="{{item.shopHeader}}" id="{{item.merchantShopId}}"></image>
+					</view>
+					<view class="right">
+						<block wx:if="{{item.goodsList.length !== 0}}">
+							<text class="name">{{item.shopName}}</text>
+							<view class="address">
+								<text class="place">{{item.provinceName}}{{item.cityName}}{{item.areaName}}{{item.address}}{{item.address}}</text>
+								<!-- <text>{{location.getDistance(latitudeUser,longitudeUser,item.dimension,item.longitude)}}</text> -->
+								<text>{{item.distance}}</text>
+							</view>
+							<view wx:for="{{item.merchantGoodsResultDo.list}}">
+								<text class="discount"><text class="coupon">惠</text>
+								<text class="title"> <text class="goodsName">{{item.goodsName}}</text></text>
+								</text>
+							</view>
+						</block>
+					</view>
+				</view>
+			</view>
+		</block>
+	</view>
+</view>
+
+
+<!-- 搜索历史 -->
+<view class="tag-bar" wx:if="{{sortTab === 0 && historyMerchantList.length !== 0&&merchantList.length==0}}">
+	<view class="title">
+		<view class="text">历史搜索</view>
+		<image src="/img/homeImg/delete.png" class="clear-icon" bindtap="clearHistoryList" />
+	</view>
+	<view class="tag-list">
+		<view class="tag-item" wx:for="{{historyMerchantList}}" wx:key="{{index}}" data-value="{{item}}" bindtap="clickSearchTag">{{item}}</view>
+	</view>
+</view>
+
+
+
+<!-- 页面搜索结果为空 -->
+<view class="empty-view" wx:if="{{sortTab !== 0 && merchantList.length === 0}}">
+	<image src="/img/defaultImg/empty.png" class="empty-img" />
+	<view class="empty-text">没有搜到这个宝贝，换个词试试吧～</view>
+</view>

@@ -1,0 +1,68 @@
+
+<!-- 格式化金钱 -->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 格式化时间 -->
+<wxs module="time" src="../../filter/time.wxs"></wxs>
+<!-- 乐享卡 -->
+<wxs module="authority" src="../../filter/enjoyCard.wxs"></wxs>
+
+<!-- 优惠卡 -->
+<view class="card">
+  <image src="https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216125435.png" class="card-bg"></image>
+  <view class="card-top">
+    <image src="https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216125529.png" bindtap="closeToast" data-status="{{true}}" class="tips-icon"></image>
+    <view class="card-name">{{cardInfo.cardTitle}}</view>
+    <view class="card-time">有效期：{{authority.deal(cardInfo.createTime)}}至{{authority.deal(cardInfo.validity)}}</view>
+    <view class="balance">¥{{numFr.getNum(cardInfo.remainingSum)}}</view>
+    <view class="balance-text">余额</view>
+  </view>
+  <view class="card-bottom">
+    <view class="price-item">
+      <view class="price-num">¥{{numFr.getNum(cardInfo.totalSum)}}</view>
+      <view class="price-text">总金额</view>
+    </view>
+    <view class="l-line"></view>
+    <view class="price-item">
+      <view class="price-num">¥{{numFr.getNum(cardInfo.useSum)}}</view>
+      <view class="price-text">已使用</view>
+    </view>
+  </view>
+</view>
+
+<!-- 使用记录 -->
+<view class="record">
+  <view class="record-title">乐享权益使用记录</view>
+  <view class="record-item" wx:if="{{recordList.length !== 0}}" wx:for="{{recordList}}" wx:key="index" bindtap="toOrderList" data-item="{{item}}">
+    <view class="record-info">
+      <view wx:if="{{item.orderType == 1 }}" class="record-desc">购物抵扣(订单号：{{item.orderId}})</view>
+      <view wx:if="{{item.orderType == 2 }}" class="record-desc">退款返还(订单号：{{item.orderId}})</view>
+      <view class="record-time">{{item.createTime}}</view>
+    </view>
+    <view class="record-price">
+      <view wx:if="{{item.orderType == 1 }}" class="record-price-red">-￥{{item.interestsSum}}</view>
+      <view  wx:if="{{item.orderType == 2 }}" class="record-price-green">+￥{{item.interestsSum}}</view>
+      <!-- <view class="record-arrow"></view> -->
+    </view>
+  </view>
+  <view class="empty" wx:if="{{recordList.length === 0}}">
+    <image class="empty-image" src="/img/defaultImg/empty.png"></image>
+  <view class="empty-text">暂无使用记录~</view>
+  </view>
+  
+</view>
+
+<!-- 提示框 -->
+<view class="toast" wx:if="{{toastStatus}}">
+  <view class="mask" bindtap="closeToast" data-status="{{false}}"></view>
+  <view class="dialog">
+    <view class="dialog-content">
+      <view class="toast-title">使用说明</view>
+      <view class="content">
+        <rich-text nodes="{{cardInfo.description}}"></rich-text>
+      </view>
+    </view>
+    <view class="close">
+      <icon bindtap="closeToast" data-status="{{false}}" type="cancel" color="#fff"></icon>
+    </view>
+  </view>
+</view>

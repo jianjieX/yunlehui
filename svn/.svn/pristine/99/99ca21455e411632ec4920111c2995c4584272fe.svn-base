@@ -1,0 +1,251 @@
+const systemInfo = wx.getSystemInfoSync()
+function getNowFormatDate() {  //yyyy-MM-dd HH:MM:SS”
+  var date = new Date();
+  var seperator1 = "/";
+  var seperator2 = ":";
+  var month = date.getMonth() + 1;
+  var strDate = date.getDate();
+  if (month >= 1 && month <= 9) {
+    month = "0" + month;
+  }
+  if (strDate >= 0 && strDate <= 9) {
+    strDate = "0" + strDate;
+  }
+  var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+    + " " + date.getHours() + seperator2 + date.getMinutes()
+    + seperator2 + date.getSeconds();
+  return currentdate;
+}
+
+function getNewDates() {  //yyyy-MM-dd”
+  var date = new Date();
+  var seperator1 = "-";
+  var seperator2 = ":";
+  var month = date.getMonth() + 1;
+  var strDate = date.getDate();
+  if (month >= 1 && month <= 9) {
+    month = "0" + month;
+  }
+  if (strDate >= 0 && strDate <= 9) {
+    strDate = "0" + strDate;
+  }
+  var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
+  return currentdate;
+}
+
+function utf16toEntities(str) {  //将emoji表情转为字符进行存储 
+  var patt = /[\ud800-\udbff][\udc00-\udfff]/g; // 检测utf16字符正则 
+  str = str.replace(patt, function (char) {
+    var H, L, code;
+    if (char.length === 2) {
+      H = char.charCodeAt(0); // 取出高位 
+      L = char.charCodeAt(1); // 取出低位 
+      code = (H - 0xD800) * 0x400 + 0x10000 + L - 0xDC00; // 转换算法 
+      return "&#" + code + ";";
+    } else {
+      return char;
+    }
+  });
+  return str;
+}
+
+function uncodeUtf16(str) {  //反解开EMOJI编码后的字符串   与上对应使用
+  var reg = /\&#.*?;/g;
+  var result = str.replace(reg, function (char) {
+    var H, L, code;
+    if (char.length == 9) {
+      code = parseInt(char.match(/[0-9]+/g));
+      H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+      L = (code - 0x10000) % 0x400 + 0xDC00;
+      return unescape("%u" + H.toString(16) + "%u" + L.toString(16));
+    } else {
+      return char;
+    }
+  });
+  return result;
+}
+
+function reciprocal(cleartime) {  //倒计时
+  if (!cleartime) {
+    return 'no'
+    return false
+  }
+  cleartime = new Date(cleartime);
+  // cleartime = cleartime ? cleartime.replace(/-/g, "/") : '';
+  let start = cleartime.getTime();
+  start = start + 1 * 60 * 1000;
+  let date = new Date();
+  let now = date.getTime();
+  let leftTime = start - now;
+  let d, h, m, s;
+  if (leftTime >= 0) {
+    d = Math.floor(leftTime / 1000 / 60 / 60 / 24);  //天
+    h = Math.floor(leftTime / 1000 / 60 / 60 % 24);  //时
+    m = Math.floor(leftTime / 1000 / 60 % 60);  //分
+    s = Math.floor(leftTime / 1000 % 60);  //秒
+    if (s != 0) {
+      return s + '秒后重发'
+    }
+  } else {
+    return 'yes'
+  }
+}
+
+function million(num) {    //数字过万处理
+  return num > 9999 ? (Math.floor(num / 1000) / 10) + '万+' : num
+}
+
+function dateConv(dateStr, type) {  //   yyyy/mm/dd
+  let year = dateStr.getFullYear(),
+    month = dateStr.getMonth() + 1,
+    today = dateStr.getDate();
+  month = month > 9 ? month : "0" + month;
+  today = today > 9 ? today : "0" + today;
+  if (type == '-') {
+    return year + "-" + month + "-" + today;
+  } else {
+    return year + "/" + month + "/" + today;
+  }
+}
+
+let getQueryString = function (url, name) {  //识别普通二维码，跳转到指定商家页面
+  console.log("url = " + url)
+  console.log("name = " + name)
+  var reg = new RegExp('(^|&|/?)' + name + '=([^&|/?]*)(&|/?|$)', 'i')
+  var r = url.substr(1).match(reg)
+  if (r != null) {
+    console.log("r = " + r)
+    console.log("r[2] = " + r[2])
+    return r[2]
+  }
+  return null;
+}
+
+/**
+   * 获取胶囊按钮位置
+   */
+function getMenuPosition() {
+  let top = 4
+  let right = 7
+  let width = 87
+  let height = 32
+  if (systemInfo.platform === 'devtools' && systemInfo.system.indexOf('Android') === -1) {
+    top = 6
+    right = 10
+  }
+  else if (systemInfo.platform === 'devtools' && systemInfo.system.indexOf('Android') != -1) {
+    top = 8
+    right = 10
+  }
+  else if (systemInfo.system.indexOf('Android') != -1) {
+    top = 8
+    right = 10
+    width = 95
+  }
+  return {
+    top: systemInfo.statusBarHeight + top,
+    left: systemInfo.windowWidth - width - right,
+    width: width,
+    height: height
+  }
+}
+/**
+ * 获取状态栏样式
+ */
+function getStatusBarStyle() {
+  let statusBarPosition = {
+    top: 0,
+    left: 0,
+    width: systemInfo.windowWidth,
+    height: systemInfo.statusBarHeight
+  }
+  return formatStyle(statusBarPosition)
+}
+/**
+ * 获取导航栏样式
+ */
+function getNavigationBarStyle() {
+  let menuPosition = getMenuPosition()
+  let navigationBarPosition = {
+    top: systemInfo.statusBarHeight,
+    left: 0,
+    width: systemInfo.windowWidth,
+    height: (menuPosition.top - systemInfo.statusBarHeight) * 2 + menuPosition.height
+  }
+  return formatStyle(navigationBarPosition)
+}
+/**
+ * 获取导航样式
+ */
+function getNavigationStyle() {
+  let menuPosition = getMenuPosition()
+  let padding = systemInfo.windowWidth - menuPosition.left - menuPosition.width
+  let navigationPosition = {
+    top: menuPosition.top,
+    left: padding,
+    // width: systemInfo.windowWidth - padding * 3 - menuPosition.width,
+    height: menuPosition.height,
+    "line-height": menuPosition.height,
+  }
+  return formatStyle(navigationPosition)
+}
+/**
+ * 获取胶囊按钮样式
+ */
+function getMenuStyle() {
+  return formatStyle(getMenuPosition())
+}
+/**
+ * 格式化Style
+ */
+function formatStyle(position) {
+  let styles = []
+  for (let key in position) {
+    styles.push(`${key}: ${position[key]}px;`)
+  }
+  return styles.join(' ')
+}
+
+/**
+ * 处理二维码URL
+ */
+function getQueryString(url, name) {
+  var reg = new RegExp('(^|&|/?)' + name + '=([^&|/?]*)(&|/?|$)', 'i')
+  var r = url.substr(1).match(reg)
+  if (r != null) {
+    return r[2]
+  }
+  return null;
+}
+
+/**
+ * 防止连续触发
+ */
+function buttonClicked(self) {
+  self.setData({
+    buttonClicked: true
+  })
+  setTimeout(function () {
+    self.setData({
+      buttonClicked: false
+    })
+  }, 500)
+}
+
+module.exports = {
+  buttonClicked: buttonClicked,
+  utf16toEntities: utf16toEntities,
+  uncodeUtf16: uncodeUtf16,
+  million: million,
+  getNowFormatDate: getNowFormatDate,
+  getNewDates: getNewDates,
+  reciprocal: reciprocal,
+  getQueryString: getQueryString,
+  dateConv: dateConv,
+  getMenuPosition: getMenuPosition,
+  getStatusBarStyle: getStatusBarStyle,
+  getNavigationBarStyle: getNavigationBarStyle,
+  getNavigationStyle: getNavigationStyle,
+  getMenuStyle: getMenuStyle,
+  getQueryString: getQueryString
+}

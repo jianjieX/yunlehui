@@ -1,0 +1,19 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  originatorDetail(data) {  //查询创作者账户信息
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/member/originatorDetail';
+    return result
+  },
+  redact(data) {  //作者账户信息修改
+    let result = {};
+    result.method = "PUT";
+    result.url = '/cmini/member/originator/redact';
+    return result
+  },
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

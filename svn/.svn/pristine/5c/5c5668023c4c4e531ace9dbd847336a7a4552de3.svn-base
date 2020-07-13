@@ -1,0 +1,451 @@
+/**
+ * 我的页面
+ * 
+ * @author liuhongbin
+ * @date 2019-08-27
+ */
+
+let app = getApp()
+let baseUrl = require("../../utils/base.js");
+import commonApi from '../../utils/config/Api/common.js';
+import myInformApi from '../../utils/config/Api/myInform.js';
+import enjoyCardApi from '../../utils/config/Api/enjoyCard.js'
+import checkUserAuthority from '../../utils/config/Api/enjoyCard.js'
+import util from '../../utils/tools/util.js';
+let uncodeUtf16 = util.uncodeUtf16 // emojy 转字符
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let alertModal = alert.alertModal;
+let sl = alert.showLoading;
+import ws from '../../utils/socket.js';
+
+Page({
+  data: {
+    //未登录时候显示头像
+    defaultImage: '../../img/activity/default.png',
+    //请求返回的用户数据结构体
+    userInfo: null,
+    //用户头像
+    userAvatar: '',
+    //用户昵称
+    nickName: '',
+    //用户会员等级
+    memberLevelId: 0,
+    //判断身份是不是创客
+    makerFlag: 0,
+    //签名
+    signature: '',
+    //总收入
+    income: 0,
+    //可提现
+    withdraw: 0,
+    //待结算
+    clearing: 0,
+    //等级
+    progress: 0,
+    //排位身份
+    rank: '',
+    //店铺客服电话
+    shopTel: "",
+    //发布的故事数量
+    publishedCount: 0,
+    //未发布或失败的数量
+    notReleaseCount: 0,
+    //绑定会员数量
+    bindMemberCount: 0,
+    //会员数量
+    memberCount: 0,
+    //邀请商户数量
+    merchantCount: 0,
+    //绑定过银行卡没的判断
+    bindBankCard: 1,
+    //订单状态数量显示右上角
+    orderNum: app.data.orderNum,
+    //全机型适配顶部背景颜色高度
+    backHeight: app.data.fixedTop + 104,
+    //全机型适配头像距顶
+    avatarTop: app.data.fixedTop + 36,
+    //全机型适配用户名距顶
+    userNameTop: app.data.fixedTop + 42,
+    //全机型适配订单距顶
+    orderTop: app.data.fixedTop + 104,
+    //全机型适配简介距顶
+    profileHeight: app.data.fixedTop + 66,
+    //全机型适配设置距顶
+    optionTop: app.data.fixedTop + 9,
+    //全机型红点距顶
+    redTop: app.data.fixedTop + 4,
+    //未读消息数
+    messageCount: app.data.messageCount,
+    //背景图高度
+    backgroundTop: app.data.fixedTop - 15,
+    //连续触发事件
+    buttonClicked: false,
+    //是否拥有乐享权益
+    haveAuthority: false,
+    //乐享卡list
+    enjoyProList: [],
+    currentPage: 1,
+    totalPages: 0
+  },
+
+
+  onShow: function (options) {
+    let that = this
+    app.accredit().then(
+      () => {
+        let {
+          avatarUrl,
+          nickName,
+          signature
+        } = app.data.userInfo
+        console.log('avatarUrl----',avatarUrl,nickName)
+        that.setData({
+          userAvatar: avatarUrl,
+          nickName,
+          signature
+        })
+        //收益
+        this.getInfo();
+        // 请求订单数量
+        // this.getOrderCount();
+        //未读消息
+        // this.totalCountForC();
+        // 初始化socket
+        ws.onSocketMessage(this.onSocketMessage);
+        //是否拥有乐享权宜
+        this.haveAuthority()
+      }
+
+    )
+  },
+  onLoad: function () {
+    let add = false;
+    let params = {
+      currentPage: this.data.currentPage,
+      enablePage: true
+    }
+    this.findEnjoyProductList(params, add);
+    this.setData({
+      orderNum: app.data.orderNum,
+    })
+    // )
+  },
+  /**
+   * 是否拥有乐享权益
+   */
+  haveAuthority() {
+    let _this = this
+    checkUserAuthority.checkUserAuthority().then(res => {
+      if (res.data.status == '0000') {
+        _this.setData({
+          haveAuthority: res.data.data
+        })
+      }
+
+    })
+  },
+  //跳转到我的活动
+  toActivityMy(e) {
+    util.buttonClicked(this)
+    let index = e.currentTarget.dataset.index
+    wx.navigateTo({
+      url: `../activityMy/activityMy?index=${index}`
+    })
+  },
+
+  //跳转到我的服务
+  toServeMy(e) {
+    util.buttonClicked(this)
+    let {
+      index,
+      isdeal
+    } = e.currentTarget.dataset
+    wx.navigateTo({
+      url: `../serveMy/serveMy?index=${index}&isDeal=${isdeal}`,
+    })
+  },
+  /**
+   * 跳转到乐享卡页面
+   */
+  toEnjoyCard() {
+
+    wx.navigateTo({
+      url: `../enjoyCard/enjoyCard`,
+    })
+  },
+  //判断有没有未读消息
+  totalCountForC() {
+    let that = this;
+    let params = {}
+    commonApi.totalCountForC(params).then(res => {
+      if (res.data.status === "0000") {
+        that.setData({
+          messageCount: res.data.data
+        })
+      }
+    })
+  },
+
+  //去总收入
+  goEarning: function () {
+    wx.navigateTo({
+      url: '../earning/earning'
+    })
+  },
+
+  //去待结算
+  goClearing: function () {
+    wx.navigateTo({
+      url: '../clearing/clearing?settAmount=' + this.data.clearing,
+    })
+  },
+
+  //去已结算
+  cashOut() {
+    wx.navigateTo({
+      url: '../settled/settled?balance=' + this.data.withdraw,
+    })
+  },
+
+  //开店
+  openShop() {
+    util.buttonClicked(this)
+    // 判断是否开过店
+    commonApi.clickOpenShop({}).then(res => {
+      console.log('是否开过店？', res.data.data.auditStatus)
+      //     auditStatus :-1没店  0 审核通过 1待审核 2 驳回
+      if (res.data.data.auditStatus !== -1) {
+        wx.navigateTo({
+          url: `../shopopen/shopopen?shopId=${res.data.data.merchantShopId}&shopStatus=${res.data.data.auditStatus}&rejectReason=${res.data.data.rejectReason}&exclusiveCode=${res.data.data.exclusiveCode}`,
+        })
+      } else {
+        wx.navigateTo({
+          url: '../shopApplication/shopApplication'
+        })
+      }
+    })
+  },
+
+  //订单列表
+  goOrderList(e) {
+    wx.navigateTo({
+      url: `../shopOrderList/shopOrderList?currentTab=${e.currentTarget.dataset.currenttab}`
+    })
+  },
+
+  //去等级
+  toMemberLevel() {
+    wx.navigateTo({
+      url: '../memberLevel/memberLevel'
+    })
+  },
+
+  //去排位
+  toRankLevel() {
+    wx.navigateTo({
+      url: '../rankLevel/rankLevel'
+    })
+  },
+
+  //去故事
+  toStory(e) {
+    let currentTab = e.currentTarget.dataset.tab
+    wx.navigateTo({
+      url: '../myHomePage/myHomePage?currentTab=' + currentTab
+    })
+  },
+
+
+
+  //获取商户和邀请会员信息
+  getMemberInfo() {
+    let that = this;
+    let params = {}
+    commonApi.showMemberNum(params).then(res => {
+      if (res.data.data != null) {
+        that.setData({
+          bindMemberCount: res.data.data.bingMemberTotalElements,
+          memberCount: res.data.data.memberTotalElements,
+          merchantCount: res.data.data.merchantTotalElements
+        })
+        wx.hideLoading();
+      } else {
+        wx.hideLoading();
+        // alertModal1(res.data.msg)
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      alertModal("请求服务失败")
+    })
+  },
+
+  //手机授权回来执行
+  showToast() {
+    wx.showToast({
+      title: '登陆成功',
+      icon: 'none'
+    })
+  },
+
+  //获取收益
+  getInfo() {
+    let that = this;
+    let params = {
+      allEd: 0
+    }
+    commonApi.getVirtualAccount(params).then(res => {
+      if (res.data.status == '0000') {
+        if (res.data.data != null) {
+
+          that.setData({
+            withdraw: res.data.data.unSettAmount,
+            income: res.data.data.totalIncome,
+            clearing: res.data.data.settAmount,
+          })
+          wx.hideLoading();
+        } else {
+          wx.hideLoading();
+          // alertModal1(res.data.msg)
+        }
+      }
+
+    }).catch(err => {
+      wx.hideLoading();
+      alertModal("请求服务失败")
+    })
+  },
+
+  //账户信息
+  accountInform() {
+    if (this.data.userAvatar) {
+      wx.navigateTo({
+        url: '../../pages/accountInform/accountInform',
+      })
+    } else {
+      return
+    }
+
+  },
+
+  //页面跳转 会员列表
+  toPsdManage(e) {
+    wx.navigateTo({
+      url: `../../pages/utilPage/utilPage`,
+    })
+  },
+
+  //页面跳转 消息列表
+  toMessage() {
+    wx.navigateTo({
+      url: `../../pages/messageList/messageList`,
+    })
+  },
+
+  /**
+   * 请求订单数量
+   */
+  getOrderCount() {
+    let that = this;
+    commonApi.getOrderCount({}).then(res => {
+      if (res.data.status === "0000") {
+        that.setData({
+          orderNum: res.data.data
+        })
+      }
+    })
+  },
+
+  //页面分享
+  onShareAppMessage: function () {
+    return app.onShare();
+  },
+  /**
+   * socket返回方法
+   */
+  onSocketMessage(result) {
+
+    let that = this;
+    let res = result.data;
+
+    if (res === 'true') {
+      console.log('shopMy.js', res);
+      let params = {
+        date: 'OK',
+        type: 1
+      };
+      ws.sendSocketMessage(JSON.stringify(params));
+    } else {
+      res = JSON.parse(res);
+      console.log('shopMy.js', res);
+      that.setData({
+        orderNum: res,
+        messageCount: res.messageCount
+      })
+    }
+
+  },
+
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function () {
+    if (this.data.currentPage > this.data.totalPages) {
+      wx.showToast({
+        title: '没有更多数据了',
+        icon: 'none'
+      })
+      return
+    }
+    this.setData({
+      currentPage: this.data.currentPage + 1
+    })
+    let add = true;
+    let _parms = {
+      currentPage: this.data.currentPage + 1,
+      enablePage: true
+    }
+    this.findEnjoyProductList(_parms, add)
+  },
+
+
+  /**
+   * 跳转商品详情
+   */
+  toGoodsDetail(e) {
+
+    let goodsId = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: `../../pages/shopDetail/shopDetail?goodsId=${goodsId}`
+    })
+  },
+
+  /**
+   * 获取乐享商品列表
+   */
+  findEnjoyProductList(params, add) {
+    let _this = this
+
+    enjoyCardApi.findEnjoyProductList(params).then(res => {
+      if (res.data.status == '0000') {
+        let data = res.data.data
+        if (add) {
+          _this.setData({
+            enjoyProList: [..._this.data.enjoyProList, ...data.content],
+            totalPages: data.totalPages
+          })
+        } else {
+          _this.setData({
+            enjoyProList: data.content,
+            totalPages: data.totalPages
+          })
+        }
+      } else {
+        _this.setData({
+          enjoyProList: []
+        })
+      }
+    })
+  },
+})

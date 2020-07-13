@@ -1,0 +1,357 @@
+/**
+ * app.js
+ */
+import exceptionHandling from './utils/config/exceptionHandling.js'
+let baseUrl = require("./utils/base.js");
+let util = require('/utils/tools/util.js');
+let getMenuPosition = util.getMenuPosition;
+let getStatusBarStyle = util.getStatusBarStyle;
+let getNavigationBarStyle = util.getNavigationBarStyle;
+let getNavigationStyle = util.getNavigationStyle;
+let getMenuStyle = util.getMenuStyle;
+let alert = require('/utils/tools/alert.js');
+let alertModal = alert.alertModal;
+const systemInfo = wx.getSystemInfoSync();
+import Api from './utils/config/Api/common.js';
+import ws from './utils/socket.js';
+
+App({
+  data: {
+    userId: null, //用户id
+    shareId: '', //分享人id
+    sourceBindingType:'MERCHANT_SHOP',//分享渠道类型
+    activeCardShopId:'6611195966457664515',
+    contUserId: "", //分享故事进来作者的id
+    token: '',
+    userPhone: false,
+    nickName: '', // 用户昵称
+    userAvatar: '', // 用户头像
+    isAuthorization: false, // 授权状态
+    statusBarStyle: '', //导航刘海头样式
+    navigationBarStyle: '', //导航栏样式
+    navigationStyle: '', //导航栏样式
+    menuStyle: '', // 胶囊样式
+    fixedTop: '', // 头部高度适配  
+    shopName: '', //商店名称  
+    shopHeader: '', //商店logo
+    orderId: '', //支付订单的id
+    flag: 0, //是否授权手机号
+    decryptDataFlag: false, // 是否授权
+    //用户基本信息
+    userInfo: {
+      //用户头像
+      avatarUrl: '',
+      //用户昵称
+      nickName: '',
+      //用户年龄
+      gender: 0,
+      //用户签名
+      signature: '',
+      //用户手机号
+      userPhone: ''
+    },
+    // 选择地址列表标识
+    chooseAddressFlag: false,
+    //订单状态数量显示右上角
+    orderNum: {
+      paidCount: 0,
+      shipCount: 0,
+      receivedCount: 0,
+      signedCount: 0,
+      returnCount: 0
+    },
+    //未读消息数
+    messageCount: 0
+  },
+  globalData: {
+    imgs: '', //裁切的图片
+    currentTab: null, //跳转的分类
+  },
+
+  onLaunch: function(options) {
+
+    this.getShopId(options)
+
+    // app对象传入exceptionHandling
+    exceptionHandling.init(this);
+
+    this.checkIsLogin()
+
+    this.getDeviceInfo()
+
+    this.dealStyle()
+
+  },
+
+  onShow(options) {
+    this.getShopId(options)
+  },
+
+  /**
+   * 全局设备信息
+   */
+  getDeviceInfo() {
+
+    let that = this
+    wx.getSystemInfo({
+      success: function(res) {
+        that.data.windowHeight = res.windowHeight;
+      }
+    })
+
+  },
+
+  /**
+   * 处理样式
+   */
+  dealStyle() {
+    this.data.statusBarStyle = getStatusBarStyle()
+    this.data.navigationBarStyle = getNavigationBarStyle()
+    this.data.navigationStyle = getNavigationStyle()
+    this.data.menuStyle = getMenuStyle()
+    this.data.fixedTop = systemInfo.statusBarHeight
+  },
+
+  //用户登录
+  userLogin: function() {
+    let that = this;
+    let promise = new Promise((resolve, reject) => {
+      wx.login({
+        success(res) {
+          console.log('^^^^***登录结果***^^^^',res);
+          if (res.code) {
+            wx.request({
+              url: `${baseUrl.base}/cloudclub/login`,
+              method: "POST",
+              data: {
+                code: res.code,
+                inviterUserId: that.data.shareId
+              },
+              success: function(res) {
+               
+                if (res.data.status === "0000") {
+                  resolve(res);
+                  wx.setStorageSync('token', res.data.data.token);
+                  that.data.token = res.data.data.token
+                  that.data.userId = res.data.data.userId
+                  that.data.flag = res.data.data.flag
+                  that.data.decryptDataFlag = res.data.data.decryptDataFlag
+                  if (res.data.data.flag === 0) {
+                    that.data.userPhone = false
+                  } else {
+                    that.data.userPhone = true
+                  }
+                } else {
+                  reject(res);
+                  wx.setStorageSync('token', null);
+                }
+
+                // 初始化socket
+                ws.init();
+                ws.onSocketMessage(that.onSocketMessage);
+              },
+              fail: function(res) {
+                reject(res);
+              }
+            })
+          } else {
+            console.log('登录失败！' + res.errMsg)
+          }
+        },
+        fail(error) {
+          wx.showToast({
+            title: '微信登录失败,请重新登录',
+            icon: 'none'
+          })
+        }
+      })
+    })
+    return promise;
+  },
+
+  /**
+   * 检查用户登录授权状态
+   */
+  checkIsLogin() {
+    let that = this
+    wx.getSetting({
+      success: res => {
+        if (res.authSetting['scope.userInfo']) {
+          console.log('已经授权')
+          that.data.isAuthorization = true
+        } else {
+          that.data.isAuthorization = false
+        }
+      },
+    })
+  },
+
+  /**
+   * 获取门店id
+   */
+  getShopId(options) {
+    wx.setStorageSync('shopId', baseUrl.shopId)
+  },
+
+  /**
+   * 分享
+   */
+  onShare() {
+    return {
+      title: this.data.shopName,
+      imageUrl: this.data.shopHeader,
+      path: '/pages/shopHome/shopHome?shopId=' + wx.getStorageSync("shopId"),
+      success(res) {
+        alertModal("分享成功")
+      }
+    }
+  },
+
+  //判断登录和手机号绑定 todo
+  checkLogin() {
+    var that = this;
+    var type = false;
+    let promise = new Promise((resolve, reject) => {
+      // 检查是否授权
+      if (!wx.getStorageSync("token")) {
+        that.userLogin()
+      }
+      wx.getSetting({
+        success: res => {
+          if (res.authSetting['scope.userInfo']) {
+            console.log('已经授权')
+            if (!that.data.userPhone) {
+              wx.showModal({
+                title: '提示',
+                content: '请先绑定手机号',
+                success(res) {
+                  if (res.confirm) {
+                    wx.navigateTo({
+                      url: '../confirmation/confirmation',
+                    })
+                  } else if (res.cancel) {
+
+                  }
+                }
+              })
+              reject(type);
+            } else {
+              resolve(!type);
+            }
+          } else {
+            wx.navigateTo({
+              url: '../confirmation/confirmation?type=0',
+            })
+          }
+        },
+      })
+    })
+    return promise;
+  },
+
+  /**
+   * 存储七日浏览记录
+   */
+  setSevenDayRecord(shopId) {
+    let that = this
+    let params = {
+      merchantShopId: shopId
+    }
+    Api.setSevenDayRecord(params).then(res => {})
+  },
+
+  /**
+   * 双授权检测
+   * 
+   * @params type 0:返回上一页，1:表示物理返回跳转shopHome
+   */
+  accredit(type = 1) {
+
+    let that = this;
+    let status = true;
+    console.log(`普通授权：${this.data.decryptDataFlag} 手机授权：${this.data.flag}`)
+    let promise = new Promise((resolve, reject) => {
+      if (this.data.decryptDataFlag) {
+        if (this.data.flag === 0) {
+          wx.showModal({
+            title: '提示',
+            content: '绑定手机号后查看',
+            success(res) {
+              if (res.confirm) {
+                wx.navigateTo({
+                  url: '../confirmation/confirmation',
+                })
+              } else if (res.cancel) {
+                wx.switchTab({
+                  url: '../shopHome/shopHome',
+                })
+              }
+            }
+          })
+          reject(!status);
+        } else {
+          resolve(status);
+        }
+      } else {
+        wx.navigateTo({
+          url: `../confirmation/confirmation?type=${type}`,
+        })
+      }
+    })
+
+    return promise
+  },
+
+  /**
+     * socket返回方法
+     */
+  onSocketMessage(result) {
+
+    let res = result.data;
+
+    if (res === 'true') {
+      console.log('app.js', res);
+      let params = {
+        date: 'OK',
+        type: 1
+      };
+      ws.sendSocketMessage(JSON.stringify(params));
+    } else {
+      res = JSON.parse(res);
+      console.log('app.js', res);
+      this.data.orderNum = res;
+      this.data.messageCount = res.messageCount;
+    }
+
+  },
+
+  /**
+   * @override 格式金钱
+   */
+  getPriceNum(value) {
+
+      if (isNaN(parseFloat(value))) {
+          return;
+      }
+
+      let dealValue = Math.round(value * 100) / 100;
+      let price = dealValue.toString();
+
+      // 加.
+      if (price.indexOf('.') < 0) {
+          price += '.';
+      }
+      // 控0
+      for (let i = price.length; i <= price.indexOf('.') + 2; i++) {
+          price += '0';
+      }
+      // 价格大于1万
+      if (price > 10000) {
+          price = ((s * 100 / 10000)/100).toString();
+          price += '万';
+      }
+
+      return price;
+
+  },
+})

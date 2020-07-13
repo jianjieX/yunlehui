@@ -1,0 +1,112 @@
+/**
+ * WebSocket配置文件
+ * 
+ * @date: 2019-12-11
+ * @author: liyujie
+ */
+import base from './base.js';
+
+const webScoket = {
+
+  init() {
+
+    // 监听连接成功
+    this.onSocketOpen();
+    // 监听连接是否关闭
+    this.onSocketClose();
+    //监听连接错误
+    this.onSocketError();
+    //连接
+    this.connectSocket();
+  },
+
+  /**
+   * 连接
+   */
+  connectSocket() {
+
+    let _this = this;
+    wx.connectSocket({
+      url: `${base.socketUrl}${wx.getStorageSync('token')}`,
+    })
+  },
+
+  /**
+   * 监听连接成功
+   */
+  onSocketOpen() {
+
+    let _this = this;
+    wx.onSocketOpen(() => {
+      console.log('[WebSocket]: 已连接');
+    })
+  },
+
+  /**
+   * 监听连接关闭
+   */
+  onSocketClose() {
+
+    let _this = this;
+    wx.onSocketClose(() => {
+      console.log('[WebSocket]: 已断开');
+      // 重连(没有网络的情况下不重连)
+      // _this.connectSocket();
+    })
+  },
+
+  /**
+   * 连接错误
+   */
+  onSocketError() {
+
+    let _this = this;
+    wx.onSocketError(error => {
+      console.error('[socket error]:', error);
+      // 重连(没有网络的情况下不重连)
+      // _this.connectSocket();
+    })
+  },
+
+  /**
+   * 接收数据
+   */
+  onSocketMessage(callback) {
+
+    let _this = this;
+    wx.onSocketMessage(message => {
+      console.log('[socket message]:', message);
+      // 数据处理。方便界面中处理数据
+      callback(message);
+    })
+  },
+
+
+  /**
+   * 发送指令
+   */
+  sendSocketMessage(msg) {
+
+    let _this = this;
+    wx.sendSocketMessage({
+      data: msg,
+      success(res) {
+        console.log('[send message success]:', res);
+      },
+      fail(err) {
+        console.log('[send message error]', err);
+      }
+    })
+  },
+
+  /**
+   * 关闭连接
+   */
+  closeSocket() {
+
+    let _this = this;
+    wx.closeSocket();
+  }
+}
+
+export default webScoket;

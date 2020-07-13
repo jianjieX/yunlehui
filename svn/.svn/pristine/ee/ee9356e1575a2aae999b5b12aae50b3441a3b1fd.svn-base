@@ -1,0 +1,898 @@
+import deepCopy from '../../utils/tools/deepCopy.js'
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let app = getApp();
+import Api from '/../../utils/config/Api/foods.js';
+Page({
+  data: {
+    shopId: '',
+    token: '',
+    goodsHeight: '',
+    shopHeight:'',
+    //拷贝商品列表
+    goodsList: [],
+    //商品列表
+    goods: [],
+    //根据菜单显示的商品
+    toView: 'order0',
+    // 总价格
+    totalPrice: 0,
+    // 总商品数
+    totalCount: 0,
+    // 享受权益后总价格
+    totalSpecialPrice:0,
+    // 省下的钱
+    totalSaveMoney:'',
+    // 权益状态
+    specialStutas:false,
+    carArray: [],
+    //是否显示遮罩层
+    fold: true,
+    //是否显示购物车
+    cartShow: 'none',
+    //tab
+    status: 0,
+    //所有节点的高度
+    listHeight: [],
+    //选中的菜单
+    menuIndex: 0,
+    //规格蒙层
+    showSpecModalStatus: false,
+    // 主规格名
+    mainSpecNameList: [],
+    // 副规格名
+    subSpecNameList: [],
+    // 主规格值
+    mainSpecValueList: [],
+    // 副规格值
+    subSpecValueList: [],
+    // 选中主规格值
+    mainSpecValue: '',
+    // 选中副规格值
+    subSpecValue: '',
+    // 规格值图片
+    specPic: '',
+    //优惠价格
+    economicalMoney:'',
+    // 规格值图片list
+    specPicList: [],
+    // 规格对应价格
+    specPrice: '',
+    // 规格对应乐享价格
+    specialPrice:'',
+    //商品主图
+    goodsPic: '',
+    //商品ID
+    goodsId: '',
+    // input默认是1
+    num: 1,
+    // 使用data数据对象设置样式名  
+    minusStatus: 'disabled',
+    //遮罩层
+    payMask: false,
+    benefit:false,
+    //是否开卡
+    openCards:false,
+    shopDetail:'云端马语位于美克壹厂一楼东区全疆首家机械手臂饮品体验店，店内配备电竞直播舞台，结合店内工业简约风格，适合承接各类中小型聚、新品发布会、沙龙等活动。店内提供新派创意融合菜、营养商务餐、各类轻食及地方特色小吃，是恋人，情侣，商务，好友，亲朋，私聊的绝佳去处，芸端马语秉承用餐环境环优雅与浪漫，传承餐饮品质与考究，至力于美味与品味相融合，体验与满意为目标，为您与您的客人塑造一个轻松舒适的就餐时光，期待您的光临为了您的满意，我们一直在努力。'
+  },
+
+  //点击菜单
+  selectMenu: function(e) {
+    var index = e.currentTarget.dataset.itemIndex;
+    // this.setData({
+    //   menuIndex:index
+    // })
+
+    this.setData({
+      toView: 'order' + index.toString()
+    })
+  },
+
+  //移除商品
+  decreaseCart: function(e) {
+    var that = this;
+    var type = e.currentTarget.dataset.type;
+    var foodObj = {};
+    //列表点击减少
+    if (type == 1) {
+      let index = e.currentTarget.dataset.itemIndex;
+      let parentIndex = e.currentTarget.dataset.parentindex;
+
+      let size = that.getShopCarNum(that.data.goods[parentIndex].goodsList[index].goodsId).size;
+      if (size > 1) {
+        alertModal1("多规格商品只能到购物车删除哦~");
+        return false;
+      }
+      foodObj = {
+        goodsId: that.data.goods[parentIndex].goodsList[index].goodsId,
+        memberGoodsflag: that.data.goods[parentIndex].goodsList[index].memberGoodsflag,
+        merchantId: that.data.goods[parentIndex].goodsList[index].merchantId,
+        num: 1,
+        shopId: that.data.goods[parentIndex].goodsList[index].merchantId,
+        spec: that.getShopCarNum(that.data.goods[parentIndex].goodsList[index].goodsId).spec
+      }
+    }
+    //购物车点击减少
+    if (type == 2) {
+      let index = e.currentTarget.dataset.itemIndex;
+      foodObj = {
+        goodsId: that.data.carArray[index].goodsId,
+        num: 1,
+        memberGoodsflag: that.data.carArray[index].memberGoodsflag,
+        merchantId: that.data.carArray[index].merchantId,
+        shopId: that.data.carArray[index].merchantId,
+        spec: that.data.carArray[index].spec
+      }
+    }
+    that.setData({
+      payMask: true
+    })
+
+    Api.upShopCar(foodObj).then((res) => {
+      if (res.data.status == "0000") {
+        that.getShopList();
+      } else {
+        alertModal1(res.data.msg);
+        that.setData({
+          payMask: false
+        })
+      }
+    }).catch((error) => {
+      console.log(error)
+      that.setData({
+        payMask: false
+      })
+    })
+  },
+
+  //购物车点击减少
+  // decreaseShopCart: function(e) {
+  //   var that = this;
+  //   var index = e.currentTarget.dataset.itemIndex;
+  //   var count = that.data.carArray[index].num;
+  //   var foodObj = {
+  //     goodsId: that.data.carArray[index].goodsId,
+  //     num: 1,
+  //     memberGoodsflag: that.data.carArray[index].memberGoodsflag,
+  //     merchantId: that.data.carArray[index].merchantId,
+  //     shopId: that.data.carArray[index].merchantId,
+  //     spec: that.data.carArray[index].spec
+  //   }
+  //   Api.upShopCar(foodObj).then((res) => {
+  //     if (res.data.status == "0000") {
+  //       that.getShopList()
+  //     } else {
+  //       alertModal1(res.data.msg)
+  //     }
+  //   }).catch((res) => {
+  //     console.log(1)
+  //   })
+  // },
+
+  //添加到购物车
+  addCart(e) {
+    let that = this;
+    var index = e.currentTarget.dataset.itemIndex;
+    var parentIndex = e.currentTarget.dataset.parentindex;
+    that.setData({
+      payMask: true
+    })
+    // 请求商品规格信息
+    that.getGoodsSpec(that.data.goods[parentIndex].goodsList[index].goodsId, that.data.goods[parentIndex].goodsList[index].merchantId, that.data.goods[parentIndex].goodsList[index].mainUrl)
+    that.setData({
+      num: 1,
+      index: index,
+      parentIndex: parentIndex
+    })
+  },
+
+  /**
+   * 添加购物车
+   */
+  confirmShop(e) {
+    let _this = this;
+    let status = e.currentTarget.dataset.type;
+
+    // 检查授权和绑定手机状态
+    app.accredit().then((res) => {
+      console.log("已经绑定手机且授权")
+      let spec = _this.data.mainSpecValue;
+      if (_this.data.subSpecValue) {
+        spec = `${_this.data.mainSpecValue}/${_this.data.subSpecValue}`
+      }
+      //购物车内点击添加
+      var validParams = {};
+      var params = {};
+      if (status == 2) {
+        let itemIndex = e.currentTarget.dataset.itemIndex;
+        params = {
+          goodsId: _this.data.carArray[itemIndex].goodsId,
+          num: 1,
+          memberGoodsflag: _this.data.carArray[itemIndex].memberGoodsflag,
+          merchantId: _this.data.carArray[itemIndex].merchantId,
+          shopId: _this.data.carArray[itemIndex].merchantId,
+          spec: _this.data.carArray[itemIndex].spec,
+          type: 2
+        }
+        validParams = {
+          goodsSpecs: params.spec,
+          id: params.goodsId,
+          num: params.num
+        }
+      }
+      //列表点击添加
+      if (status == 1) {
+        let index = _this.data.index;
+        let parentIndex = _this.data.parentIndex;
+        params = {
+          goodsId: _this.data.goods[parentIndex].goodsList[index].goodsId,
+          memberGoodsflag: _this.data.goods[parentIndex].goodsList[index].memberGoodsflag,
+          merchantId: _this.data.goods[parentIndex].goodsList[index].merchantId,
+          num: _this.data.num,
+          shopId: _this.data.goods[parentIndex].goodsList[index].merchantId,
+          spec: spec,
+          type: 2
+        }
+        validParams = {
+          goodsSpecs: spec,
+          id: _this.data.goodsId,
+          num: _this.data.num
+        }
+      }
+      _this.setData({
+        payMask: true
+      })
+
+      Api.validGoodsSpecs(validParams).then(res => {
+        if (res.data.data) {
+          Api.addShopCar(params).then(res => {
+            if (res.data.status === "0000") {
+              _this.getShopList();
+              //_this.getShopCarCount(_this.data.userId)
+              // 添加成功
+              wx.showToast({
+                title: '添加成功~',
+                icon: 'success',
+                duration: 2000
+              })
+              _this.hideDialog()
+            } else {
+              alertModal1(res.data.msg)
+              _this.setData({
+                payMask: false
+              })
+            }
+          })
+        } else {
+          alertModal1('商品库存不足')
+          _this.setData({
+            payMask: false
+          })
+        }
+      })
+    });
+    console.log("没绑定")
+  },
+
+  //购物车点击添加
+  // addShopCart: function (e) {
+  //   var that = this;
+  //   var index = e.currentTarget.dataset.itemIndex;
+  //   var foodObj = {
+  //     goodsId: that.data.carArray[index].goodsId,
+  //     num: 1,
+  //     memberGoodsflag: that.data.carArray[index].memberGoodsflag,
+  //     merchantId: that.data.carArray[index].merchantId,
+  //     shopId: that.data.carArray[index].merchantId,
+  //     spec: that.data.carArray[index].spec
+  //   }
+  //   Api.addShopCar(foodObj).then((res) => {
+  //     if (res.data.status == "0000") {
+  //       that.getShopList();
+  //     } else {
+  //       alertModal1(res.data.msg)
+  //     }
+  //   }).catch((res) => {
+  //     console.log(1)
+  //   })
+  // },
+
+  /**
+   * 请求商品规格信息
+   */
+  getGoodsSpec(goodsId, shopId, goodsPic) {
+
+    let _this = this
+    let params = {
+      goodsId: goodsId,
+      shopId: shopId
+    }
+    Api.getGoodsInfo(params).then(res => {
+      console.log('商品规格', res)
+      if (res.data.status == '0000') {
+        //请求购物车数量
+        //_this.getShopCarCount();
+        if (res.data.data) {
+          let data = res.data.data.cminiGoodsSpecsDetailRes
+          let specPic = data.cminiMeaSureList[0].goodsSpecsUrl;
+          if (!data.cminiMeaSureList[0].goodsSpecsUrl) {
+            specPic = goodsPic
+          }
+          console.log('--------', data)
+          _this.setData({
+            goodsId: goodsId,
+            goodsPic: goodsPic,
+            // 主规格list
+            mainSpecNameList: data.mainSpecsNameList,
+            // 主规格值
+            mainSpecValue: data.cminiMeaSureList[0].goodsSpecsValue,
+            // 副规格list
+            subSpecNameList: data.subSpecsNameList,
+            // 副规格值
+            subSpecValue: data.cminiMeaSureList[0].subSpecsList[0].subSpecsValue,
+            // 主规格值list
+            mainSpecValueList: data.cminiMeaSureList,
+            // 副规格值list
+            subSpecValueList: data.cminiMeaSureList[0].subSpecsList,
+            // 优惠金额
+            economicalMoney: data.cminiMeaSureList[0].subSpecsList[0].economicalMoney,
+            // 规格图片
+            specPic: specPic,
+            //对应价格
+            specPrice: data.cminiMeaSureList[0].subSpecsList[0].selectedPrice,
+            //对应乐享权益价格
+            specialPrice: data.cminiMeaSureList[0].subSpecsList[0].specialPrice,
+          })
+          let list = []
+          data.cminiMeaSureList.map(item => {
+            if (item.goodsSpecsUrl == '') {
+              list.push(goodsPic)
+            } else {
+              list.push(item.goodsSpecsUrl)
+            }
+          })
+          _this.setData({
+            specPicList: list
+          })
+
+          _this.showSpecModal();
+          _this.setData({
+            payMask: false
+          })
+        }
+      } else {
+        alertModal1(res.data.msg);
+        _this.setData({
+          payMask: false
+        })
+      }
+    })
+  },
+
+  // 规格图片
+  previewSpecPic(e) {
+
+    let that = this;
+    let current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.specPicList
+    })
+  },
+
+  /**
+   * 切换商品规格tab
+   */
+  // 切换主规格
+  changeMainSpecName(e) {
+
+    let _this = this;
+    console.log(e)
+    let data = e.target.dataset.current
+    let specPic = data.goodsSpecsUrl;
+    if (!data.goodsSpecsUrl) {
+      specPic = _this.data.goodsPic
+    }
+    let index = (data.subSpecsList || []).findIndex((item) => item.subSpecsValue == _this.data.subSpecValue);
+    if (this.data.mainSpecValue === data.goodsSpecsValue) {
+      return false;
+    } else {
+      _this.setData({
+        subSpecValueList: data.subSpecsList,
+        mainSpecValue: data.goodsSpecsValue,
+        specPic: specPic,
+        specPrice: data.subSpecsList[index].selectedPrice,
+        economicalMoney: data.subSpecsList[index].economicalMoney,
+        specialPrice: data.subSpecsList[index].specialPrice,
+      })
+    }
+  },
+  // 切换副规格
+  changeSubSpecName(e) {
+
+    let _this = this;
+    console.log(e)
+    let data = e.target.dataset.current;
+    if (this.data.subSpecValue === data.goodsSpecsValue || data.stock === 0) {
+      return false;
+    } else {
+      _this.setData({
+        subSpecValue: data.subSpecsValue,
+        specPrice: data.selectedPrice,
+        specialPrice: data.specialPrice,
+        economicalMoney: data.economicalMoney
+      })
+    }
+  },
+
+  /**
+   * 数量加减
+   */
+  bindMinus() {
+
+    let num = this.data.num;
+    if (num > 1) {
+      num--;
+    }
+    // 只有大于一件的时候，才能normal状态，否则disable状态
+    let minusStatus = num <= 1 ? 'disabled' : 'normal';
+    this.setData({
+      num: num,
+      minusStatus: minusStatus
+    });
+  },
+  bindPlus() {
+
+    let num = this.data.num;
+    let spec = this.data.mainSpecValue;
+    if (this.data.subSpecValue) {
+      spec = `${this.data.mainSpecValue}/${this.data.subSpecValue}`
+    }
+    let validInfo = {
+      num: num + 1,
+      id: this.data.goodsId,
+      goodsSpecs: spec
+    }
+    Api.validGoodsSpecs(validInfo).then(res => {
+      console.log(res)
+      if (res.data.data) {
+        // 有库存
+        num++;
+        // 只有大于一件的时候，才能normal状态，否则disable状态  
+        let minusStatus = num < 1 ? 'disabled' : 'normal';
+        this.setData({
+          num: num,
+          minusStatus: minusStatus
+        });
+      } else {
+        alertModal1("没有更多库存了")
+      }
+    })
+  },
+  /* 输入框事件 */
+  bindManual(e) {
+    let num = e.detail.value;
+    this.setData({
+      num: num
+    });
+  },
+
+  //计算总价
+  calTotalPrice: function() {
+    var carArray = this.data.carArray;
+    var totalPrice = 0;
+    var totalCount = 0;
+    var totalSpecialPrice = 0;
+    var specialStutas = false;
+    var totalSaveMoney = 0;
+    for (var i = 0; i < carArray.length; i++) {
+      totalPrice += carArray[i].price * carArray[i].num;
+      totalCount += carArray[i].num;
+      if (carArray[i].specialPrice >= 0 && carArray[i].economicalMoney){
+        totalSpecialPrice += carArray[i].specialPrice * carArray[i].num;
+      }
+      else{
+        totalSpecialPrice += carArray[i].price * carArray[i].num;
+      }
+    }
+    if (this.data.openCards){
+      if (totalSpecialPrice != totalPrice) {
+        specialStutas = true;
+      }
+    }
+    
+    totalSaveMoney = totalPrice.toFixed(2) - totalSpecialPrice.toFixed(2);
+    this.setData({
+      totalSpecialPrice: totalSpecialPrice.toFixed(2),
+      totalPrice: totalPrice.toFixed(2),
+      totalCount: totalCount,
+      specialStutas: specialStutas,
+      totalSaveMoney: totalSaveMoney
+    });
+    console.log(this.data.totalSpecialPrice, specialStutas)
+    if (this.data.totalCount == 0) {
+      this.setData({
+        cartShow: 'none',
+        fold: true
+      })
+    }
+  },
+
+  //結算
+  pay() {
+    if (this.data.totalCount == 0) {
+      alertModal1("购物车是空的哟！")
+      return;
+    }
+
+    wx.navigateTo({
+      url: '../confirmFoodsOrder/confirmFoodsOrder?shopId=' + this.data.shopId
+    })
+  },
+
+  //弹起购物车
+  toggleList: function() {
+    if (!this.data.carArray.length > 0) {
+      return;
+    }
+    this.setData({
+      fold: !this.data.fold,
+    })
+    var fold = this.data.fold
+    this.cartShow(fold)
+  },
+  cartShow: function(fold) {
+    if (fold == false) {
+      this.setData({
+        cartShow: 'block',
+      })
+    } else {
+      this.setData({
+        cartShow: 'none',
+      })
+    }
+  },
+
+  //切换tab
+  tabChange: function(e) {
+    var showtype = e.target.dataset.type;
+    this.setData({
+      status: showtype,
+    });
+  },
+
+  onLoad: function(options) {
+
+  },
+
+  //获取商品列表
+  getGoods() {
+    var that = this;
+    Api.getFoods().then((res) => {
+      console.log(res)
+      if (res.data.status == "0000") {
+        var goodsList = deepCopy.deepCopy(res.data.data);
+        that.setData({
+          goods: res.data.data,
+          shopId: res.data.data[0].goodsList[0].merchantId,
+          goodsList: goodsList
+        })
+        this.getHeights();
+
+        this.getShopList();
+      }
+    }).catch((res) => {
+      console.log(1)
+    })
+  },
+  //获取购物车数据
+  getShopList() {
+    var that = this;
+    var obj = {
+      shopId: that.data.shopId
+    }
+    Api.getShopCar(obj).then((res) => {
+      if (res.data.status == "0000") {
+        if (res.data.data.length) {
+          that.setData({
+            carArray: res.data.data[0].cminiShopCarList,
+          })
+        } else {
+          that.setData({
+            carArray: res.data.data,
+          })
+        }
+        that.getNumChange()
+        that.calTotalPrice();
+      }
+    }).catch((res) => {
+      console.log(1)
+    })
+  },
+  //点击购物车内的添加或减少，背景中得num也会跟着变化
+  getNumChange() {
+    var that = this;
+    //let carList = that.data.carArray;
+    let goods = that.data.goods;
+    for (let i = 0; i < goods.length; i++) {
+      for (let j = 0; j < goods[i].goodsList.length; j++) {
+        let num = that.getShopCarNum(goods[i].goodsList[j].goodsId).num;
+        goods[i].goodsList[j].num = num;
+      }
+    }
+    that.setData({
+      goods: goods,
+      payMask: false
+    })
+  
+  },
+  //大列表数据回显
+  getShopCarNum(id) {
+    let that = this;
+    let carList = that.data.carArray;
+    let obj = {
+      num: 0,
+      size: 0,
+      spec: ''
+    }
+    for (let i = 0; i < carList.length; i++) {
+      if (carList[i].goodsId == id) {
+        obj.num = obj.num + carList[i].num;
+        obj.size = obj.size + 1;
+        obj.spec = carList[i].spec
+      }
+    }
+    return obj;
+  },
+
+  //获取scroll下拉的高度
+  getHeights() {
+    var that = this;
+    wx.getSystemInfo({
+      success: function(res) {
+        wx.createSelectorQuery().selectAll('.food-list-hook').boundingClientRect(function(rect) {
+          let foodList = rect;
+          let height = 0
+          that.data.listHeight.push(height)
+          for (let i = 0, l = foodList.length; i < l; i++) {
+            let item = foodList[i]
+            height += item.height
+            that.data.listHeight.push(height)
+          }
+        }).exec();
+      }
+    });
+  },
+
+  //计算分类
+  menuCurrentIndex(event) {
+    var that = this;
+    //获取商品块得高度
+    wx.getSystemInfo({
+      success: function(res) {
+        wx.createSelectorQuery().select('.goods').boundingClientRect(function(rect) {
+          let foodList = rect.height;
+          that.setData({
+            goodsHeight: foodList
+          })
+        }).exec();
+      }
+    });
+
+    let dataIndex = 0;
+    //判断是否是最后一个分类的商品
+    //获取倒数第二个节点的高度
+    var x = that.data.listHeight.length - 2;
+    //最后一个节点的高度
+    var diffVal = that.data.listHeight[that.data.listHeight.length - 1] - that.data.listHeight[x];
+    //判断最后一个节点的高度是否大于整个scroll的高度
+    // if (diffVal < that.data.goodsHeight) {
+    //   if ((event.detail.scrollTop + (that.data.goodsHeight * 0.95)) > that.data.listHeight[x]) {
+    //     that.setData({
+    //       menuIndex: x
+    //     })
+    //     return false;
+    //   }
+    // }
+    //为了兼容iPhone，向上拉到头时再向上拉默认选中第一个分类
+    if (event.detail.scrollTop < 1) {
+      that.setData({
+        menuIndex: 0
+      })
+      return false;
+    }
+    for (let i = 0, l = that.data.listHeight.length; i < l; i++) {
+      let topHeight = that.data.listHeight[i]
+      let bottomHeight = that.data.listHeight[i + 1]
+      if (!bottomHeight || (event.detail.scrollTop >= topHeight && event.detail.scrollTop < bottomHeight)) {
+        dataIndex = i
+        that.setData({
+          menuIndex: dataIndex
+        })
+        return;
+      }
+    }
+  },
+
+  //清空购物车
+  empty() {
+    let that = this;
+    wx.showModal({
+      title: '清空购物车',
+      content: '是否清空购物车中全部商品',
+      showCancel: true,//是否显示取消按钮
+      confirmColor: '#FABE00',//确定文字的颜色
+      success: function (res) {
+        if (res.cancel) {
+          //点击取消,默认隐藏弹框
+        } else {
+          let arr = [];
+          for (let i = 0; i < that.data.carArray.length; i++) {
+            arr.push(that.data.carArray[i].id)
+          }
+          let obj = {
+            shopCarIds: arr
+          }
+          Api.delShopCar(obj).then((res) => {
+            if (res.data.status == "0000") {
+              that.setData({
+                goods: res.data.data,
+                carArray: [],
+              })
+              that.calTotalPrice();
+            } else {
+
+            }
+          }).catch((res) => {
+            console.log(1)
+          })
+        }
+      },
+      fail: function (res) { },//接口调用失败的回调函数
+      complete: function (res) { },//接口调用结束的回调函数（调用成功、失败都会执行）
+    })
+    
+  },
+
+  //点击遮罩层，隐藏购物车
+  hideList() {
+    this.setData({
+      cartShow: 'none',
+      fold: true
+    })
+  },
+
+  /**
+   * 规格弹窗动画
+   */
+  showSpecModal() {
+
+    // 显示遮罩层
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(450).step()
+    this.setData({
+      animationData: animation.export(),
+      showSpecModalStatus: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        animationData: animation.export()
+      })
+    }.bind(this), 200)
+  },
+
+  /**
+   *点击规格蒙层 
+   */
+  hideDialog: function() {
+    this.hideSpecModal()
+  },
+  /**
+   * 规格蒙层操作
+   */
+  hideSpecModal() {
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(450).step()
+    this.setData({
+      animationData: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        animationData: animation.export(),
+        showSpecModalStatus: false
+      })
+    }.bind(this), 200)
+  },
+
+
+  //登录
+  login() {
+    let that = this;
+    app.userLogin().then(() => {
+      that.getGoods();
+    }).catch(() => {
+      wx.hideLoading()
+      wx.showModal({
+        title: '提示',
+        content: '连接服务器失败，请重新登录',
+        showCancel: false,
+        success(res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            that.login();
+          }
+        }
+      })
+    })
+  },
+
+  /**
+   * 获取是否开卡
+   */
+  getQuoto() {
+    var that = this;
+    var openCards = that.data.openCards;
+    Api.getQuoto().then((res) => {
+      if (res.data.status == "0000") {
+        var myDate = Date.parse(new Date());
+
+        var thisTime = 0;
+        var time = 0;
+        if (res.data.data.validity){
+          thisTime = res.data.data.validity.replace(/-/g, '/');
+          time = new Date(thisTime).getTime();
+        }
+        
+        // 判断是否开卡
+        if (res.data.data.id && myDate < time) {
+          openCards = true;
+        }
+        else {
+          openCards = false;
+        }
+        that.setData({
+          openCards: openCards
+        })
+      }
+    }).catch((error) => {
+      console.log(error)
+    })
+  },
+
+  onReady: function(dataIndex) {
+    // 页面渲染完成
+  },
+  onShow: function() {
+    this.login();
+    //初始化分类被选中和获取token
+    this.getQuoto();
+    this.setData({
+      toView: 'order0',
+      token: wx.getStorageSync('token'),
+      shopHeight: app.data.windowHeight - 185
+    });
+
+    wx.setNavigationBarTitle({
+      title: '云端马语'
+    })
+    // 页面显示
+  },
+  onHide: function() {
+    // 页面隐藏
+  },
+  onUnload: function() {
+    // 页面关闭
+  }
+})

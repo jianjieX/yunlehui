@@ -1,0 +1,219 @@
+// pages/myServe/myServe.js
+import serviceApi from '../../utils/config/Api/activity.js'
+//alert提示
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+// 加loading
+let sl = alert.showLoading;
+let loading = alert.loading;
+
+let app = getApp()
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //当前时间
+    nowTime:'',
+    // 当前页码
+    currentPage: '1',
+    //导航分类aip标识
+    isDeal: '0',
+    //总页数
+    totalPage: '1',
+    // 导航选中标识
+    focuseItem: '0',
+    // 导航
+    tabList: [{
+      name: '全部',
+      value: 0,
+      isDeal: ''
+    }, {
+      name: '未处理',
+      value: 1,
+      isDeal: '0'
+    }, {
+      name: '已处理',
+      value: 2,
+      isDeal: '1'
+    }],
+    // 服务数据列表
+    serveList: []
+  },
+  /**
+   * 获取更多服务信息
+   */
+  getServiceList(data) {
+    sl("加载中")
+    serviceApi.getService(data).then((res) => {
+      let serveList = res.data.data.list
+      let totalPage = res.data.data.totalPage
+      if (serveList) {
+        this.setData({
+          // 服务列表
+          serveList,
+          // 总页数
+          totalPage,
+        })
+      }
+      wx.hideLoading()
+    }).catch()
+  },
+  /***
+   * 导航切换
+   */
+
+  handleTab(e) {
+    let focuseItem = e.target.dataset.current
+    if (focuseItem == this.data.focuseItem) {
+      return
+    }
+    let isDeal = e.target.dataset.isdeal
+    this.setData({
+      currentPage: '1',
+      isDeal,
+      focuseItem
+    })
+    let params = {
+      currentPage: '1',
+      isDeal
+    }
+    this.getServiceList(params)
+
+  },
+  /**跳转到服务详情 */
+  toServeDetail(e) {
+   
+    
+      let {
+        id,
+        state,
+        delstate
+      } = e.currentTarget.dataset
+      if (!state || delstate) {
+        return
+      } else {
+        wx.navigateTo({
+          url: `/pages/serveMyDetail/serveMyDetail?id=${id}`,
+        })
+      }
+
+    
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    //加载列表
+    this.setData({
+      focuseItem: options.index,
+      isDeal: options.isDeal
+    })
+    let params = {
+      currentPage: '1',
+      isDeal: options.isDeal
+    }
+
+    this.getServiceList(params)
+    //获取当前时间
+    this.getNowTime()
+  },
+  /**
+   * 获取时间的事件
+   */
+  getNowTime() {
+    let nowTime = new Date().getTime()
+    this.setData({
+        nowTime
+    })
+  },
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function() {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function() {
+    // 显示顶部刷新
+    wx.showNavigationBarLoading();
+
+    this.setData({
+      currentPage: '1'
+
+    })
+    let params = {
+      currentPage: '1',
+      isDeal: this.data.isDeal
+    }
+
+    this.getServiceList(params)
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+    sl("加载中")
+    let currentPage = Number(this.data.currentPage) + 1;
+    if (currentPage > Number(this.data.totalPage)) {
+      wx.hideLoading()
+      return
+    }
+    let params = {
+      currentPage,
+      isDeal: this.data.isDeal
+    }
+    serviceApi.getService(params).then((res) => {
+      let serveList = res.data.data.list
+      let totalPage = res.data.data.totalPage
+      let currentPage = Number(this.data.currentPage) + 1;
+      if (serveList) {
+        this.setData({
+          // 活动列表
+          serveList: [...this.data.serveList, ...serveList],
+          // 总页数
+          totalPage,
+          // 当前页码
+          currentPage
+        })
+      }
+      wx.hideLoading()
+    }).catch()
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function() {
+
+  }
+
+})

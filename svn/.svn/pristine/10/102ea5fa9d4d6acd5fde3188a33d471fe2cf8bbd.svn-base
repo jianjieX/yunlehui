@@ -1,0 +1,202 @@
+// pages/activityMy/activityMy.js
+import activityApi from '../../utils/config/Api/activity.js'
+//alert提示
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+// 加loading
+let sl = alert.showLoading;
+let loading = alert.loading;
+
+let app = getApp()
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    totalPages: '1',
+    currentPage: '1',
+    type: '0',
+    focuseItem: '0',
+    navigationStyle: app.data.navigationStyle,
+    statusBarStyle: app.data.statusBarStyle,
+    navigationBarStyle: app.data.navigationBarStyle,
+    tabList: [{
+      name: '全部',
+      value: 0
+    }, {
+      name: '未开始',
+      value: 1
+    }, {
+      name: '进行中',
+      value: 2
+    }, {
+      name: '已结束',
+      value: 3
+    }],
+    activityList: []
+  },
+  // 切换导航
+  handleTab(e) {
+    let focuseItem = e.target.dataset.value
+    if (focuseItem == this.data.focuseItem) {
+      return
+    }
+    this.setData({
+      currentPage: '1',
+      focuseItem,
+      type: focuseItem
+    })
+    let params = {
+      currentPage: '1',
+      type: focuseItem
+    }
+
+    this.getActivityList(params)
+
+  },
+  /**
+   * 获取更多活动
+   */
+  getActivityList(data) {
+    sl("加载中")
+    activityApi.getActivity(data).then((res) => {
+      let activityList = res.data.data.content
+      let totalPages = res.data.data.totalPages
+      let currentPage = res.data.data.currentPage
+      if (activityList) {
+        this.setData({
+          // 活动列表
+          activityList,
+          // 总页数
+          totalPages,
+          // 当前页码
+          currentPage
+        })
+      }
+      wx.hideLoading()
+    }).catch()
+  },
+
+
+  /**
+   * 跳转到我的活动详情
+   */
+  toactivityDetail(e) {
+    console.log(e)
+    let {
+      id,
+      state,
+      delstate
+    } = e.currentTarget.dataset
+    if (!state || delstate) {
+      return 
+    } else {
+      wx.navigateTo({
+        url: `/pages/activityMyDetail/activityMyDetail?id=${id}`,
+      })
+    }
+
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    this.setData({
+      focuseItem: options.index,
+      type: options.index
+    })
+    let params = {
+      currentPage: this.data.currentPage,
+      type: options.index
+    }
+    this.getActivityList(params)
+
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function() {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function() {
+    this.setData({
+      currentPage: '1',
+      type: this.data.type
+    })
+    let params = {
+      currentPage: '1',
+      type: this.data.type
+    }
+    this.getActivityList(params)
+  },
+
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function() {
+
+  },
+  /**
+   * 触底事件
+   */
+  onReachBottom() {
+
+    sl("加载中")
+    let currentPage = Number(this.data.currentPage) + 1;
+    if (currentPage > Number(this.data.totalPages)) {
+      wx.hideLoading()
+      return
+    }
+    let params = {
+      currentPage,
+      type: this.data.type
+    }
+    se
+    activityApi.getActivity(params).then((res) => {
+      let activityList = res.data.data.content
+      let totalPages = res.data.data.totalPages
+      let currentPage = Number(this.data.currentPage) + 1;
+      if (activityList) {
+        this.setData({
+          // 活动列表
+          activityList: [...this.data.activityList, ...activityList],
+          // 总页数
+          totalPages,
+          // 当前页码
+          currentPage
+        })
+      }
+      wx.hideLoading()
+    }).catch()
+  }
+})

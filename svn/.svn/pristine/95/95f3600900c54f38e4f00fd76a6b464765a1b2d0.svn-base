@@ -1,0 +1,8 @@
+<view class="container">
+  <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200210142105hm.png" class="img1"></image>
+  <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200210142209aO.png" class="img2"></image>
+  <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200210142229UV.png" class="img3"></image>
+  <view class="open-btn" bindtap="openShop">
+    <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200210142259sm.png" class="open-img"></image>
+  </view>
+</view>

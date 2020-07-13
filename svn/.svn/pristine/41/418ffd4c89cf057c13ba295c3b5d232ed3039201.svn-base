@@ -1,0 +1,32 @@
+var handleGoodsTag = {
+  getTagNum: function (tagNum) {
+    switch (tagNum) {
+      case 1:
+        return '/img/homeImg/active.png';
+      case 2:
+        return '/img/homeImg/new.png';
+      case 3:
+        return '/img/homeImg/hot.png';
+      case 4:
+        return '/img/homeImg/special.png';
+    }
+  }
+}
+
+var storyStatusTag = {
+  getSrc: function (tagNum) {
+    switch (tagNum) {
+      case 0:
+        return '/img/mine/mark_draft.png';
+      case 1:
+        return '/img/mine/mark_waiting.png';
+      case 3:
+        return '/img/mine/mark_refuse.png';
+    }
+  }
+}
+
+module.exports = {
+  getTagNum: handleGoodsTag.getTagNum,
+  getSrc: storyStatusTag.getSrc
+}

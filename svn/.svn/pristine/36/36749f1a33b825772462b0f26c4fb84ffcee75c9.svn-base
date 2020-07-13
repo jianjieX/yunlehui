@@ -1,0 +1,15 @@
+
+
+<!-- 开店入驻协议 -->
+<image wx:if="{{agreementType == 1}}" wx:for="{{imgList1}}" src="{{item}}" mode="widthFix"></image>
+
+<!-- 注册协议 -->
+<image wx:if="{{agreementType == 2}}" wx:for="{{imgList2}}" src="{{item}}" mode="widthFix"></image>
+
+<!-- 异业联盟会员章程 -->
+<image wx:if="{{agreementType == 3}}" wx:for="{{imgList3}}" src="{{item}}" mode="widthFix"></image>
+
+
+<!-- 底部按钮 -->
+<view style="height:100rpx;"></view>
+<view class="bottom-button-view" bindtap="agreeTo">已读并知晓</view>

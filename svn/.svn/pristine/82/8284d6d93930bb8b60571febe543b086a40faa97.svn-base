@@ -1,0 +1,78 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  addShopCar(data) {  // 添加购物车
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar';
+    return result
+  },
+  updateShopCar(data) {  // 修改购物车
+    let result = {};
+    result.method = "PUT";
+    result.url = '/cmini/shopcar';
+    return result
+  },
+  deleteShopCar(data) {  // 清空购物车
+    let result = {};
+    result.method = "DELETE";
+    result.url = `/cmini/shopcar?shopCarIds=${data.shopCarId}`;
+    return result
+  },
+  getGoodsInfo(data) {  // 获取商品规格
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/getGoodsInfo';
+    return result
+  },
+  getShopCarCount(data) {  // 获取购物车总数量
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/getShopcarGoodsCount';
+    return result
+  },
+  getShopCarList(data) {  // 获取购物车列表
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/getShopcarList';
+    return result
+  },
+  updateShopCarNum(data) {  // 更新购物车数量
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/updateNum';
+    return result
+  },
+  /**
+   * 校验数量
+   */
+  validGoodsSpecs(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/validGoodsSpecs';
+    return result
+  },
+  /**
+   * 购物车会员礼包列表
+   */
+  getVipGoodsList(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/factoryShopCarGoodsList';
+    return result
+  },
+  /**
+   * 查询是否开卡
+   */
+  checkOpenCardFlag() {
+    let result = {};
+    result.method = "POST";
+    result.url = '/interest/findInterestsByUserId';
+    return result
+  }
+
+}
+
+const Api = new MyHttp(ALL_API);
+
+export default Api;

@@ -1,0 +1,44 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="time" src="../../filter/time.wxs"></wxs>
+<!--可提现页面-->
+<block wx:if="{{hasInform}}">
+  <view style='padding:30rpx;'>
+    <view class='mywealth'>
+      <view class='wealth-item'>
+        <view class='total-price'>
+          <text style="font-size:24rpx;">￥</text>{{numFr.getNum(totalAmount)}}</view>
+        <view class='mid'>可提现</view>
+      </view>
+      <view class="display-content">
+        <view class='wealth-item'>
+          <view class='price'>￥{{numFr.getNum(auditAmount)}}</view>
+          <view style='font-size:24rpx;color:white;'>提现中</view>
+        </view>
+        <view style="width:1px;height:20px;background-color:white;margin:auto;"></view>
+        <view class='wealth-item'>
+          <view class='price'>￥{{numFr.getNum(finishAmount)}}</view>
+          <view style='font-size:24rpx;color:white;'>累计提现</view>
+        </view>
+      </view>
+      <view class="withdraw-button-view" bindtap='cashOut'>立即提现</view>
+    </view>
+  </view>
+  <view class='list' wx:for="{{withdrawalList}}">
+    <view class='list-item'>
+      <view class='record'>
+        <view>申请提现</view>
+        <view style='color:#f4bb2e;font-size:18px;'>{{(item.status == 0 || item.status == 1) ? '-' : '+'}}￥{{numFr.getNum(item.withdrawalPrice)}}</view>
+      </view>
+      <view class='time'>
+        <view>申请时间</view>
+        <view>{{time.time(item.createTime)}}</view>
+      </view>
+    </view>
+  </view>
+</block>
+<block wx:else>
+  <view class="no-content-view">
+    <image class="no-content-image" src="../../img/withdraw/earnings _withdrawal_ settlement_null.png"></image>
+    <view class="no-content-text">当前暂无提现记录~</view>
+  </view>
+</block>

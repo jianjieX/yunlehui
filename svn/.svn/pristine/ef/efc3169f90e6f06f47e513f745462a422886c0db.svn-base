@@ -1,0 +1,314 @@
+page {
+  background-color: #fff;
+}
+
+.merchant-line {
+  border: 1rpx solid hsla(0, 0%, 0%, 0.1);
+}
+
+/*详情*/
+
+.detail {
+  width: 94%;
+  margin: 16rpx auto;
+}
+
+.detail .logo {
+  width: 702rpx;
+  height:100%;
+  border-radius: 8px;
+}
+
+.detail .name {
+  font-size: 36rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  line-height: 50rpx;
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail .title {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  line-height: 40rpx;
+  padding: 8rpx 0 16rpx;
+}
+
+.detail .title image {
+  width: 100% !important;
+}
+
+.detail button {
+  background: #fff;
+  margin: 0;
+  line-height: normal;
+  right: -24rpx;
+}
+
+.detail button image {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.detail button::after {
+  border: none;
+}
+
+.detail .line {
+  border-bottom: 1rpx solid hsla(0, 0%, 0%, 0.1);
+}
+
+/*时间*/
+
+.time {
+  padding: 24rpx 0;
+}
+
+.time .left {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.time .right {
+  padding-left: 16rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+/*地点*/
+
+.address {
+  padding: 22rpx 0 8rpx;
+  display: flex;
+  flex-direction: row;
+}
+
+.address .left .logo {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.address .medium {
+  padding-left: 8rpx;
+}
+
+.address .medium .title {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.address .medium .distance {
+  font-size: 22rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  line-height: 32rpx;
+}
+
+.address .right {
+  margin-left: auto;
+  padding-top: 16rpx;
+}
+
+.address .right .logo {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+/*空白处*/
+
+.blank {
+  height: 16rpx;
+  background-color: hsla(0, 0%, 94%, 1);
+}
+
+/*优惠专区*/
+
+.empty {
+  background-color: #fff;
+}
+
+.coupon {
+  margin: 24rpx 6rpx 0 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.coupon .left {
+  width: 30rpx;
+  height: 30rpx;
+  background: rgba(255, 102, 51, 1);
+  border-radius: 2px;
+  color: #fff;
+  display: inline-block;
+  text-align: center;
+  font-size: 22rpx;
+  line-height: 30rpx;
+  margin-right: 6rpx;
+}
+
+.coupon .right {
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.coupon .title {
+  font-size: 18rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 1);
+  line-height: 26rpx;
+}
+
+.coupon .coupon-block {
+  padding-left: 6rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+/*商户*/
+
+.list {
+  width: 100%;
+  margin: 0 auto;
+  padding-top: 16rpx;
+  padding-bottom: 24rpx;
+}
+
+.list .list-top {
+  display: flex;
+  flex-direction: row;
+  padding: 0 24rpx;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list .list-top .left {
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.list .list-top .logo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 4px;
+}
+
+.list .list-top .medium {
+  width: 400rpx;
+  height: 160rpx;
+  margin-left: 16rpx;
+  flex: 1;
+}
+
+.list .medium .name {
+  width: 400rpx;
+  height: 68rpx;
+  font-size: 28rpx;
+  font-family: PingFang-SC-Medium, PingFang-SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  word-wrap: break-word;
+  word-break: break-all;
+  display: inline-block;
+}
+
+.list .medium .time {
+  width: 100rpx;
+  height: 28rpx;
+  font-size: 20rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 28rpx;
+}
+
+.list .medium .couponEmpty {
+  height: 16rpx;
+}
+
+.list .medium .week {
+  width: 100rpx;
+  height: 28rpx;
+  font-size: 20rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 28rpx;
+}
+
+.enjoyment-price {
+  height: 32rpx;
+  font-size: 24rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 600;
+  color: rgba(245, 35, 64, 1);
+  line-height: 32rpx;
+  display: inline-block;
+}
+
+.enjoyment-saveMoney {
+  background: rgba(245, 35, 64, 0.08);
+  border-radius: 4rpx;
+  font-size: 16rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(245, 35, 64, 1);
+  display: inline-block;
+  margin-left: 16rpx;
+  margin-top: 8rpx;
+  padding: 4rpx;
+}
+
+.list .medium .money {
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold, PingFang SC;
+  font-weight: 600;
+  color: rgba(255, 75, 47, 1);
+  line-height: 32rpx;
+  margin-left: -6rpx;
+}
+
+.list .medium .discount {
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 32rpx;
+  padding-left: 10rpx;
+  text-decoration: line-through;
+}
+
+.list .list-top .right {
+  height: 30rpx;
+  padding-right: 14rpx;
+  position: relative;
+  top: 77rpx;
+}
+
+.list .list-top .sale {         
+  font-size: 22rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 30rpx;
+}

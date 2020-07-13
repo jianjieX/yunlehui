@@ -1,0 +1,32 @@
+<!-- 控制背景色 -->
+<view class="{{activityList==0?'page-style-empty':'page-style'}}">
+  <!-- 自定义tabbar -->
+  <view class='nav'>
+    <block wx:for="{{tabList}}" wx:key="item.value">
+      <view class="{{item.value == focuseItem?'focus':''}}" bindtap='handleTab' data-value="{{item.value}}">{{item.name}} </view>
+    </block>
+  </view>
+  <!-- 主体列表展示部分 -->
+  <view class="activity-all">
+    <view wx:for="{{activityList}}" wx:key="{{item.id}}" class="{{!item.isShow||item.isDeleted?'activity-item activity-outTime-background':'activity-item'}}" bindtap="toactivityDetail" data-state="{{item.isShow}}"  data-delState="{{item.isDeleted}}" data-id="{{item.enrolId}}">
+      <view class="img-container">
+        <image src="{{item.mainImage}}"></image>
+      </view>
+      <view class="activity-text-container" class="activity-text-container">
+        <view class="{{!item.isShow||item.isDeleted?'activity-title activity-outTime-text':'activity-title'}}">
+          {{item.title}}
+        </view>
+        <view class="{{!item.isShow||item.isDeleted?'activity-remark activity-outTime-text':'activity-remark'}}" wx:if="{{item.startTime}}">
+          时间时间: {{item.startTime}}至{{item.endTime}}
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- 插图 -->
+  <view class="illustration-view" wx:if="{{activityList==0}}">
+    <view class="illustration-border">
+      <image class="illustration-style" src="../../img/defaultImg/empty.png"></image>
+      <view class="illustration-text">当前暂无活动～</view>
+    </view>
+  </view>
+</view>

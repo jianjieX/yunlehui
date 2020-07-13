@@ -1,0 +1,266 @@
+/**
+ * 我的商户
+ * 
+ * @author wanghongli
+ * @date 2019-08-27
+ */
+
+let app = getApp();
+import Api from '/../../utils/config/Api/member';
+let alert = require('../../utils/tools/alert.js');
+import util from '../../utils/tools/util.js';
+// emojy 转字符
+let uncodeUtf16 = util.uncodeUtf16;
+let alertModal = alert.alertModal;
+let showLoading = alert.showLoading;
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 头部自适应样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    isBottomShow: true,
+    //模块类型    0：我的会员/1：我绑定的会员/2：我邀请的商户
+    moudelType: '1',
+    //当前页 
+    currentPage: 1,
+    //每页多少条 
+    pageSize: 10,
+    //是否需要分页
+    enablePage: false,
+    //总页数 
+    totalPages: null,
+    //会员列表
+    memberList: []
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    var that = this;
+    // 适配
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      moudelType: options.moudelType
+    })
+    showLoading();
+    //会员列表
+    let params = {
+      currentPage: this.data.currentPage,
+      enablePage: true,
+      pageSize: 10,
+    }
+
+    console.log(this.data.moudelType);
+    this.getMemmberList(params);
+  },
+
+  /**
+   * 获取会员列表
+   */
+  getMemmberList: function(params) {
+    let that = this;
+    console.log(this.data.moudelType);
+    switch (this.data.moudelType) {
+      case '0':
+        //获取我的会员列表
+        Api.myMember(params).then(res => {
+          if (res.data.status === "0000") {
+            if (res.data.data.content != '') {
+              var list = res.data.data.content;
+              for (var i = 0; i < list.length; i++) {
+                if (list[i].nickName == null) {
+                  list[i].nickName = "暂无昵称"
+                } else {
+                  list[i].nickName = uncodeUtf16(list[i].nickName)
+                }
+                if (list[i].memberImg == null || list[i].memberImg == "") {
+                  list[i].memberImg = "../../img/LOGO.png"
+                }
+              }
+              that.setData({
+                memberList: list,
+                isBottomShow: true,
+                totalPages: res.data.data.totalPages
+              })
+            }
+          } else {
+            that.setData({
+              memberList: [],
+              isBottomShow: false,
+            })
+          }
+        }).catch((res) => {
+          that.setData({
+            memberList: [],
+          })
+          alertModal("请求服务失败")
+        })
+        break;
+      case '1':
+        //查询我的绑定会员信息
+        Api.myBingMember(params).then(res => {
+          console.log(res);
+          if (res.data.status === "0000") {
+            if (res.data.data.content != '') {
+              var list = res.data.data.content;
+              for (var i = 0; i < list.length; i++) {
+                if (list[i].nickName == null) {
+                  list[i].nickName = "暂无昵称"
+                } else {
+                  list[i].nickName = uncodeUtf16(list[i].nickName)
+                }
+                if (list[i].memberImg == null || list[i].memberImg == "") {
+                  list[i].memberImg = "../../img/LOGO.png"
+                }
+              }
+              that.setData({
+                memberList: list,
+                isBottomShow: true,
+                totalPages: res.data.data.totalPages
+              })
+            }
+          } else {
+            that.setData({
+              memberList: [],
+              isBottomShow: false,
+            })
+          }
+        }).catch((res) => {
+          console.log(res);
+          that.setData({
+            memberList: [],
+          })
+          alertModal("请求服务失败")
+        })
+        break;
+      case '2':
+        //我邀请的商户
+        Api.showMyMerchantShop(params).then(res => {
+          console.log(res);
+          if (res.data.status === "0000") {
+            if (res.data.data.content.length !== 0) {
+              var list = res.data.data.content;
+              for (var i = 0; i < list.length; i++) {
+                if (list[i].nickName == null) {
+                  list[i].nickName = "暂无昵称"
+                } else {
+                  list[i].nickName = uncodeUtf16(list[i].nickName)
+                }
+                if (list[i].memberImg == null || list[i].memberImg == "") {
+                  list[i].memberImg = "../../img/LOGO.png"
+                }
+              }
+              that.setData({
+                memberList: list,
+                isBottomShow: true,
+              })
+            } else {
+              that.setData({
+                memberList: [],
+                isBottomShow: false,
+              })
+            }
+          } else {
+            that.setData({
+              memberList: [],
+              isBottomShow: false,
+            })
+          }
+        }).catch((res) => {
+          alertModal("请求服务失败")
+        })
+        break;
+    }
+    // 停止下拉动作
+    wx.stopPullDownRefresh();
+  },
+
+
+  /**
+   * 回到上一页
+   */
+
+  goBack: function() {
+    wx.navigateBack({
+      delta: 1
+    })
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function() {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function() {
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    var currentPage = this.data.currentPage;
+    console.log(currentPage);
+    let params = {
+      currentPage: currentPage,
+      enablePage: true,
+      pageSize: 10,
+    }
+    this.getMemmberList(params);
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+    wx.showLoading({
+      title: '加载中',
+    })
+    var that = this;
+    var currentPage = that.data.currentPage;
+    var totalPages = that.data.totalPages;
+    if (currentPage >= totalPages) {
+      alertModal("没有更多内容了")
+      return;
+    } else {
+      currentPage++;
+      let params = {
+        currentPage: currentPage,
+        enablePage: true,
+        pageSize: 10,
+      }
+      this.getMemmberList(params);
+    }
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function() {
+    //   return{
+    //     title: this.data.moudelType,
+    //     path: '/pages/inviteMember/inviteMember',
+    //     success(res) {
+    //       alertModal("分享成功")
+    //     }
+
+    //   }
+  }
+})

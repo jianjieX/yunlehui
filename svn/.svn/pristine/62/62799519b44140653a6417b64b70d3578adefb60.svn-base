@@ -1,0 +1,38 @@
+<!-- 编辑地址页面 -->
+
+<!-- 输入收货人 电话地址等信息 -->
+<view class='container'>
+  <view class='item'>
+    <view class='key'>收货人</view>
+    <input class="input" placeholder="收货人" bindinput="handleName" value='{{name}}' />
+  </view>
+  <view class='item'>
+    <view class='key'>联系电话</view>
+    <input class="input" type='number' placeholder="联系电话" bindinput="handlePhone" value='{{phone}}' />
+  </view>
+  <view class='item'>
+    <view class='key'>所在地区</view>
+    <picker mode="region" bindchange="bindRegionChange" value="{{region}}" custom-item="{{customItem}}">
+      <view class="picker">
+        {{region[0]}}，{{region[1]}}，{{region[2]}}
+      </view>
+    </picker>
+  </view>
+  <view class='item height'>
+    <view class='key'>详细地址</view>
+    <input class="input" bindinput='handleAddress' placeholder="详细地址" value='{{address}}' />
+  </view>
+</view>
+
+<!-- 是否默认 -->
+<view class='default'>
+  <view class='item'>
+    <view class='key'>设为默认</view>
+    <view class="body-view">
+      <switch color="#f4bb2e" bindchange="switchChange" checked='{{isDefault}}' />
+    </view>
+  </view>
+</view>
+
+<!-- 提交按钮 -->
+<view class='button' bindtap='submit'>保存收货信息</view>

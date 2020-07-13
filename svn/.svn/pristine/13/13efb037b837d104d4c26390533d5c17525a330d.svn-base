@@ -1,0 +1,356 @@
+// 引入全局app对象
+const app = getApp()
+let baseUrl = require("../../utils/base.js");
+import Api from '/../../utils/config/Api/shopMerchant.js';
+// 引入分享朋友圈 canvas相关
+import Poster from '../../components/miniprogram_dist/poster/poster';
+import WxParse from '../../wxParse/wxParse.js'
+// 引入解码表情方法
+let utils = require('../../utils/tools/util.js')
+// 引入封装alert
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 门店图
+    shopDoorPic: '',
+    // 门店名称
+    shopName: '',
+    // 营业时间
+    week: '',
+    // 门店地址
+    shopAddress: '',
+    // 门店电话
+    phone: '',
+    // 门店描述
+    mark: '',
+    // 商户列表
+    merchantList: [],
+    //当前页
+    currentPage: 1,
+    //每页多少条
+    pageSize: 10,
+    //总页数
+    totalPage: null,
+    // 门店ID
+    merchantId: '',
+    // 经度
+    longitude: '',
+    // 纬度
+    dimension: '',
+    latitude:'',
+    // 用户当前纬度
+    latitudeUser: '',
+    // 用户当前经度
+    longitudeUser: '',
+    distance:null,
+    //扫码进来的参数
+    qMerchantShopId:''
+  },
+
+  onLoad(options) {
+    let that = this;
+    var latitude;
+    var longitude
+    console.log('+++++我对对进来了',options)
+    if (options.q) {
+      console.log('扫码进入我对对进来了')
+      let q = decodeURIComponent(options.q)
+      this.setData({
+        qMerchantShopId: utils.getQueryString(q, 'merchantShopId')
+      })
+      wx.setStorageSync('shopId', utils.getQueryString(q, 'merchantShopId'))
+
+      
+      that.getUserLocation();
+
+    } else {
+      console.log('普通进入')
+      let params = {
+        merchantId: options.merchantShopId,
+        dimension: options.latitude,
+        longitude: options.longitude,
+      }
+
+      this.setData({
+        dimension: options.latitude,
+        longitude: options.longitude,
+        distance: options.distance
+      })
+      that.data.merchantId = options.merchantShopId;
+      console.log('参数', params)
+      app.userLogin().then(() => {
+        console.time()
+        that.getMerchantDeatil(params);
+        that.getConpon();
+        console.timeEnd()
+      })
+
+    }
+  },
+
+  
+  /**
+   * 判断用户是否拒绝地理位置信息授权，拒绝的话重新请求授权
+   */
+
+  getUserLocation: function() {
+    let that = this;
+    wx.getSetting({
+      success: (res) => {
+        console.log(JSON.stringify(res))
+        // res.authSetting['scope.userLocation'] == undefined    表示 初始化进入该页面
+        // res.authSetting['scope.userLocation'] == false    表示 非初始化进入该页面,且未授权
+        // res.authSetting['scope.userLocation'] == true    表示 地理位置授权
+        if (res.authSetting['scope.userLocation'] != undefined && res.authSetting['scope.userLocation'] != true) {
+          wx.showModal({
+            title: '请求授权当前位置',
+            content: '需要获取您的地理位置，请确认授权',
+            success: function(res) {
+              if (res.cancel) {
+                wx.showToast({
+                  title: '拒绝授权',
+                  icon: 'none',
+                  duration: 1000
+                })
+                wx.navigateTo({
+                  url: '../shopHome/shopHome',
+                })
+              } else if (res.confirm) {
+                wx.openSetting({
+                  success: function(dataAu) {
+                    if (dataAu.authSetting["scope.userLocation"] == true) {
+                      wx.showToast({
+                        title: '授权成功',
+                        icon: 'success',
+                        duration: 1000
+                      })
+                      //再次授权，调用wx.getLocation的API
+                      that.getLocation();
+                    } else {
+                      wx.showToast({
+                        title: '授权失败',
+                        icon: 'none',
+                        duration: 1000
+                      })
+                    }
+                  }
+                })
+              }
+            }
+          })
+        } else if (res.authSetting['scope.userLocation'] == undefined) {
+          //调用wx.getLocation的API
+          that.getLocation();
+        } else {
+          //调用wx.getLocation的API
+          that.getLocation();
+        }
+      }
+    })
+  },
+
+  /**
+   *  获取定位当前位置的经纬度
+   * */
+  getLocation: function () {
+    let that = this;
+    wx.getLocation({
+      type: 'wgs84',
+      success: function (res) {
+        console.log("---+++++++++----到这了获取位置信息", res)
+        let params = {
+          merchantId: that.data.qMerchantShopId,
+          dimension: res.latitude,
+          longitude: res.longitude
+        }
+        
+        that.setData({
+           latitudeUser: res.latitude,
+            longitudeUser: res.longitude
+        })
+        console.log('---------' + that.data.latitudeUser)
+        console.log('---------' + that.data.longitudeUser)
+        that.data.merchantId = that.data.qMerchantShopId;
+        console.log('参数扫码请求', params)
+        app.userLogin().then(() => {
+          that.getMerchantDeatil(params);
+          that.getConpon();
+        })
+
+      },
+      fail: function (res) {
+        console.log('fail' + JSON.stringify(res))
+      }
+    })
+  },
+
+  /**
+   * 商户详情页
+   */
+  getMerchantDeatil(params) {
+    console.log(params);
+    let that = this;
+    Api.getMerchantDtail(params).then((res) => {
+      console.log(res)
+      if (res.data.status == '0000') {
+        //有查询结果情况
+        if (res.data.data != null) {
+          console.log(res.data.data,res.data.data.shopDoorPic)
+          var shopDoorPic=[];
+          if(res.data.data.shopDoorPic){
+            shopDoorPic= res.data.data.shopDoorPic.split(',')
+          }
+          that.setData({
+            shopDoorPic:shopDoorPic,
+            shopName: res.data.data.shopName,
+            week: res.data.data.week,
+            beginTime: res.data.data.beginTime,
+            endTime: res.data.data.endTime,
+            shopAddress: res.data.data.shopAddress,
+            latitude: res.data.data.dimension,
+            dimension: res.data.data.dimension,
+            longitude: res.data.data.longitude,
+            mark: WxParse.wxParse('article', 'html', res.data.data.mark, that, 5),
+            phone: res.data.data.phone
+          })
+
+          wx.setNavigationBarTitle({
+            title: `${this.data.shopName}`
+          })
+        }
+        //无查询结果情况
+        else {
+          alertModal("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      console.log('详情catch-----',res)
+      alertModal("请求服务失败")
+    })
+  },
+
+  /**
+   * 打开地图
+   */
+  openMap() {
+
+    let name = this.data.shopAddress;
+    let latitude = Number(this.data.dimension);
+    let longitude = Number(this.data.longitude);
+    wx.openLocation({
+      name: name,
+      latitude: latitude,
+      longitude: longitude,
+      scale: 18
+    })
+  },
+
+  /**
+   * 打开电话
+   */
+  openPhone() {
+    let phoneNumber = this.data.phone;
+    wx.makePhoneCall({
+      phoneNumber: phoneNumber,
+      success: function() {
+        console.log("拨打电话成功！")
+      },
+      fail: function() {
+        console.log("拨打电话失败！")
+      }
+    })
+  },
+
+  /**
+   * 优惠专区
+   */
+  getConpon() {
+    let _this = this;
+    let params = {
+      currentPage: _this.data.currentPage,
+      enablePage: true,
+      pageSize: _this.data.pageSize,
+      merchantId: _this.data.merchantId,
+      sourceType: 2
+    }
+    Api.getConpon(params).then((res) => {
+      console.log(res,'-----********')
+      if (res.data.status == '0000') {
+        //有查询结果情况
+        if (res.data.data != null) {
+
+          _this.setData({
+            merchantList: [..._this.data.merchantList, ...res.data.data.content],
+            totalPages: res.data.data.totalPages
+          })
+        }
+        //无查询结果情况
+        else {
+          that.setData({
+            merchantList: []
+          })
+          alertModal("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      console.log('catch-----',res)
+      alertModal("请求服务失败")
+    })
+  },
+
+  /**
+   * 跳转商品详情页
+   */
+  jumpDetail(e) {
+    let that = this;
+    console.log('====eeee', that.data.qMerchantShopId )
+    let id = e.currentTarget.id;
+    wx.navigateTo({
+         url: '../../pages/shopDetail/shopDetail?goodsId=' + id + '&merchantShopId=' + that.data.qMerchantShopId,
+    })
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+
+    let that = this;
+    let currentPage = that.data.currentPage;
+    currentPage++;
+    that.setData({
+      currentPage
+    })
+    if (currentPage > that.data.totalPages) {
+      return
+    }
+    that.getConpon();
+  },
+
+  /**
+   * 分享
+   */
+  onShareAppMessage() {
+    let that = this;
+    let latitude = that.data.dimension
+    let longitude = that.data.longitude
+    let distance = that.data.distance
+    return {
+      title: that.data.shopName,
+      imageUrl: that.data.shopDoorPic,
+      path: '/pages/merchantDetail/merchantDetail?merchantShopId=' + that.data.merchantId + '&latitude=' + latitude + '&longitude=' + longitude + '&distance=' + distance
+
+    }
+  }
+
+})

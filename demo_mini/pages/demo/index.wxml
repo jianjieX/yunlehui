@@ -1,0 +1,34 @@
+<!--pages/demo/index.wxml-->
+
+<view class='container_icon'>
+  <view class='mycon'>
+    <view class='items' wx:for='{{list}}' wx:key='index'>
+        <view style="width:80rpx;height:80rpx;margin-bottom:20rpx">
+          <image src='{{item.icon}}'></image>
+        </view>
+        <view>{{item.name}}</view>
+    </view>
+  </view>
+</view>
+<button bindtap="chooseLocation">选择位置</button>
+<button bindtap='location'>验证定位</button>
+	<swiper
+        indicator-dots="true" autoplay="truetrue" circular="true"
+        interval="5000" duration="500" style="height:376rpx">
+        <block wx:for="{{shopDoorPic}}" wx:key="index">
+          <swiper-item wx:if='{{item}}'>
+						<image class="logo" src="{{item}}" mode='scaleToFill'></image>
+          </swiper-item>
+        </block>
+      </swiper>
+<block>
+  <view wx:for='{{shops}}' wx:key='index'>
+   {{item.name}}
+    <view wx:for='{{item.list}}' wx:for-item='ids' wx:key='index'>
+      <view>
+      <text>{{ids.name}}</text>
+      <text>已售数量：{{ids.num}}</text>
+      </view>
+    </view>
+  </view>
+</block>

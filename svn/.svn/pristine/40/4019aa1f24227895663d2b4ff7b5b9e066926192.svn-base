@@ -1,0 +1,371 @@
+/**
+ * @fileoverview 售后详情页面
+ * @author liyujie
+ */
+
+const app = getApp();
+// 引入接口api
+import Api from '/../../utils/config/Api/order.js';
+// 引入toast loading
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let loading = alert.showLoading;
+// 引入表情转码方法
+import tools from '../../utils/tools/util.js'
+let utf16toEntities = tools.utf16toEntities // emojy 转字符
+let uncodeUtf16 = tools.uncodeUtf16 //字符转emojy
+
+
+Page({
+  data: {
+    // 头部样式适配
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    navigationStyle: '',
+    menuStyle: '',
+    // 售后信息默认显示全部
+    hiddenafterSales: false,
+    // 订单信息默认显示全部
+    hiddenOrder: false,
+    // 是否已经选择地址
+    isAddress: false,
+    // 售后id
+    returnId: '',
+    // 物流弹层显示状态
+    logisticsHidden: true,
+    // 用户填写物流单号
+    expressNo: '',
+    // 物流公司
+    logisticsCompany: '',
+    // 预览图片list
+    imglist: [],
+    // 定时器
+    timeId: null
+  },
+
+  onLoad(options) {
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      navigationBarHeight: app.data.fixedTop + 44
+    })
+    this.data.orderId = options.orderId;
+    this.data.returnId = options.returnId
+    loading()
+    // 请求详情
+    this.getOrderDetail();
+  },
+
+  /**
+   * 获取订单详情
+   */
+  getOrderDetail() {
+    var that = this;
+    clearTimeout(this.data.timeId)
+    let params = {
+      orderReturnId: this.data.returnId
+    }
+    Api.afterSaleDetail(params).then(res => {
+      console.log("售后详情", res.data)
+      if (res.data.status === "0000") {
+        let list = []
+        res.data.data.orderReturnPicResList.map(item => {
+          list.push(item.goodsUrl)
+        })
+        let data = res.data.data;
+        data.returnInfo = uncodeUtf16(data.returnInfo);
+        data.returnUserName = uncodeUtf16(data.returnUserName);
+        data.note = uncodeUtf16(data.note);
+        data.systemLogList.map(item => {
+          item.operUser = uncodeUtf16(item.operUser)
+        })
+  
+        that.setData({
+          auditReason: res.data.data.auditReason,
+          orderDetail: data,
+          imglist: list
+        })
+        wx.hideLoading()
+        // 隐藏导航栏加载框
+        wx.hideNavigationBarLoading();
+        // 停止下拉动作
+        wx.stopPullDownRefresh();
+        if (res.data.data.returnStatus == 1) {
+          that.calcTime(res.data.data.reimburTime)
+        } else {
+          that.calcTime(res.data.data.returnEndTime)
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 计算剩余时间
+   */
+  calcTime(time) {
+    if (!time) {
+      return
+    }
+    var timestamp = Date.parse(new Date());
+    var totime = time / 1000;
+    console.log('截止时间', totime)
+    console.log('当前时间', timestamp)
+    //当前时间戳
+    timestamp = timestamp / 1000;
+    var surplus = totime - timestamp;
+    if (surplus >= 0) {
+      this.setData({
+        time: surplus
+      })
+      this.setTimeCount()
+    }
+  },
+
+  /**
+   * 倒计时
+   */
+  setTimeCount() {
+    let time = this.data.time
+    time--;
+    if (time <= 0) {
+      time = 0;
+      return
+    }
+    this.setData({
+      time: time
+    })
+    this.data.timeId = setTimeout(this.setTimeCount, 1000);
+  },
+
+  /**
+   * 是否折叠
+   */
+  foldingClick(e) {
+    var type = e.currentTarget.dataset.type;
+    var that = this;
+    switch (type) {
+      case 'afterSales':
+        that.data.hiddenafterSales = !that.data.hiddenafterSales; //隐藏物流信息
+        break;
+      case 'order':
+        that.data.hiddenOrder = !that.data.hiddenOrder; //隐藏订单信息
+        break;
+      default:
+        return
+    }
+    this.setData({
+      hiddenafterSales: that.data.hiddenafterSales,
+      hiddenOrder: that.data.hiddenOrder
+    })
+  },
+
+  /**
+   * 查询物流
+   */
+  logistics(e) {
+    let _this = this
+    loading();
+    console.log(e.target.dataset.no)
+    let params = {
+      expressNo: e.target.dataset.no,
+      orderReturnId: _this.data.returnId
+    }
+    Api.logisticsForAfterSale(params).then(res => {
+      console.log(res)
+      if (res.data.status === "0000") {
+        _this.setData({
+          logisticsHidden: false,
+          logisticsMessage: {
+            stepList: res.data.data
+          }
+        })
+      } else {
+        logisticsMessage: {
+          stepList: null
+        }
+        alertModal1(res.data.msg)
+      }
+    }).catch(err => {
+      logisticsMessage: {
+        stepList: null
+      }
+    })
+  },
+
+  /**
+   * 关闭物流弹层
+   */
+  cancelClick() {
+    this.setData({
+      logisticsHidden: true,
+      logisticsMessage: {
+        stepList: null
+      }
+    })
+  },
+
+  /**
+   * 返回
+   */
+  back() {
+    // wx.navigateBack({
+    //   detal: 1
+    // })
+    var pages = getCurrentPages(); // 当前页面
+    var beforePage = pages[pages.length - 2]; // 前一个页面
+    // console.log("beforePage");
+    // console.log(beforePage);
+    wx.navigateBack({
+      success: function() {
+        beforePage.backGetReturnList();
+      }
+    });
+  },
+
+  /**
+   * 用户输入
+   */
+  userInput(e) {
+    let type = e.currentTarget.dataset.type
+    let value = e.detail.value
+
+    switch (type) {
+      case 1:
+        this.setData({
+          expressNo: value
+        })
+        return
+      case 2:
+        this.setData({
+          logisticsCompany: value
+        })
+        return
+    }
+  },
+
+  /**
+   * 撤销申请
+   */
+  cancelAfterSale() {
+    let _this = this
+    wx.showModal({
+      title: '撤销售后申请',
+      content: '撤销售后申请，售后订单将关闭。之后您将无法发起平台申诉！',
+      success(res) {
+        if (res.confirm) {
+          let params = {
+            orderReturnId: _this.data.returnId,
+            returnStatus: 8
+          }
+          Api.cancelAfterSale(params).then(res => {
+            if (res.data.status === "0000") {
+              alertModal1("取消售后成功")
+              _this.getOrderDetail()
+            } else {
+              alertModal1(res.data.msg)
+            }
+          })
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+
+  /**
+   * 提交退货物流
+   */
+  submitLogistics() {
+    let _this = this
+    if (this.data.expressNo == '') {
+      alertModal1("请填写物流单号")
+      return
+    }
+    if (!/^[0-9a-zA-Z]+$/.test(this.data.expressNo)) {
+      alertModal1("物流单号只能输入数字和字母")
+      return
+    }
+    loading()
+    let params = {
+      expressNo: this.data.expressNo,
+      logisticsCompany: this.data.logisticsCompany,
+      orderReturnId: this.data.returnId
+    }
+    Api.submitLogistics(params).then(res => {
+      if (res.data.status === "0000") {
+        alertModal1("提交物流信息成功")
+        _this.getOrderDetail()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 平台申诉
+   */
+  complain() {
+    let _this = this
+    loading()
+    let params = {
+      orderReturnId: this.data.returnId
+    }
+    Api.complain(params).then(res => {
+      if (res.data.status === "0000") {
+        alertModal1("平台申诉成功")
+        _this.getOrderDetail()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 扫一扫 取快递单号
+   */
+  sweep() {
+    let _this = this
+    // 允许从相机和相册扫码
+    wx.scanCode({
+      success(res) {
+        console.log(res)
+        _this.setData({
+          expressNo: res.result
+        })
+      }
+    })
+  },
+
+  /**
+   * 下拉刷新
+   */
+  onPullDownRefresh() {
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    this.getOrderDetail()
+  },
+
+  /**
+   * 图片预览
+   */
+  previewImage(e) {
+    var that = this;
+    var current = e.currentTarget.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.imglist
+    })
+  },
+
+  /**
+   * 离开时清除setTimeout
+   */
+  onUnload() {
+    clearTimeout(this.data.timeId)
+  }
+})

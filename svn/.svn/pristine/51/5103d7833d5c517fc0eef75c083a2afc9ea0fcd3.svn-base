@@ -1,0 +1,16 @@
+var index = {
+  levelChange: function (data, level) {
+    var x = 0;
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].level == level) {
+        x = x + 1;
+      }
+    }
+    return 5 - x;
+  }
+}
+
+module.exports = {
+  levelChange: index.levelChange,
+
+}

@@ -1,0 +1,128 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<view>
+  <view class="content-wrap">
+    <view class="list">
+      <view class="item-wrap">
+        <view class="img-wrap" bindtap="jumpToDetail">
+          <image lazy-load="true" mode="scaleToFill" src="{{mainImage}}"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="sell-bar" >
+    <view class="sell-wrap">
+      <view class="sell-contnet-left">
+        <image class="avatar" wx:if="{{publisherPortrait}}" src="{{publisherPortrait}}"></image>
+        <image class="avatar" wx:else src="../../img/activity/default.png"></image>
+        <text class="ml10 name"wx:if="{{publisher}}">{{publisher}}</text>
+      </view>
+    </view>
+  </view>
+  <view class="line" wx:if="{{publisher}}"></view>
+  <view class="sell-bar" bindtap="openMap" wx:if="{{address}}">
+    <view class="sell-wrap">
+      <view class="sell-contnet-left">
+        <image class="icon" src="../../img/activity/location.png"></image>
+        <text class="ml10 name">{{address}}</text>
+      </view>
+      <view class="sell-contnet-right">
+        <image class="icon" src="../../img/homeImg/arrow.png"></image>
+      </view>
+    </view>
+  </view>
+  <view class="line" wx:if="{{address}}"></view>
+  <view class="sell-bar" bindtap="openPhone" wx:if="{{contactNumber}}">
+    <view class="sell-wrap">
+      <view class="sell-contnet-left">
+        <image class="icon" src="../../img/activity/phone.png"></image>
+        <text class="ml10 name">{{contactNumber}}</text>
+      </view>
+      <view class="sell-contnet-right">
+        <image class="icon" src="../../img/homeImg/arrow.png"></image>
+      </view>
+    </view>
+  </view>
+  <view class="line" wx:if="{{contactNumber}}"></view>
+
+  <view class="serve-title">
+    <!-- <text v-html>{{content}}</text> -->
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:content}}" />
+  </view>
+
+  <!-- 商品详情和故事 -->
+  <view class='goodsDesc'>
+    <!-- 故事 -->
+    <view class='story' wx:if="{{currentTab == 2}}">
+      <view class="story-item" wx:for="{{goodsStoryList}}" wx:key="{{index}}">
+        <view class="story-banner">
+          <image src="{{item.contentBanner}}"></image>
+        </view>
+        <!-- 内容区 -->
+        <view class="story-detail">
+          <view class="story-title">{{item.storyTitle}}</view>
+          <!-- 富文本 -->
+          <view class="story-content">
+            <import src="../../wxParse/wxParse.wxml" />
+            <template is="wxParse" data="{{wxParseData:storyArticle.nodes}}" />
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="serve-detail-title">{{title}}</view>
+    <!-- 详情富文本解析 -->
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+  </view>
+
+
+
+
+
+  <!-- 规格弹层 -->
+  <view class='mask' wx:if="{{showSpecModalStatus}}" bindtap='hideDialog' catchtouchmove='{{true}}'></view>
+  <view class='dialog' animation="{{animationData}}" wx:if="{{showSpecModalStatus}}" catchtouchmove='{{true}}'>
+    <!-- 弹窗头部 -->
+    <view class="header">
+      <!-- 关闭按钮 -->
+      <text>预约信息</text>
+      <image src="/img/activity/close.png" class="cancel-icon" wx:if="{{searchValue !== ''}}" catchtap="hideDialog" />
+    </view>
+    <form catchsubmit="formSubmit">
+      <view class="form-item">
+        <view class='title'>昵称</view>
+        <input class="title-value" disabled value="{{signParams.memberName}}" name="memberName" placeholder="请输入昵称" />
+      </view>
+      <view class="form-item">
+        <view class='title'>电话</view>
+        <input class="title-value" disabled value="{{signParams.mobile}}" name="mobile" placeholder="请输入电话" />
+      </view>
+      <view class="form-textarea">
+        <view class='title'>备注</view>
+        <textarea fixed  placeholder-class="placeholder-color" maxlength="50" value="{{signParams.memberRemark}}" class="form-textarea-text" name="memberRemark" placeholder="请输入备注"></textarea>
+      </view>
+      <!-- 底部按钮 -->
+      <button class="btn" formType="submit">确定</button>
+    </form>
+
+  </view>
+  <!-- footer 底部按钮-->
+  <view class="footer" wx:if="{{joinModeStatus==0}}">
+    <view class="button-group">
+      <!-- 分享 -->
+      <button class="footer-item" open-type="share">
+        <image class='item-img' src='../../img/detailImg/share.png' />
+        <view class="item-text">分享</view>
+      </button>
+    </view>
+
+    <view class="btn-group">
+      <!-- 立即参与 -->
+      <button class="btn {{joinModeVaild==1? 'disabled' : ''}}" data-type='1' bindtap="{{joinModeVaild==0 && (!buttonClicked) ? 'showDialog' : ''}}">{{joinModeName}}</button>
+    </view>
+  </view>
+  <view class="suspensionButton" wx:if="{{joinModeStatus==1}}">
+    <!-- 分享 -->
+    <button class="shareButton" open-type="share">分享</button>
+  </view>
+</view>

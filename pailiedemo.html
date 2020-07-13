@@ -1,0 +1,108 @@
+<html>
+  <head>
+    <script src="https://cdn.bootcss.com/jquery/3.5.0/jquery.min.js"></script>
+  </head>
+<body>
+
+</body>
+</html>
+<script>
+	let mainList=[
+      {
+        value:"颜色",
+        mainSpecValue:[
+          {
+            value:'红色'
+          },
+          {
+            value:'黑色'
+          }
+        ]
+      }
+	];
+  let subList=[
+    {
+      value:'尺寸',
+      subVal:[
+        {
+          value:'L'
+        },
+        {
+          value:'XL'
+        }
+      ]
+    },{
+      value:'腰围',
+      subVal:[
+        {
+          value:'23'
+        },
+        {
+          value:'24'
+        }
+      ]
+    }
+  ];
+  let arr1=[];
+
+  // 颜色  尺寸  腰围
+  //  红    L     23
+  //  黑    XL    24
+
+  // 红色/L/23
+  // 红色/L/24
+  // 红色/XL/23
+  // 红色/XL/24
+  // 黑色/L/23
+  // 黑色/L/24
+  // 黑色/XL/23
+  // 黑色/XL/24
+    var arr2=subList.reduce(function(d, item){
+      return d.reduce(function(c, citem){
+        var so = JSON.stringify(citem)
+        return c.concat(item.subVal.map(function(option){
+          var o = JSON.parse(so)
+          o[item.value] = option.value
+          return o
+        }))
+      }, [])
+    }, [{}])
+    console.log(arr2);
+    let newArray=[];
+    mainList[0].mainSpecValue.forEach(items=>{
+      arr2.forEach(item=>{
+        var sum=items.value+'/'
+        for(var k in item){
+          sum+=item[k]+'/'
+        }
+        sum=sum.substring(0,sum.length-1)
+        newArray.push({
+          goods:sum
+        })
+
+      })
+    })
+    //
+
+    console.log(newArray);
+    // var xhr=new XMLHttpRequest();
+    // xhr.open('GET','https://jianjiex.github.io/json.js');
+    // xhr.send(null);
+    // xhr.onreadystatechange = function () { // 状态发生变化时，函数被回调
+    //   if (xhr.readyState === 4) { // 成功完成
+    //     console.log(xhr.responseText);
+    //   }
+    // }
+    $.ajax({
+      type:'post',
+      url:'http://api.weixin.qq.com/wxa/business/getliveinfo',
+      data:{
+        "start": 0,
+        "limit": 10,
+        "access_token":'32_HbZTmgcVyTSCKVvEnYert4LxiTMn2Lqh6P7woMRRPatFu-1u2QIDT4LWcUkiaUZPM33vQUVvQ7ZJarXRrpVmBAWHTFm4dnTcDnTf_17CzuPzIKmQWZjr037gt9gEWOdo6v2O-ic9xfw3hciVVUIcAJAPOC'
+      },
+      success:function (res) {
+          console.log(res)
+      }
+    })
+</script>

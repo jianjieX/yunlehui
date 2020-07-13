@@ -1,0 +1,162 @@
+<!-- 引入处理订单 处理金额 处理时间过滤器 -->
+<wxs module="handleOrder" src="../../filter/handleOrder.wxs"></wxs>
+<wxs module="handleTime" src="../../filter/time.wxs"></wxs>
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!-- tab选项卡 -->
+<view class='nav'>
+	<view class="{{currentTab == 0?'focus':''}}" data-current='{{0}}' bindtap='handleTab'>全部</view>
+	<view class="{{currentTab == 1?'focus':''}}" data-current='{{1}}' bindtap='handleTab'>待付款</view>
+	<view class="{{currentTab == 2?'focus':''}}" data-current='{{2}}' bindtap='handleTab'>待发货</view>
+	<view class="{{currentTab == 3?'focus':''}}" data-current='{{3}}' bindtap='handleTab'>待收货</view>
+	<view class="{{currentTab == 4?'focus':''}}" data-current='{{4}}' bindtap='handleTab'>已收货</view>
+	<!-- <view class="{{currentTab == 5?'focus':''}}" data-current='{{5}}' bindtap='handleTab'>已完成</view> -->
+	<view class="{{currentTab == 8?'focus':''}}" data-current='{{8}}' bindtap='handleTab'>售后</view>
+</view>
+
+<!-- 没有订单 -->
+<view wx:if="{{dataList.length == 0 && currentTab != 8}}" class='no-order'>
+	<image src='/img/defaultImg/empty.png'></image>
+	<view>暂时没有相关订单哦~</view>
+</view>
+
+<!-- 订单列表 -->
+<view class='orderList' wx:if="{{dataList.length !== 0 && currentTab !== 8}}">
+	<view class='shop' wx:for="{{dataList}}" wx:key="{{item}}">
+		<view class='shop-title'>
+			<view style="display:flex;flex-flow:row;">
+				<image src='../../img/homeImg/shop.png' mode='widthFix'></image>
+				<view class="merchantName-view">{{item.merchantName}}</view>
+				<!-- <view style="color:#aaa; font-size:13px;margin-left:20rpx;">{{handleTime.formatTime(item.orderTime)}}</view> -->
+			</view>
+			<view class="order-status">{{handleOrder.getOrder(item.orderStatus)}}</view>
+		</view>
+		<view class='goods-item' wx:for="{{item.orderResList}}" wx:key="{{goodsItem.id}}" wx:for-item="goodsItem" wx:for-index="goodsIndex" data-id='{{item.orderId}}' bindtap='goOrderDetail' data-mode="{{item.isMealsOrder}}">
+			<view class="goods-item-left">
+				<view class='goodsImgBox'>
+					<image src='{{goodsItem.productPic}}'></image>
+				</view>
+				<view class='goods-info'>
+					<view class='title'>
+						<span wx:if="{{goodsItem.goodsType === 2}}" class="select">严选</span>
+						<span style="line-height:34rpx;">{{goodsItem.productName}}</span>
+					</view>
+					<view class='spec'>
+						<text style='background: #f1f1f1;padding: 8rpx 20rpx;'>{{goodsItem.specs}}</text>
+					</view>
+				</view>
+			</view>
+
+			<view class='price'>
+				<!-- <view>￥{{numFr.getNum(numFr.getTotalNum(goodsItem.productPrice,goodsItem.enjoyTotalDiscountAmount))}}</view> -->
+        <view>￥{{goodsItem.productPrice}}</view>
+				<view style='text-align:right;color:#999999; font-size:22rpx ; margin-top:14rpx;'>x {{goodsItem.productQuantity}}</view>
+			</view>
+		</view>
+		<view class="freight">
+			<view>运费</view>
+			<view wx:if="{{item.freightAmount!=0.00}}">￥
+				<span>{{numFr.getNum(item.freightAmount)}}</span>
+			</view>
+			<view wx:else>免运费</view>
+		</view>
+		<view style='text-align:right;margin-right:24rpx;'>
+			<text style="color:#666666;font-size:20rpx;">共{{numFr.calcNum(item.orderResList)}}件</text>
+			<text style="color:#666666;font-size:20rpx;">小计: </text>
+			<span style="font-size:20rpx;color:#FF5850">￥</span>
+			<span style="font-size:26rpx;color:#FF5850">{{numFr.getNum(item.payAmount)}}</span>
+		</view>
+		<!-- <view style='text-align:right;margin-top:20rpx;' wx:if="{{(item.orderStatus === 0 || item.orderStatus === 1||item.orderStatus === 2 || item.orderStatus === 3||item.orderStatus === 4)&&!item.isMealsOrder ||(item.orderStatus === 0 || item.orderStatus === 1|| item.orderStatus === 3)&&item.isMealsOrder}}"> -->
+		<view style='text-align:right;margin-top:20rpx;'>
+			<!-- 选择取消订单原因 -->
+		  <picker style="display:inline-block" bindchange="bindPickerChange" range-key="name" range="{{cancelReasonList}}" data-id="{{item.orderId}}" data-status="{{item.orderStatus}}">
+				<view class='btn btn-cancel' wx:if="{{(item.orderStatus === 0|| item.orderStatus === 1) && !item.isActivateCard && !item.belongOwnFlag  }}">取消订单</view>
+			</picker>
+			<view class='btn' wx:if="{{item.orderStatus === 0}}" bindtap='pay' data-id="{{item.orderId}}" data-price="{{item.payAmount}}">继续支付</view>
+
+			<span>
+				<view class='btn' wx:if="{{ item.orderStatus === 3 && !item.isMealsOrder && !item.isActivateCard &&!item.enjoyTotalDiscountAmount && !item.verificationCode|| item.orderStatus === 3 && item.isMealsOrder &&  handleOrder.foodCanAfterSale(item.receiveTime) && !item.isActivateCard && !item.enjoyTotalDiscountAmount}}" bindtap='applyAfterSale' data-id="{{item.orderId}}">申请售后</view>
+			</span>
+			<view class='btn btn-cancel' wx:if="{{(item.orderStatus === 2 || item.orderStatus === 3||item.orderStatus === 4) && item.deliverySn}}" bindtap='logistics' data-id='{{item.orderId}}'>查看物流</view>
+			<view class='btn' wx:if="{{item.orderStatus === 2  && !item.isMealsOrder &&  !item.verificationCode}}" data-id='{{item.orderId}}' bindtap='receiveGoods'>确认收货</view>
+			<view class='btn' wx:if="{{item.orderStatus === 1 &&item.verificationCode &&  !item.isMealsOrder}}" data-vericode='{{item.verificationCode}}' bindtap='goOrderDetail' data-mode="{{item.isMealsOrder}}" data-id='{{item.orderId}}'>核销码</view>
+    
+      <view class='btn btn-cancel' bindtap="cancelMyOrder"  wx:if="{{(item.orderStatus === 1||item.orderStatus === 0) && item.belongOwnFlag &&  !item.isMealsOrder && !item.isActivateCard && !item.isActivateCard}}" data-id="{{item.orderId}}" data-status="{{item.orderStatus}}" >取消订单</view>
+		</view>
+	</view>
+</view>
+
+
+<view wx:if="{{returnOrderList.length == 0 && currentTab == 8}}" class='no-order'>
+	<image src='/img/defaultImg/empty.png'></image>
+	<view>暂时没有相关订单哦~</view>
+</view>
+
+<!-- 售后订单列表 -->
+<view class='orderList' wx:if="{{returnOrderList.length !== 0 && currentTab == 8}}">
+	<view class='shop' wx:for="{{returnOrderList}}" wx:key="{{item}}" bindtap='goAfterSaleDetail' data-mode="{{item.isMealsOrder}}" data-id="{{item.id}}">
+		<view class='shop-title'>
+			<view style="display:flex;flex-flow:row;">
+				<image src='../../img/homeImg/shop.png' mode='widthFix'></image>
+				<view class="merchantName-view">{{item.merchantName}}</view>
+				<!-- <view style="color:#aaa; font-size:13px;margin-left:20rpx;">{{handleTime.formatTime(item.orderTime)}}</view> -->
+			</view>
+			<view class="order-status">{{handleOrder.returnStatus(item.returnStatus)}}</view>
+		</view>
+		<view class='goods-item' wx:for="{{item.orderResList}}" wx:key="{{goodsItem.id}}" wx:for-item="goodsItem" wx:for-index="goodsIndex" data-id='{{item.orderId}}'>
+			<view class="goods-item-left">
+				<view class='goodsImgBox'>
+					<image src='{{goodsItem.productPic}}'></image>
+				</view>
+				<view class='goods-info'>
+					<view class='title'>
+						<span wx:if="{{goodsItem.goodsType === 2}}" class="select">严选</span>
+						<span style="line-height:34rpx;">{{goodsItem.productName}}</span>
+					</view>
+					<view class='spec'>
+						<text style='background: #f1f1f1;padding: 8rpx 20rpx; style="line-height:34rpx;'>{{goodsItem.specs}}</text>
+					</view>
+				</view>
+			</view>
+			<view class='price'>
+				<view>￥{{numFr.getNum(numFr.getTotalNum(goodsItem.productPrice,goodsItem.enjoyTotalDiscountAmount))}}</view>
+				<view style='text-align:right;color:#999999; font-size:22rpx ; margin-top:14rpx;'>x {{goodsItem.productQuantity}}</view>
+			</view>
+		</view>
+		<view class="freight">
+			<view>运费</view>
+			<view wx:if="{{item.freightAmount!=0.00}}">￥
+				<span>{{item.freightAmount}}</span>
+			</view>
+			<view wx:else>免运费</view>
+		</view>
+		<!-- <view style='text-align:right;margin-right:20rpx;'>共{{numFr.calcNum(item.orderResList)}}件商品 实付:
+      <span style="font-size:14px;">￥{{numFr.getNum(item.payAmount)}}</span>
+
+    </view> -->
+		<view style='text-align:right;margin-right:24rpx;'>
+			<text style="color:#666666;font-size:20rpx;">共{{numFr.calcNum(item.orderResList)}}件</text>
+			<text style="color:#666666;font-size:20rpx;">小计: </text>
+			<span style="font-size:20rpx;color:#FF5850">￥</span>
+			<span style="font-size:26rpx;color:#FF5850">{{numFr.getNum(item.payAmount)}}</span>
+		</view>
+	</view>
+
+</view>
+
+<!-- 物流弹窗 -->
+<import src="../../components/dialog/dialog.wxml" />
+<view hidden="{{logisticsHidden}}">
+	<template is="logistics" data='{{...logisticsMessage}}' />
+</view>
+
+<!-- 支付遮罩层 -->
+<view class="pay-mask" wx:if="{{payMask}}"></view>
+<view class="pay-mask" style="z-index:1;" wx:if="{{isShowQrcode}}" catchtouchmove="{{true}}"></view>
+<view wx:if="{{isShowQrcode}}" class="verficationcode-contain" catchtouchmove="{{true}}">
+  <view class="close-show-qrcode"><view></view><image src="../../img/enjoyCard/close.png" bindtap="cancel"></image></view>
+  <view class="verfication-number">{{verficationcode}}</view>
+  <view class="verfication-text">核销码</view>
+	<canvas class="canvas-code" canvas-id="myQrcode" style="background:#ffffff;width: 256rpx;height: 256rpx;" />
+  <view class="verfition-disc">请扫该核销码</view>
+</view>

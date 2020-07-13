@@ -1,0 +1,33 @@
+
+// 引入封装alert
+let alert = require('../tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+// 引入全局app对象
+let _app = null;
+function init(app) {
+  _app = app
+}
+
+// token超时处理
+function tokenTimeout(res) {
+  _app.userLogin().then(() => {
+    alertModal(res.data.msg)
+    setTimeout(() => {
+      wx.reLaunch({
+        url: '/pages/shopHome/shopHome',
+      })
+    }, 2000)
+  })
+}
+
+// 服务器异常处理
+function serverErr(res) {
+  alertModal1(res.data.msg);
+}
+
+module.exports = {
+  tokenTimeout,
+  serverErr,
+  init
+}

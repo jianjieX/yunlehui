@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<div style="height:1000px;width:20px"></div>
+<!-- guestion One --><!-- 图片懒加载 -->
+<!-- <img alt="" id='img' data-src='https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1594098356976&di=f3943868bf309b56f23c4b47794a88fe&imgtype=0&src=http%3A%2F%2Fe.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fd62a6059252dd42a1c362a29033b5bb5c9eab870.jpg'> -->
+</body>
+<script>
+// guestion One 1
+// console.log(img.getBoundingClientRect().top)
+// console.log(document.documentElement.clientHeight)
+// console.log(img.getAttribute('data-src'))
+// if(img.getBoundingClientRect().top<document.documentElement.clientHeight){
+// 	img.src=img.getAttribute('data-src')
+// }
+// guestion One 2
+// const observer = new IntersectionObserver((changes) => {
+//   // changes: 目标元素集合
+//   changes.forEach((change) => {
+//     // intersectionRatio
+//     console.log(change)
+//     if (change.isIntersecting) {
+//       const img = change.target
+//       img.src = img.dataset.src
+//       observer.unobserve(img)
+//     }
+//   })
+// })
+
+// observer.observe(img)
+
+
+//question Two 防抖-节流
+
+// 防抖
+// function debounce(fn, delay) {
+//   // 维护一个 timer，用来记录当前执行函数状态
+//   let timer = null;
+// console.log(fn)
+//   return function() {
+//     // 通过 ‘this’ 和 ‘arguments’ 获取函数的作用域和变量
+//     let context = this;
+//     let args = arguments;
+//     // 清理掉正在执行的函数，并重新执行
+//     clearTimeout(timer);
+//     timer = setTimeout(function() {
+//       fn.apply(context, args);
+//     }, delay);
+//   }
+// }
+
+// es6改写
+// function debounce(f,wait){
+// 	let timer
+// 	return (...args)=>{
+// 		clearTimeout(timer)
+// 		timer=setTimeout(()=>{
+// 			f(...args)
+// 		},wait)
+// 	}
+// }
+// 
+// let flag = 0; // 记录当前函数调用次数
+// // // 当用户滚动时被调用的函数
+// function foo() {
+//   flag++;
+//   console.log('Number of calls: %d', flag);
+// }
+
+// // 在 debounce 中包装我们的函数，过 2 秒触发一次
+// window.onscroll=debounce(foo, 2000);
+ 
+// 节流
+
+// function throttle(f,wait){
+// 	let timer
+// 	return (...args)=>{
+// 		if(timer){return}
+// 		timer=setTimeout(()=>{
+// 			f(...args);
+// 			timer=null;
+// 		},wait)	
+// 	}
+// }
+// window.onscroll=throttle(foo, 2000);
+
+// 防抖：防止抖动，单位时间内事件触发会被重置，避免事件被误伤触发多次。代码实现重在清零 clearTimeout
+// 节流：控制流量，单位时间内事件只能触发一次，如果服务器端的限流即 Rate Limit。代码实现重在开锁关锁 timer=timeout; timer=null
+// 
+
+// question Three 如何实现一个简单的 Promise
+// class Prom {
+//   static resolve (value) {
+//     if (value && value.then) {
+//       return value 
+//     }
+//     return new Prom(resolve => resolve(value))
+//   }
+
+//   constructor (fn) {
+//     this.value = undefined
+//     this.reason = undefined
+//     this.status = 'PENDING'
+
+//     // 维护一个 resolve/pending 的函数队列
+//     this.resolveFns = []
+//     this.rejectFns = []
+
+//     const resolve = (value) => {
+//       // 注意此处的 setTimeout
+//       setTimeout(() => {
+//         this.status = 'RESOLVED'
+//         this.value = value
+//         this.resolveFns.forEach(({ fn, resolve: res, reject: rej }) => res(fn(value)))
+//       })
+//     }
+
+//     const reject = (e) => {
+//       setTimeout(() => {
+//         this.status = 'REJECTED'
+//         this.reason = e
+//         this.rejectFns.forEach(({ fn, resolve: res, reject: rej }) => rej(fn(e)))
+//       })
+//     }
+
+//     fn(resolve, reject)
+//   }
+
+
+//   then (fn) {
+//     if (this.status === 'RESOLVED') {
+//       const result = fn(this.value)
+//       // 需要返回一个 Promise
+//       // 如果状态为 resolved，直接执行
+//       return Prom.resolve(result)
+//     }
+//     if (this.status === 'PENDING') {
+//       // 也是返回一个 Promise
+//       return new Prom((resolve, reject) => {
+//         // 推进队列中，resolved 后统一执行
+//         this.resolveFns.push({ fn, resolve, reject }) 
+//       })
+//     }
+//   }
+
+//   catch (fn) {
+//     if (this.status === 'REJECTED') {
+//       const result = fn(this.value)
+//       return Prom.resolve(result)
+//     }
+//     if (this.status === 'PENDING') {
+//       return new Prom((resolve, reject) => {
+//         this.rejectFns.push({ fn, resolve, reject }) 
+//       })
+//     }
+//   }
+// }
+// Prom.resolve(10).then(o => o * 10).then(o => o + 10).then(o => {
+//   console.log(o)
+// })
+
+// new Prom((resolve, reject) => reject('Error')).catch(e => {
+//   console.log('Error', e)
+// })
+// 
+
+// question Four 一行代码实现bind
+// Function.prototype.fakeBind=function(obj){return (...args)=>this.apply(obj,args)}
+// function f(arg){
+// console.log(this.a,arg)
+// }
+// f.bind({a:3})(4) //3,4
+// f.fakeBind({a:3})(4) //3,4
+
+
+// question Five可选链操作符
+// const o={a:1};
+// console.log(o?.a?.b?.c?.d)
+// 
+
+const getData = () =>
+  new Promise(resolve => setTimeout(() => resolve("data"), 1000))
+
+// 这样的一个async函数 应该再1秒后打印data
+async function test() {
+  const data = await getData()
+  console.log('data: ', data);
+  const data2 = await getData()
+  console.log('data2: ', data2);
+  return 'success'
+}
+
+// async函数会被编译成generator函数 (babel会编译成更本质的形态，这里我们直接用generator)
+function* testG() {
+  // await被编译成了yield
+  const data = yield getData()
+  console.log('data: ', data);
+  const data2 = yield getData()
+  console.log('data2: ', data2);
+  return 'success'
+}
+
+function asyncToGenerator(generatorFunc) {
+  return function() {
+    const gen = generatorFunc.apply(this, arguments)
+
+    return new Promise((resolve, reject) => {
+      function step(key, arg) {
+        let generatorResult
+        try {
+          generatorResult = gen[key](arg)
+        } catch (error) {
+          return reject(error)
+        }
+
+        const { value, done } = generatorResult
+
+        if (done) {
+          return resolve(value)
+        } else {
+          return Promise.resolve(value).then(
+            function onResolve(val) {
+              step("next", val)
+            },
+            function onReject(err) {
+              step("throw", err)
+            },
+          )
+        }
+      }
+      step("next")
+    })
+  }
+}
+
+const testGAsync = asyncToGenerator(testG)
+testGAsync().then(result => {
+  console.log(result)
+})
+</script>
+</html>

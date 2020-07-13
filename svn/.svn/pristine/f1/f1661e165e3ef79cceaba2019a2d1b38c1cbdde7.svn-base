@@ -1,0 +1,35 @@
+//上传图片到oss的API.js
+let baseUrl = require('../base.js')
+let alert = require('./alert.js');
+
+let alertModal1 = alert.alertModal1;
+let loading = alert.loading;
+
+function uploadFile(tempFilePaths, type) {  //上传图片到OSS
+  return new Promise(function (resolve, reject) {
+    loading("上传中");
+    wx.uploadFile({
+      url: `${baseUrl.uploadUrl}?type=${type}`,
+      filePath: tempFilePaths,
+      name: 'file',
+      success(res) {
+        wx.hideLoading();
+        let data = JSON.parse(res.data);
+        if (data.status === '0000') {
+          resolve(data.data);
+        } else {
+          alertModal1(data.msg)
+        }
+      },
+      fail(error) {
+        alertModal1('上传图片失败');
+        reject(error);
+      }
+    })
+  })
+
+}
+
+module.exports = {
+  uploadFile: uploadFile
+}

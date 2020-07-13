@@ -1,0 +1,313 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:14:20
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story`;
+CREATE TABLE `t_story`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `editor` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  `version` bigint(20) NOT NULL,
+  `attention_number` int(11) NOT NULL DEFAULT 0 COMMENT '用户关注故事数量',
+  `fans_number` int(11) NOT NULL DEFAULT 0 COMMENT '用户粉丝数量',
+  `thumb_up_number_total` int(11) NOT NULL DEFAULT 0 COMMENT '用户点赞总数',
+  `user_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:16:08
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story_attention
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story_attention`;
+CREATE TABLE `t_story_attention`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `editor` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  `version` bigint(20) NOT NULL,
+  `is_attention` int(11) NOT NULL COMMENT '是否关注(0未关注，1已关注)',
+  `owner_user_id` bigint(20) NOT NULL COMMENT '故事所有者',
+  `user_id` bigint(20) NOT NULL COMMENT '关注者',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:16:55
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story_category
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story_category`;
+CREATE TABLE `t_story_category`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `editor` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `version` bigint(20) NOT NULL,
+  `story_id` bigint(20) NOT NULL,
+  `merchant_id` bigint(20) NULL DEFAULT NULL COMMENT '商户',
+  `category_id` bigint(20) NULL DEFAULT NULL COMMENT '商品分类',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:23:09
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story_detail
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story_detail`;
+CREATE TABLE `t_story_detail`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `editor` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  `version` bigint(20) NOT NULL,
+  `category_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `content_banner` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `content_detail` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `editor_img` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `related_content` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `related_content_id` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '关联的其他故事的id',
+  `review_status` int(11) NOT NULL COMMENT '审核状态（1待审核，2审核通过，3审核驳回）',
+  `selected_category_id` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '故事关联的商品分类',
+  `serial_number` int(11) NOT NULL DEFAULT 0 COMMENT '故事序号',
+  `source_type` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '故事来源',
+  `thumb_up_number` int(11) NOT NULL DEFAULT 0 COMMENT '该篇故事的真实点赞数量',
+  `title` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `dismiss_reason` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '驳回原因',
+  `user_type` int(11) NULL DEFAULT NULL COMMENT '用户类型1会员，2商户，3供应商，4运维',
+  `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL,
+  `story_id` bigint(20) NULL DEFAULT NULL,
+  `custom_flag` int(11) NOT NULL DEFAULT 1 COMMENT '自定义标识字段用来表表示是c端添加的故事为0还是saas后台或供应商添加为1',
+  `share_number` int(20) NOT NULL DEFAULT 0 COMMENT '该篇故事分享数量',
+  `goods_ids` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NULL DEFAULT NULL COMMENT '故事关联商品id',
+  `new_update_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '故事修改时间以改时间为主',
+  `virtual_thumb_up_number` int(20) NOT NULL DEFAULT 0 COMMENT '虚拟点赞数',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:23:40
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story_goods
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story_goods`;
+CREATE TABLE `t_story_goods`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `editor` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `version` bigint(20) NOT NULL,
+  `story_id` bigint(20) NOT NULL,
+  `merchant_id` bigint(20) NULL DEFAULT NULL COMMENT '商户',
+  `goods_id` bigint(20) NULL DEFAULT NULL COMMENT '商品id',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:25:31
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story_thumb_up
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story_thumb_up`;
+CREATE TABLE `t_story_thumb_up`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `editor` varchar(40) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NULL DEFAULT NULL,
+  `status` int(11) NOT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+  `version` bigint(20) NOT NULL,
+  `is_thumb_up` int(11) NOT NULL COMMENT '是否点赞(0未点赞，1点赞)',
+  `story_id` bigint(20) NOT NULL COMMENT '故事',
+  `user_id` bigint(20) NOT NULL COMMENT '用户',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_bin ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 3307
+ Source Server Type    : MySQL
+ Source Server Version : 50726
+ Source Host           : 192.168.1.199:3307
+ Source Schema         : saas
+
+ Target Server Type    : MySQL
+ Target Server Version : 50726
+ File Encoding         : 65001
+
+ Date: 26/02/2020 09:26:40
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for t_story_top_state
+-- ----------------------------
+DROP TABLE IF EXISTS `t_story_top_state`;
+CREATE TABLE `t_story_top_state`  (
+  `id` bigint(20) NOT NULL,
+  `create_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `creater` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `editor` varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `remark` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `status` int(11) NULL DEFAULT NULL,
+  `update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+  `version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+  `story_id` bigint(20) NOT NULL,
+  `merchant_id` bigint(20) NOT NULL COMMENT '置顶的商户',
+  `story_top_state` int(11) NOT NULL COMMENT '故事置顶状态(0非置顶，1置顶)',
+  `new_update_time` timestamp(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '故事置顶状态的更新时间以该时间为主',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+SET FOREIGN_KEY_CHECKS = 1;

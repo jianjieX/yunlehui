@@ -1,0 +1,10 @@
+<!--小猪绑定成功页-->
+<view class="success-view">
+  <icon type="success" size="93" color="#09BB07"></icon>
+  <view class="success-text">
+    <view class="success-text2">申请成功，正在审核中，请耐心等待</view>
+    <view class="success-text1">1~5分钟</view>
+    <view class="success-text2">！</view>
+  </view>
+  <view class="success-button" bindtap="complete">返回收益</view>
+</view>

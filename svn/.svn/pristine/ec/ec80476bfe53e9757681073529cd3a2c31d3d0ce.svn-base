@@ -1,0 +1,54 @@
+<!--pages/activityMyDetail/activityMyDetail.wxml-->
+<!-- 格式化手机 -->
+<wxs module="changeStyle">
+  var  format = function(data) {
+    var mobile = data
+    return data.slice(0,3)+' '+data.slice(3,7)+' '+data.slice(7,11)
+  }
+    module.exports = {
+      format:format
+    }
+</wxs>
+
+<!-- 我的活动概述 -->
+<view class="Summary-activity">
+  <view class="image-container">
+    <image src="{{mainImage}}"></image>
+  </view>
+  <!-- 文字概述区域 -->
+  <view class="text-container">
+    <view class="activity-title">{{title}}</view>
+    <view class="join-num">参与人数：{{joinNumber}}</view>
+    <view class="activity-remark">备注:{{memberRemark}}</view>
+    <view class="activity-time">
+      <view></view>
+      <view class="contain-time">{{createTime}}</view>
+    </view>
+  </view>
+</view>
+<!-- 参与信息 -->
+<view class="join-info">
+  <view class="join-info-item box-shadow">参与信息</view>
+  <view class="show-info show-item box-shadow">
+    <view class="show-key">昵称</view>
+    <view class="show-val">{{memberName}}</view>
+  </view>
+  <view class="show-info  show-item box-shadow">
+    <view class="show-key">电话</view>
+    <view class="show-val">{{changeStyle.format(mobile)}}</view>
+  </view>
+  <view class="show-info show-item box-shadow">
+    <view class="show-key">参与人数</view>
+    <view class="show-val">{{joinNumber}}</view>
+  </view>
+  <view class="show-info  box-shadow show-info-remake">
+    <view class="remark-detailed">备注</view>
+    <view class="remark-area">{{memberRemark}}</view>
+  </view>
+</view>
+<view class="join-time">
+  <view class="show-info  show-item box-shadow">
+    <view class="show-key">参与时间</view>
+    <view class="show-val">{{createTime}}</view>
+  </view>
+</view>

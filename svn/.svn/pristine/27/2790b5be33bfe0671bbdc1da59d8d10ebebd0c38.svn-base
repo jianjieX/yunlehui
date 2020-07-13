@@ -1,0 +1,27 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  myBingMember(data) {  //查询我的绑定会员信息
+    let result = {};
+    result.method = "GET";
+    result.url = 'cmini/member/myBingMember';
+    return result
+  },
+  myMember(data){//我的会员信息
+    let result = {};
+    result.method = "GET";
+    result.url = 'cmini/member/myMember';
+    return result
+  },
+
+  showMyMerchantShop(data){//我邀请的商户
+    let result = {};
+    result.method = "GET";
+    result.url = 'cmini/member/showMyMerchantShop';
+    return result
+  }
+
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

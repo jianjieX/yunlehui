@@ -1,0 +1,310 @@
+<!--pages/my/my.wxml-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="index" src="../../filter/index.wxs"></wxs>
+
+<view class='back'>
+  <image class='header-img' src='/img/rank/bg_banner@3x.png'></image>
+  <view class='Level-tab'>
+    <view class="swiper-tab">
+      <view class="swiper-tab-list {{currentTab==0 ? 'on' : ''}}" data-current="0" bindtap="swichNav">小红包</view>
+      <view class="swiper-tab-list {{currentTab==1 ? 'on' : ''}}" data-current="1" bindtap="swichNav">大红包</view>
+      <view class="swiper-tab-list {{currentTab==2 ? 'on' : ''}}" data-current="2" bindtap="swichNav">超大红包</view>
+      <view class="swiper-tab-list {{currentTab==3 ? 'on' : ''}}" data-current="3" bindtap="swichNav">终极红包</view>
+    </view>
+
+    <swiper current="{{currentTab}}" class="swiper-box" duration="300" style="height:160px" bindchange="currentTabChange">
+      <swiper-item>
+        <view class="rank-scroll">
+          <scroll-view scroll-x class="rankmy-scroll">
+            <block wx:for="{{memberRankInfos}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level == 1}}" id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num you'>{{item.serialNumber}}号</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>￥{{item.rankReward}}</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>￥{{item.generalizeReward}}</text>
+                  </view>
+                  <button class='rank-reward-btn' data-id="{{item.memberRankId}}" data-serial="{{item.serialNumber}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+            <block wx:for="{{index.levelChange(memberRankInfos,1)}}" wx:for-item="item" wx:key="index">
+              <view id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num wu'>无</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>--元</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>--元</text>
+                  </view>
+                  <button class='rank-reward-btn1' data-id="{{item.memberRankId}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+          </scroll-view>
+        </view>
+      </swiper-item>
+      <swiper-item>
+        <view class="rank-scroll">
+          <scroll-view scroll-x class="rankmy-scroll">
+            <block wx:for="{{memberRankInfos}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level == 2}}" id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num you'>{{item.serialNumber}}号</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>￥{{item.rankReward}}</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>￥{{item.generalizeReward}}</text>
+                  </view>
+                  <button class='rank-reward-btn' data-id="{{item.memberRankId}}" data-serial="{{item.serialNumber}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+            <block wx:for="{{index.levelChange(memberRankInfos,2)}}" wx:for-item="item" wx:key="index">
+              <view id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num wu'>无</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>--元</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>--元</text>
+                  </view>
+                  <button class='rank-reward-btn1' data-id="{{item.memberRankId}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+          </scroll-view>
+        </view>
+      </swiper-item>
+      <swiper-item>
+        <view class="rank-scroll">
+          <scroll-view scroll-x class="rankmy-scroll">
+            <block wx:for="{{memberRankInfos}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level == 3}}" id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num you'>{{item.serialNumber}}号</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>￥{{item.rankReward}}</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>￥{{item.generalizeReward}}</text>
+                  </view>
+                  <button class='rank-reward-btn' data-id="{{item.memberRankId}}" data-serial="{{item.serialNumber}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+            <block wx:for="{{index.levelChange(memberRankInfos,3)}}" wx:for-item="item" wx:key="index">
+              <view id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num wu'>无</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>--元</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>--元</text>
+                  </view>
+                  <button class='rank-reward-btn1' data-id="{{item.memberRankId}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+          </scroll-view>
+        </view>
+      </swiper-item>
+      <swiper-item>
+        <view class="rank-scroll">
+          <scroll-view scroll-x class="rankmy-scroll">
+            <block wx:for="{{memberRankInfos}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level == 4}}" id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num you'>{{item.serialNumber}}号</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>￥{{item.rankReward}}</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>￥{{item.generalizeReward}}</text>
+                  </view>
+                  <button class='rank-reward-btn' data-id="{{item.memberRankId}}" data-serial="{{item.serialNumber}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+            <block wx:for="{{index.levelChange(memberRankInfos,4)}}" wx:for-item="item" wx:key="index">
+              <view id="img1" class="rank-item">
+                <view class='rank-reward-list'>
+                  <view class='rank-reward-num wu'>无</view>
+                  <view class='rank-reward-price'>红包金额
+                    <text>--元</text>
+                  </view>
+                  <view class='rank-reward-price'>推广礼包
+                    <text>--元</text>
+                  </view>
+                  <button class='rank-reward-btn1' data-id="{{item.memberRankId}}" bindtap="withdrawLeave">红包提现</button>
+                </view>
+              </view>
+            </block>
+          </scroll-view>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+  <view class='play-text'>
+    <view class='title'>
+      <image src='/img/rank/dev_line_le.png'></image>
+      <text>怎么玩？</text>
+      <image src='/img/rank/dev_line_r.png'></image>
+    </view>
+    <view class='play-desc'>
+      <view class='desc-detail'>
+        <view class='yuandian'></view>
+        <text>无排位号会员，推广3个会员礼包，可获得1个青铜排位号；</text>
+      </view>
+      <view class='desc-detail'>
+        <view class='yuandian'></view>
+        <text>每购买1个会员礼包，可以获得1个青铜排位号；</text>
+      </view>
+      <view class='desc-detail'>
+        <view class='yuandian'></view>
+        <text>不满5个排位号会员，同一个订单购买6个会员礼包，可获得1个白银排位号；</text>
+      </view>
+      <view class='desc-detail'>
+        <view class='yuandian'></view>
+        <text>无排位号会员，每推广一个会员礼包商品，奖励50元/个；</text>
+      </view>
+    </view>
+    <view class="a-scroll">
+      <scroll-view scroll-x class="my-scroll">
+        <block wx:for="{{giftInfos}}" wx:for-item="item" wx:key="index">
+          <view id="img1" class="s-item">
+            <view class='scroll-col'>
+              <image src="{{item.goodsMainUrl}}"></image>
+              <text class='item-name'>{{item.goodsName}}</text>
+              <text class='item-price'>￥{{numFr.getNum(item.goodsPrices[0].selectedPrice)}}</text>
+              <button class='item-btn' bindtap='buyNow' data-id='{{item.goodsId}}'>立即购买</button>
+            </view>
+          </view>
+        </block>
+      </scroll-view>
+    </view>
+    <view class='title2'>
+      <image src='/img/rank/dev_line_le.png'></image>
+      <text>战绩榜单</text>
+      <image src='/img/rank/dev_line_r.png'></image>
+    </view>
+    <view class='Level-tab2'>
+      <view class="swiper-tab">
+        <view class="swiper-tab-list {{currentRankTab==0 ? 'on' : ''}}" data-current="0" bindtap="swichRankNav">小红包</view>
+        <view class="swiper-tab-list {{currentRankTab==1 ? 'on' : ''}}" data-current="1" bindtap="swichRankNav">大红包</view>
+        <view class="swiper-tab-list {{currentRankTab==2 ? 'on' : ''}}" data-current="2" bindtap="swichRankNav">超大红包</view>
+        <view class="swiper-tab-list {{currentRankTab==3 ? 'on' : ''}}" data-current="3" bindtap="swichRankNav">终极红包</view>
+      </view>
+
+      <swiper current="{{currentRankTab}}" class="swiper-box" duration="600" style="min-height:500rpx" >
+        <swiper-item catchtouchmove="stopTouchMove">
+          <scroll-view scroll-y style="height: 500rpx;" lower-threshold='30' bindscrolltolower='scrollToLower'>
+            <block wx:for="{{rankRecordList}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level==1}}" class='rank-list'>
+                <view class='rank-no'>
+                  <text>{{item.serialNumber}}</text>
+                </view>
+                <text class='rank-no-text'>号</text>
+                <image wx:if="{{item.isRise==1}}" class='rank-top' src='/img/rank/mark_up@3x.png'></image>
+                <image class="{{item.isRise==1?'rank-avo':'rank-avo2'}}" src="{{item.memberImg}}"></image>
+                <text class='rank-name'>{{item.memberName}}</text>
+              </view>
+            </block>
+            <view class="load_more" hidden="{{!loading}}">
+              <view class="load_loading"></view>
+              <view class="load-tips">正在加载……</view>
+            </view>
+            <view class="load_end" hidden="{{!loaded}}">没有更多数据了……</view>
+          </scroll-view>
+        </swiper-item>
+
+        <swiper-item catchtouchmove="stopTouchMove">
+           <scroll-view scroll-y style="height: 500rpx;" lower-threshold='30' bindscrolltolower='scrollToLower'>
+            <block wx:for="{{rankRecordList}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level==2}}" class='rank-list'>
+                <view class='rank-no'>
+                  <text>{{item.serialNumber}}</text>
+                </view>
+                <text class='rank-no-text'>号</text>
+                <image wx:if="{{item.isRise==1}}" class='rank-top' src='/img/rank/mark_up@3x.png'></image>
+                <image class="{{item.isRise==1?'rank-avo':'rank-avo2'}}" src="{{item.memberImg}}"></image>
+                <text class='rank-name'>{{item.memberName}}</text>
+              </view>
+            </block>
+            <view class="load_more" hidden="{{!loading}}">
+              <view class="load_loading"></view>
+              <view class="load-tips">正在加载……</view>
+            </view>
+            <view class="load_end" hidden="{{!loaded}}">没有更多数据了……</view>
+          </scroll-view>
+        </swiper-item>
+ <swiper-item catchtouchmove="stopTouchMove">
+           <scroll-view scroll-y style="height: 500rpx;" lower-threshold='30' bindscrolltolower='scrollToLower'>
+            <block wx:for="{{rankRecordList}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level==3}}" class='rank-list'>
+                <view class='rank-no'>
+                  <text>{{item.serialNumber}}</text>
+                </view>
+                <text class='rank-no-text'>号</text>
+                <image wx:if="{{item.isRise==1}}" class='rank-top' src='/img/rank/mark_up@3x.png'></image>
+                <image class="{{item.isRise==1?'rank-avo':'rank-avo2'}}" src="{{item.memberImg}}"></image>
+                <text class='rank-name'>{{item.memberName}}</text>
+              </view>
+            </block>
+            <view class="load_more" hidden="{{!loading}}">
+              <view class="load_loading"></view>
+              <view class="load-tips">正在加载……</view>
+            </view>
+            <view class="load_end" hidden="{{!loaded}}">没有更多数据了……</view>
+          </scroll-view>
+        </swiper-item>
+         <swiper-item catchtouchmove="stopTouchMove">
+           <scroll-view scroll-y style="height: 500rpx;" lower-threshold='30' bindscrolltolower='scrollToLower'>
+            <block wx:for="{{rankRecordList}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level==4}}" class='rank-list'>
+                <view class='rank-no'>
+                  <text>{{item.serialNumber}}</text>
+                </view>
+                <text class='rank-no-text'>号</text>
+                <image wx:if="{{item.isRise==1}}" class='rank-top' src='/img/rank/mark_up@3x.png'></image>
+                <image class="{{item.isRise==1?'rank-avo':'rank-avo2'}}" src="{{item.memberImg}}"></image>
+                <text class='rank-name'>{{item.memberName}}</text>
+              </view>
+            </block>
+            <view class="load_more" hidden="{{!loading}}">
+              <view class="load_loading"></view>
+              <view class="load-tips">正在加载……</view>
+            </view>
+            <view class="load_end" hidden="{{!loaded}}">没有更多数据了……</view>
+          </scroll-view>
+        </swiper-item>
+         <swiper-item catchtouchmove="stopTouchMove">
+           <scroll-view scroll-y style="height: 500rpx;" lower-threshold='30' bindscrolltolower='scrollToLower'>
+            <block wx:for="{{rankRecordList}}" wx:for-item="item" wx:key="index">
+              <view wx:if="{{item.level==5}}" class='rank-list'>
+                <view class='rank-no'>
+                  <text>{{item.serialNumber}}</text>
+                </view>
+                <text class='rank-no-text'>号</text>
+                <image wx:if="{{item.isRise==1}}" class='rank-top' src='/img/rank/mark_up@3x.png'></image>
+                <image class="{{item.isRise==1?'rank-avo':'rank-avo2'}}" src="{{item.memberImg}}"></image>
+                <text class='rank-name'>{{item.memberName}}</text>
+              </view>
+            </block>
+            <view class="load_more" hidden="{{!loading}}">
+              <view class="load_loading"></view>
+              <view class="load-tips">正在加载……</view>
+            </view>
+            <view class="load_end" hidden="{{!loaded}}">没有更多数据了……</view>
+          </scroll-view>
+        </swiper-item>
+      </swiper>
+    </view>
+  </view>
+</view>

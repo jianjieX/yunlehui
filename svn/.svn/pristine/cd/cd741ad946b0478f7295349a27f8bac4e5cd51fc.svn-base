@@ -1,0 +1,155 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  placeOrder(data) { // 下单
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order';
+    return result
+  },
+  validateOrder(data) { // 下单校验库存
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/validateOrder';
+    return result
+  },
+  confirmReceipt(data) { // 确认收货
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/confirmReceipt';
+    return result
+  },
+  getOrderDetail(data) { // 订单详情
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/detail';
+    return result
+  },
+  getOrderList(data) { // 获取订单列表
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/list';
+    return result
+  },
+  viewLogistics(data) { // 查看物流
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/viewLogistics';
+    return result
+  },
+  /**
+   * 售后查看物流
+   */
+  logisticsForAfterSale(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return/viewLogistics';
+    return result
+  },
+  restartPay(data) { // 继续支付
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/restartPay/' + data.id;
+    return result
+  },
+  queryPay(data) { // 查询支付
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/queryPay/' + data.id;
+    return result
+  },
+  /**
+   * 取消订单
+   */
+  cancelOrder(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/cancelOrder';
+    return result
+  },
+  /**
+   * 售后订单列表
+   */
+  getReturnList(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return/list';
+    return result
+  },
+  /**
+   * 取消订单原因列表
+   */
+  getCancelReasonList(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/order/cancelResonList';
+    return result
+  },
+  /**
+   * 申请售后
+   */
+  applyAfterSale(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return';
+    return result
+  },
+  /**
+   * 申请售后的原因列表
+   */
+  returnReasonList(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/return/resonList';
+    return result
+  },
+
+  /**
+   * 售后详情
+   */
+  afterSaleDetail(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = `/cmini/return/${data.orderReturnId}`;
+    return result
+  },
+  /**
+   * 平台申诉
+   */
+  complain(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return/platCom';
+    return result
+  },
+  /**
+   * 提交退货物流信息
+   */
+  submitLogistics(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return/submitLogistics';
+    return result
+  },
+  /**
+   * 取消申请售后
+   */
+  cancelAfterSale(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return/cancel';
+    return result
+  },
+  /**
+   * 查询限额
+   */
+  getLimitPrice() {
+    let result = {};
+    result.method = "GET";
+    result.url = '/interest/interestsUserDetail';
+    return result
+  }
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

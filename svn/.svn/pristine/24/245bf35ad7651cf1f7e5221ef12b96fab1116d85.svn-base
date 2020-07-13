@@ -1,0 +1,138 @@
+/**
+ * 可提现
+ * 
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+import Api from '/../../utils/config/Api/withdrawal.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let sl = alert.showLoading;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //提现中
+    auditAmount: 0,
+    //累计提现
+    finishAmount: 0,
+    //可提现
+    totalAmount: 0,
+    //提现列表
+    withdrawalList: [], 
+    //显示内容数据
+    hasInform: false, 
+    //当前页 
+    currentPage: 1,
+    //每页多少条 
+    pageSize: 10,
+    //总页数 
+    totalPages: null,
+  },
+
+  onShow: function() {
+    this.data.currentPage = 1;
+    this.getWithdrawInfo();
+  },
+
+  //提现信息接口
+  getWithdrawInfo() {
+    var that = this;
+    sl("加载中")
+    let _parms = {
+      currentPage: that.data.currentPage,
+      enablePage: true,
+      pageSize: that.data.pageSize,
+      type: 1,
+      allEd: 0
+    }
+    Api.getWithdrawalList(_parms).then((res) => {
+      if (res.data.data != null) {
+        that.setData({
+          currentPage: that.data.currentPage + 1,
+          totalPages: res.data.data.totalPages,
+          auditAmount: res.data.data.auditAmount,
+          finishAmount: res.data.data.finishAmount,
+          totalAmount: res.data.data.balance,
+          withdrawalList: res.data.data.withdrawalList
+        })
+        if (res.data.data.withdrawalList != undefined) {
+          if (res.data.data.balance != 0) {
+            that.setData({
+              hasInform: true
+            })
+          }
+        }
+        wx.hideLoading();
+      } else {
+        wx.hideLoading();
+        // alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  //申请提现按钮
+  cashOut() {
+    wx.navigateTo({
+      url: '../cashOut/cashOut',
+    })
+  },
+
+  //获取更多 
+  getMore() {
+    var that = this;
+    var currentPage = that.data.currentPage;
+    var totalPages = that.data.totalPages;
+    if (currentPage > totalPages) {
+      alertModal1("没有更多数据了")
+      return;
+    }
+    let _parms = {
+      "currentPage": currentPage,
+      "enablePage": true,
+      "pageSize": that.data.pageSize,
+      "type": 1,
+    }
+    Api.getWithdrawalList(_parms).then((res) => {
+      if (res.data.data != null) {
+        var list = res.data.data.withdrawalList;
+        list = that.data.withdrawalList.concat(list);
+        that.setData({
+          currentPage: that.data.currentPage + 1,
+          totalPages: res.data.data.totalPages,
+          auditAmount: res.data.data.auditAmount,
+          finishAmount: res.data.data.finishAmount,
+          totalAmount: res.data.data.balance,
+          withdrawalList: list
+        })
+        if (res.data.data.withdrawalList != undefined) {
+          if (res.data.data.balance != 0) {
+            that.setData({
+              hasInform: true
+            })
+          }
+        }
+        wx.hideLoading();
+      } else {
+        wx.hideLoading();
+        // alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal1("请求服务失败")
+    })
+  },
+
+  /** 
+   * 页面上拉触底事件的处理函数 
+   */
+  onReachBottom: function () {
+    this.getMore();
+  },
+})

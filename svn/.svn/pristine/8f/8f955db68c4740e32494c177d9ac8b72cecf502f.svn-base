@@ -1,0 +1,427 @@
+{
+	"description": "项目配置文件",
+	"setting": {
+		"urlCheck": false,
+		"es6": true,
+		"enhance": false,
+		"postcss": true,
+		"preloadBackgroundData": false,
+		"minified": true,
+		"newFeature": true,
+		"coverView": true,
+		"autoAudits": false,
+		"showShadowRootInWxmlPanel": true,
+		"scopeDataCheck": false,
+		"checkInvalidKey": true,
+		"checkSiteMap": false,
+		"uploadWithSourceMap": true,
+		"babelSetting": {
+			"ignore": [],
+			"disablePlugins": [],
+			"outputPath": ""
+		}
+	},
+	"compileType": "miniprogram",
+	"libVersion": "2.9.2",
+	"appid": "wx085287d07297583e",
+	"projectname": "%E4%B8%80%E5%8E%82",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"gamePlugin": {
+			"current": -1,
+			"list": []
+		},
+		"miniprogram": {
+			"current": -1,
+			"list": [
+				{
+					"id": 0,
+					"name": "开店",
+					"pathName": "pages/shopApplication/shopApplication",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "会员等级",
+					"pathName": "pages/memberLevel/memberLevel",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "验证码",
+					"pathName": "pages/phoneVerification/phoneVerification",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "排位等级",
+					"pathName": "pages/rankLevel/rankLevel",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 4,
+					"name": "商品详情",
+					"pathName": "pages/shopDetail/shopDetail",
+					"query": "goodsId=6546992892969505795",
+					"scene": 1047
+				},
+				{
+					"id": -1,
+					"name": "授权",
+					"pathName": "pages/confirmation/confirmation",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "提现",
+					"pathName": "pages/cashOut/cashOut",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 7,
+					"name": "故事分享",
+					"pathName": "pages/storyDetails/storyDetails",
+					"query": "id=6580385973630424067&type=0&userId=10",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "开店 成功",
+					"pathName": "pages/shopopen/shopopen",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "提交订单",
+					"pathName": "pages/shopSubmitOrder/shopSubmitOrder",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 10,
+					"name": "物流",
+					"pathName": "pages/logistics/logistics",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "支付成功",
+					"pathName": "pages/orderPaySuccess/orderPaySuccess",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "申请售后",
+					"pathName": "pages/applyAfterSale/applyAfterSale",
+					"query": "orderId=6553822365308179463",
+					"scene": null
+				},
+				{
+					"id": 13,
+					"name": "售后详情",
+					"pathName": "pages/afterSaleDetail/afterSaleDetail",
+					"query": "returnId=6556734139758040067",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "地址列表",
+					"pathName": "pages/shopAddressList/shopAddressList",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 15,
+					"name": "好物列表",
+					"pathName": "pages/strictShop/strictShop",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "搜索商品",
+					"pathName": "pages/searchGoods/searchGoods",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的",
+					"pathName": "pages/shopMy/shopMy",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "总收入",
+					"pathName": "pages/earning/earning",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 19,
+					"name": "绑卡成功",
+					"pathName": "pages/cashOutResult/cashOutResult",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "提现",
+					"pathName": "pages/cashOut/cashOut",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "添加银行卡",
+					"pathName": "pages/addBankCard/addBankCard",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "提现记录",
+					"pathName": "pages/withdrawalRecord/withdrawalRecord",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "订单详情",
+					"pathName": "pages/orderDetail/orderDetail",
+					"query": "orderId=6555695260032586755",
+					"scene": null
+				},
+				{
+					"id": 24,
+					"name": "活动列表",
+					"pathName": "pages/activityHome/activityHome",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "活动详情",
+					"pathName": "pages/activityDetail/activityDetail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "精选商户",
+					"pathName": "pages/shopMerchant/shopMerchant",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 27,
+					"name": "我的活动",
+					"pathName": "pages/shopMy/shopMy",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "购物车",
+					"pathName": "pages/shopCart/shopCart",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "授权页面",
+					"pathName": "pages/confirmation/confirmation",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "大管家",
+					"pathName": "pages/activityCategory/activityCategory",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的主页",
+					"pathName": "pages/myHomePage/myHomePage",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 32,
+					"name": "服务详情",
+					"pathName": "pages/serveDetail/serveDetail",
+					"query": "id=6600736338914312195",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的服务详情",
+					"pathName": "pages/serveMyDetail/serveMyDetail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的页面进入的服务详情",
+					"pathName": "pages/serveMyDetail/serveMyDetail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的主页进入活动详情页面",
+					"pathName": "pages/activityMyDetail/activityMyDetail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 37,
+					"name": "我的服务",
+					"pathName": "pages/serveMy/serveMy",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "我的活动",
+					"pathName": "pages/activityMy/activityMy",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "大管家-活动分类",
+					"pathName": "pages/activityCategory/activityCategory",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "申请售后",
+					"pathName": "pages/applyAfterSale/applyAfterSale",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "支付成功",
+					"pathName": "pages/orderPaySuccess/orderPaySuccess",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "申请售后",
+					"pathName": "pages/applyAfterSale/applyAfterSale",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 42,
+					"name": "支付成功",
+					"pathName": "pages/orderPaySuccess/orderPaySuccess",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "乐享",
+					"pathName": "pages/enjoyCard/enjoyCard",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "售后",
+					"pathName": "pages/afterSaleDetail/afterSaleDetail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 45,
+					"name": "疫情",
+					"pathName": "pages/activity/activity",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "落地页",
+					"pathName": "pages/activityBanner/activityBanner",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/shopApplication/shopApplication",
+					"pathName": "pages/shopApplication/shopApplication",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "精选商户详情",
+					"pathName": "pages/merchantDetail/merchantDetail",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "精选商户-搜索",
+					"pathName": "pages/searchMerchantGoods/searchMerchantGoods",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "好物",
+					"pathName": "pages/strictShop/strictShop",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 51,
+					"name": "pages/shopDetail/shopDetail",
+					"pathName": "pages/shopDetail/shopDetail",
+					"query": "goodsId=6612258420897895427",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "开卡",
+					"pathName": "pages/enjoyCard/enjoyCard",
+					"query": "",
+					"scene": null
+				}
+			]
+		}
+	}
+}

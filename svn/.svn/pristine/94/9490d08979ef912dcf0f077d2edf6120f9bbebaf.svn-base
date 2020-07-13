@@ -1,0 +1,384 @@
+.left {
+  float: left;
+}
+
+.rigth {
+  float: right;
+}
+
+.left {
+  float: left;
+}
+
+.rigth {
+  float: right;
+}
+
+.w30 {
+  width: 30rpx !important;
+}
+
+.w50 {
+  width: 50rpx !important;
+}
+
+.w70 {
+  width: 70rpx !important;
+}
+
+.w75 {
+  width: 75rpx !important;
+}
+
+.w80 {
+  width: 80rpx !important;
+}
+
+.w100 {
+  width: 100rpx !important;
+}
+
+.w120 {
+  width: 120rpx !important;
+}
+
+.w180 {
+  width: 164rpx !important;
+}
+
+.w200 {
+  width: 200rpx !important;
+}
+
+.w220 {
+  width: 220rpx !important;
+}
+
+.w240 {
+  width: 240rpx !important;
+}
+
+.w248 {
+  width: 248rpx !important;
+}
+
+.w260 {
+  width: 260rpx !important;
+}
+
+.w300 {
+  width: 300rpx !important;
+}
+
+.w360 {
+  width: 360rpx !important;
+}
+
+.w375 {
+  width: 375rpx !important;
+}
+
+.w640 {
+  width: 640rpx !important;
+}
+
+.wth270, .w270 {
+  width: 270rpx !important;
+}
+
+.wth423, .w423 {
+  width: 423rpx !important;
+}
+
+.wth620, .w620 {
+  width: 620rpx !important;
+}
+
+.fz12, .fs12 {
+  font-size: 12rpx !important;
+}
+
+.fz13 {
+  font-size: 13rpx !important;
+}
+
+.fz14 {
+  font-size: 14rpx !important;
+}
+
+.fz15 {
+  font-size: 15rpx !important;
+}
+
+.fz16 {
+  font-size: 16rpx !important;
+}
+
+.fz18 {
+  font-size: 18rpx !important;
+}
+
+.fz20 {
+  font-size: 20rpx !important;
+}
+
+.fz24 {
+  font-size: 24rpx !important;
+}
+
+.fz30 {
+  font-size: 30rpx !important;
+}
+
+.fz48 {
+  font-size: 48rpx !important;
+}
+
+.fz64 {
+  font-size: 64rpx !important;
+}
+
+.fz96 {
+  font-size: 96rpx !important;
+}
+
+.ml20 {
+  margin-left: 20rpx !important;
+}
+
+.mnone {
+  margin: 0;
+}
+
+.mr, .mr5 {
+  margin-right: 5rpx !important;
+}
+
+.mr10 {
+  margin-right: 10rpx !important;
+}
+
+.mr15 {
+  margin-right: 15rpx !important;
+}
+
+.mr20 {
+  margin-right: 20rpx !important;
+}
+
+.mr30 {
+  margin-right: 30rpx !important;
+}
+
+.mr40 {
+  margin-right: 40rpx !important;
+}
+
+.ml, .ml5 {
+  margin-left: 5rpx !important;
+}
+
+.ml10 {
+  margin-left: 10rpx !important;
+}
+
+.ml10 {
+  margin-left: 10rpx !important;
+}
+
+.ml15 {
+  margin-left: 15rpx !important;
+}
+
+.ml30 {
+  margin-left: 30rpx !important;
+}
+
+.ml40 {
+  margin-left: 40rpx !important;
+}
+
+.mt5 {
+  margin-top: 5rpx !important;
+}
+
+.mt10 {
+  margin-top: 10rpx !important;
+}
+
+.mt15 {
+  margin-top: 15rpx !important;
+}
+
+.mt20 {
+  margin-top: 20rpx !important;
+}
+
+.mt25 {
+  margin-top: 25rpx !important;
+}
+
+.mt30 {
+  margin-top: 30rpx !important;
+}
+
+.mt45 {
+  margin-top: 45rpx !important;
+}
+
+.mt50 {
+  margin-top: 50rpx !important;
+}
+
+.mt60 {
+  margin-top: 60rpx !important;
+}
+
+.mt120 {
+  margin-top: 120rpx !important;
+}
+
+.mb5 {
+  margin-bottom: 5rpx !important;
+}
+
+.mb10 {
+  margin-bottom: 10rpx !important;
+}
+
+.mb15 {
+  margin-bottom: 15rpx !important;
+}
+
+.mb20 {
+  margin-bottom: 20rpx !important;
+}
+
+.mb45 {
+  margin-bottom: 45rpx !important;
+}
+
+.mb64 {
+  margin-bottom: 64rpx !important;
+}
+
+.pb15 {
+  padding-bottom: 15rpx !important;
+}
+
+.pb20 {
+  padding-bottom: 20rpx !important;
+}
+
+.pb60 {
+  padding-bottom: 60rpx !important;
+}
+
+.pb100 {
+  padding: 0rpx 100rpx !important;
+}
+
+.pl5 {
+  padding-left: 5rpx !important;
+}
+
+.pl10 {
+  padding-left: 10rpx !important;
+}
+
+.pt30 {
+  padding-top: 30rpx !important;
+}
+
+.pt10 {
+  padding-top: 10rpx !important;
+}
+
+.pt15 {
+  padding-top: 15rpx !important;
+}
+
+.pt20 {
+  padding-top: 20rpx !important;
+}
+
+.pt90 {
+  padding-top: 90rpx !important;
+}
+
+.pl60 {
+  padding-left: 60rpx !important;
+}
+
+.pl20 {
+  padding-left: 20rpx !important;
+}
+
+.pl15 {
+  padding-left: 15rpx !important;
+}
+
+.pl10 {
+  padding-left: 10rpx !important;
+}
+
+.pr10 {
+  padding-right: 10rpx !important;
+}
+
+.pr20 {
+  padding-right: 20rpx !important;
+}
+
+.pd10 {
+  padding: 10rpx !important;
+}
+
+.pd30 {
+  padding: 30rpx !important;
+}
+
+.pd5 {
+  padding: 5rpx !important;
+}
+
+.font12 {
+  font-size: 12rpx !important;
+}
+
+.font18 {
+  font-size: 18rpx !important;
+}
+
+.font22 {
+  font-size: 22rpx !important;
+}
+
+.font24 {
+  font-size: 24rpx !important;
+}
+
+.font30 {
+  font-size: 30rpx !important;
+}
+
+page{
+  background-color: #ededed;
+}
+
+
+.font-blue{
+  color: '#1769ff';
+}
+
+.button-gradient {
+    background-image: -webkit-gradient(linear,left top,right top,from(#1769ff),to(#142894));
+    background-image: linear-gradient(90deg,#1769ff,#142894);
+}
+
+
+.line{
+  height: 5rpx;
+  width: 100%;
+  color:  red;
+}

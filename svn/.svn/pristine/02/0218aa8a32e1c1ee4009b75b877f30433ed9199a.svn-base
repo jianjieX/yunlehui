@@ -1,0 +1,17 @@
+<!--图片-->
+<image src="{{img}}" class="headImg"></image>
+
+<!--模块List-->
+<block wx:for="{{list}}" wx:key="">
+  <view class="list-item">
+    <view class="list-item-row">
+      <block wx:for="{{item.listInner}}" wx:key="">
+        <view class="list-inner" data-id="{{item.id}}" data-type="{{item.type}}" data-belong="{{item.typeId}}" data-name="{{item.name}}" data-target="{{item.navigateTarget}}"   bindtap="goDetail" >
+          <image src="{{item.url}}" class="picture"></image>
+          <text class="name">{{item.name}}</text>
+        </view>
+      </block>
+    </view>
+  </view>
+</block>
+

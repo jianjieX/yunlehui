@@ -1,0 +1,264 @@
+<wxs module="handleOrder" src="../../filter/handleOrder.wxs"></wxs>
+<wxs module="handleTime" src="../../filter/time.wxs"></wxs>
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<view class="header-bg" style="height:{{navigationBarHeight}}px" />
+
+<!-- 头部导航 -->
+<view class="header" style="height:{{navigationBarHeight}}px">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}"></view>
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}" bindtap="back">
+      <view class="arrow"></view>
+      <view class="page-title-text">申请售后</view>
+    </view>
+  </view>
+  <!-- menu -->
+  <view class="menu" style="{{ menuStyle }}" />
+</view>
+
+<!-- 新ui售后状态 -->
+<view class="return-status">
+  <view class="status-text">{{handleOrder.returnDetailStatus(orderDetail.returnStatus)}}</view>
+  <view class="count-down-time" wx:if="{{time}}">
+    <text wx:if='{{orderDetail.returnStatus == 1 || orderDetail.returnStatus == 4}}'>剩余{{handleTime.countDown(time)}}</text>
+  </view>
+</view>
+
+<!-- 提示信息 -->
+<view class="tips" wx:if='{{orderDetail.returnStatus == 1}}'>
+  <view class="tips-title">您已经成功发起了申请，请耐心等待商家的处理！</view>
+  <view class="tips-content">如果商家超时未处理，退货申请将达成，请按照系统给出的退货地址退货，商家拒绝，您可以发起平台申诉 ，平台将会联系商家处理，商家同意后，请按照给出的退货地址退货，并记录退货的单号；</view>
+</view>
+
+<view class="tips" wx:if='{{orderDetail.returnStatus == 2}}'>
+  <view class="tips-title">商家已经同意退货申请，请按照商家的收货地址退货！</view>
+  <view class="tips-content">如果商家超时未处理，退货申请将达成，请按照系统给出的退货地址退货，商家拒绝，您可以发起平台申诉 ，平台将会联系商家处理，商家同意后，请按照给出的退货地址退货，并记录退货的单号；</view>
+</view>
+
+<view class="tips" wx:if='{{orderDetail.returnStatus == 3 || orderDetail.returnStatus == 4}}'>
+  <view class="tips-title">如果商家收到货并验证无误，将操作退款给您！</view>
+  <view class="tips-content">如果商家超时未处理，退货申请将达成，请按照系统给出的退货地址退货，商家拒绝，您可以发起平台申诉 ，平台将会联系商家处理，商家同意后，请按照给出的退货地址退货，并记录退货的单号；</view>
+</view>
+
+<!-- 小标题 -->
+<view class="page-title">售后详情</view>
+
+<view class="page-content-view">
+  <view class="goodMssage-view">
+    <view class='shop'>
+      <view class='shop-title'>
+        <view>
+          <image src='/img/homeImg/shop.png'></image>
+          <span style="font-size:32rpx;color:rgba(51,51,51,1);font-weight:500;">{{orderDetail.merchantName}}</span>
+        </view>
+        <view class="orderStatus">{{handleOrder.getReturnOrderStatus(orderDetail.returnStatus)}}</view>
+      </view>
+      <view class='goods-item' wx:for="{{orderDetail.orderReturnGoodsItemResList}}" wx:key="{{item}}">
+        <view class="goods-item-left">
+          <view class='imgBox'>
+            <image src='{{item.productPic}}'></image>
+          </view>
+          <view class='goods-info'>
+            <view class='goods-title'>{{item.productName}}</view>
+            <view class='spec'>
+              <text>{{item.specs}}</text>
+            </view>
+          </view>
+        </view>
+        <view class='price'>
+          <view>
+            <span style="font-size:20rpx; font-weight:500;">￥</span>{{numFr.getNum(numFr.getTotalNum(item.productPrice,item.enjoyTotalDiscountAmount))}}</view>
+          <view style='text-align:right;color:#999999; margin-top:14rpx; font-size:22rpx;'>
+            <span style="font-size:20rpx; font-weight:500;">x </span>{{item.productQuantity}}</view>
+        </view>
+      </view>
+
+      <view class="total-view">共{{orderDetail.orderReturnGoodsItemResList.length}}件小计:
+        <!-- <span class='total-title'></span> -->
+        <span class='payAmount'>￥
+          <span style="font-size:26rpx;">{{numFr.getNum(orderDetail.payAmount)}}</span>
+        </span>
+      </view>
+    </view>
+  </view>
+  <!-- 售后信息 -->
+  <view class="afterSales-view">
+    <view class="title">
+      <view class="message message1">
+        <view class="name">发起时间</view>
+        <view class="content">{{numFr.dateFormat(orderDetail.returnSubmitTime)}}</view>
+      </view>
+      <view class="folding-view-big" bindtap="foldingClick" data-hiddenlogistics="{{hiddenafterSales}}" data-type="afterSales">
+        <view class="{{hiddenafterSales == false ? 'folding-view1' : 'folding-view'}}"></view>
+      </view>
+    </view>
+    <view class="message">
+      <view class="name">售后编号</view>
+      <view class="content">{{orderDetail.id}}</view>
+    </view>
+    <view hidden="{{hiddenafterSales}}">
+      <view class="message">
+        <view class="name">退货原因</view>
+        <view class="content">{{orderDetail.returnReasonName}}</view>
+      </view>
+      <view class="message">
+        <view class="name">问题描述</view>
+        <view class="content">{{orderDetail.returnInfo}}</view>
+      </view>
+      <view class="message">
+        <view class="name">联系人</view>
+        <view class="content">{{orderDetail.returnUserName}}</view>
+      </view>
+      <view class="message">
+        <view class="name">联系方式</view>
+        <view class="content">{{orderDetail.returnUserPhone}}</view>
+      </view>
+      <view class="message">
+        <view class="name">退货地址</view>
+        <view class="content">{{orderDetail.receiverProvinceName}} {{orderDetail.receiverCityName}} {{orderDetail.receiverRegionName}} {{orderDetail.receiverDetailAddress}}</view>
+      </view>
+      <view class="message">
+        <view class="name">退货凭证</view>
+        <view class="content-image">
+          <view class='addPicPic' wx:for="{{orderDetail.orderReturnPicResList}}" wx:key="{{item}}" bindtap="previewImage" data-src="{{item.goodsUrl}}">
+            <image src="{{item.goodsUrl}}" class="slide-pic"></image>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- 订单信息 -->
+  <view class="orderMessage-view">
+    <view class="title">
+      <view class="message message1">
+        <view class="name">订单编号</view>
+        <view class="content">{{orderDetail.orderId}}</view>
+      </view>
+      <view class="folding-view-big" bindtap="foldingClick" data-hiddenorder="{{hiddenOrder}}" data-type="order">
+        <view class="{{hiddenOrder == false ? 'folding-view1' : 'folding-view'}}"></view>
+      </view>
+    </view>
+    <view class="message">
+      <view class="name">下单时间</view>
+      <view class="content">{{numFr.dateFormat(orderDetail.orderTime)}}</view>
+    </view>
+    <view hidden="{{hiddenOrder}}">
+      <view class="message">
+        <view class="name">支付方式</view>
+        <view class="content" wx:if="{{orderDetail.payType == 1}}">支付宝</view>
+        <view class="content" wx:else>微信支付</view>
+      </view>
+      <!-- <view class="message">
+        <view class="name">发票信息</view>
+        <view class="content">个人发票</view>
+      </view> -->
+      <view class="message">
+        <view class="name">物流单号</view>
+        <view class="content">
+          {{orderDetail.deliverySn || ''}}
+        </view>
+      </view>
+      <view class="message">
+        <view class="name">客户留言</view>
+        <view class="content">{{orderDetail.note || ''}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 物流信息 -->
+  <view class="logistics-view" wx:if='{{orderDetail.returnStatus >= 2 && orderDetail.receiverName}}'>
+    <!-- <view class="title">退货地址</view>
+    <view class="address">
+      <view class="address-img-view">
+        <image class="address-image" src="/img/order/address.png"></image>
+      </view>
+      <view class="address-info">
+        <view class="top">
+          <text class="name">{{orderDetail.receiverName}}</text>
+          <text class="phone">{{orderDetail.receiverPhone}}</text>
+        </view>
+        <view class="bottom">
+          {{orderDetail.receiverProvinceName}} {{orderDetail.receiverCityName}} {{orderDetail.receiverRegionName}} {{orderDetail.receiverDetailAddress}}
+        </view>
+      </view>
+    </view> -->
+    <view class="message" wx:if='{{orderDetail.returnStatus !== 2}}'>
+      <view class="name">物流单号</view>
+      <view class="content">{{orderDetail.expressNo || ''}}</view>
+    </view>
+    <view class="message" wx:if='{{orderDetail.returnStatus !== 2}}'>
+      <view class="name">退货时间</view>
+      <view class="content">{{numFr.dateFormat(orderDetail.refundTime)}}</view>
+    </view>
+    <view class="message m-logistics" wx:if='{{orderDetail.returnStatus == 2}}'>
+      <view class="name">物流单号</view>
+      <view class="content sweep-position">
+        <input value="{{expressNo}}" bindinput="userInput" data-type="{{1}}" placeholder="请输入物流单号"></input>
+        <image class="sweep" src="/img/order/btn_sweep@2x.png" catchtap="sweep" />
+      </view>
+    </view>
+    <!-- <view wx:if='{{orderDetail.returnStatus !== 2}}' class="view-logistics" bindtap="logistics" data-no="{{orderDetail.expressNo}}">查看物流</view> -->
+  </view>
+
+  <!-- 提交物流信息 -->
+  <!-- <view class="logistics" wx:if="{{ orderDetail.returnStatus === 2 }}">
+    <view class="message">
+      <view class="name">物流单号</view>
+      <view class="content sweep-position">
+        <input value="{{expressNo}}" bindinput="userInput" data-type="{{1}}" placeholder="请输入物流单号"></input>
+        <image class="sweep" src="/img/order/btn_sweep@2x.png" catchtap="sweep"/>
+      </view>
+    </view>
+    <view class="message">
+      <view class="name">物流公司</view>
+      <view class="content">
+        <input value="{{logisticsCompany}}" bindinput="userInput" data-type="{{2}}" placeholder="请输入物流公司"></input>
+      </view>
+    </view>
+  </view> -->
+
+
+  <!-- 记录 -->
+  <!-- 待确认售后完成时是否显示操作时间 -->
+  <!-- wx:if="{{orderDetail.returnStatus!=5}}" -->
+  <view class="log-item" wx:for="{{orderDetail.systemLogList}}" wx:key="{{index}}">
+    <view class="message">
+      <view class="name">操作时间</view>
+      <view class="content">{{numFr.dateFormat(item.operDate)}}</view>
+    </view>
+    <view class="message">
+      <view class="name">操作人</view>
+      <view class="content">{{item.operUser}}</view>
+    </view>
+    <view class="message">
+      <view class="name">操作结果</view>
+      <view class="content" style="color:#E02020">{{item.remark}}</view>
+    </view>
+    <view class="message" wx:if="{{item.reasonName && item.newValue == 6}}">
+      <view class="name">拒绝原因</view>
+      <view class="content">{{item.reasonName}}</view>
+    </view>
+  </view>
+
+</view>
+
+<!-- 底部按钮 -->
+<view class="footer" wx:if="{{orderDetail.returnStatus == 1 || orderDetail.returnStatus == 2 ||orderDetail.returnStatus == 6||orderDetail.returnStatus == 3 && orderDetail.receiverName}}">
+  <button wx:if='{{orderDetail.returnStatus == 1}}' data-id="{{orderDetail.id}}" bindtap="cancelAfterSale">取消售后</button>
+  <button wx:if='{{orderDetail.returnStatus == 2}}' data-id="{{orderDetail.id}}" bindtap="submitLogistics">上传物流单号</button>
+  <button  wx:if='{{orderDetail.returnStatus == 3 && orderDetail.receiverName }}' bindtap="logistics" data-no="{{orderDetail.expressNo}}">查看物流</button>
+  <button class="double" wx:if='{{orderDetail.returnStatus == 6 && orderDetail.receiverName}}' bindtap="logistics" data-no="{{orderDetail.expressNo}}">查看物流</button>
+
+  <button class="double" wx:if='{{orderDetail.returnStatus == 6}}' data-id="{{orderDetail.id}}" bindtap="cancelAfterSale">撤销申请</button>
+  <button class="double" wx:if='{{orderDetail.returnStatus == 6}}' data-id="{{orderDetail.id}}" bindtap="complain">平台申诉</button>
+</view>
+
+<!-- 物流弹窗 -->
+<import src="../../components/dialog/dialog.wxml" />
+<view hidden="{{logisticsHidden}}">
+  <template is="logistics" data='{{...logisticsMessage}}' />
+</view>

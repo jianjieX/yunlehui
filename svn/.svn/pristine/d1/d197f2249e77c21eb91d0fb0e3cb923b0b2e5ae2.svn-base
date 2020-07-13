@@ -1,0 +1,285 @@
+/**
+ * 搜索商品
+ */
+
+// 引入全局app对象
+const app = getApp();
+// 引入接口api
+import Api from '/../../utils/config/Api/goods.js';
+// 引入toast等提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let showLoading = alert.showLoading;
+// 引入表情解码与编码方法
+import tools from '../../utils/tools/util.js'
+let utf16toEntities = tools.utf16toEntities // emojy转字符
+let uncodeUtf16 = tools.uncodeUtf16 //字符转emojy
+
+
+Page({
+
+  data: {
+    // 搜索关键词
+    searchValue: '',
+    // 搜索历史列表
+    historyList: [],
+    // 商品列表
+    goodsList: [],
+    // 当前排序tab 0:默认状态 1:默认 2:销售升序 3:销售降序 4:价格升序 5:价格降序
+    sortTab: 0,
+    // 当前页码
+    currentPage: 1,
+    // 开卡状态
+    openCardFlag: false
+  },
+
+  onShow() {
+    this.getHistorySearch();
+    this.checkOpenCardFlag()
+  },
+
+  /**
+   * 到底部加载更多
+   */
+  onReachBottom() {
+    let currentPage = this.data.currentPage;
+    currentPage++;
+    this.data.currentPage = currentPage;
+    this.getGoodsList();
+  },
+
+  /**
+   * 输入搜索内容
+   */
+  inputSearchValue(e) {
+
+    let searchValue = e.detail.value;
+    this.setData({
+      searchValue
+    })
+    if (searchValue === '' && this.data.goodsList.length === 0) {
+      this.setData({
+        sortTab: 0
+      })
+      this.getHistorySearch();
+    }
+    
+  },
+
+  /**
+   * 清空input
+   */
+  cancelInput() {
+
+    this.setData({
+      searchValue: ''
+    })
+    this.getHistorySearch();
+
+    if (this.data.searchValue === '' && this.data.goodsList.length === 0) {
+      this.setData({
+        sortTab: 0
+      })
+      this.getHistorySearch();
+    }
+  },
+
+  /**
+   * 从storage取出搜索历史
+   */
+  getHistorySearch() {
+
+    this.setData({
+      historyList: wx.getStorageSync('historyList')
+    })
+
+  },
+
+  /**
+   * 点击搜索
+   */
+  searchGoods() {
+
+    let inputValue = this.data.searchValue.trim();
+    if (inputValue === '') {
+      alertModal1('搜索内容不能为空')
+      return
+    }
+    
+    // 调用存入历史记录
+    this.saveHistoryList(inputValue);
+
+    // 请求搜索商品列表
+    this.setData({
+      sortTab: 1
+    })
+    this.data.goodsList = [];
+    this.data.currentPage = 1;
+    this.getGoodsList();
+
+  },
+
+  /**
+   * 存入历史搜索记录
+   */
+  saveHistoryList(value) {
+
+    let historyList = wx.getStorageSync('historyList') || [];
+    // 如果大于15条 删除最早一条
+    if (historyList.length >= 15) {
+      historyList.pop()
+    }
+    // 循环storage是否有此记录
+    for (let i = 0; i < historyList.length; i++) {
+      if (historyList[i].toLowerCase() === value.toLowerCase()) {
+        value = historyList[i];
+        historyList.splice(i, 1);
+      }
+    }
+    historyList.unshift(value);
+    // 搜索历史存入storage
+    wx.setStorageSync('historyList', historyList)
+
+  },
+
+  /**
+   * 清除搜索记录
+   */
+  clearHistoryList() {
+    let that = this
+    wx.showModal({
+      title: '删除历史搜索',
+      content: '确认删除历史搜索吗?',
+      success(res) {
+        if (res.confirm) {
+          wx.removeStorageSync('historyList')
+          that.setData({
+            historyList: []
+          })
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+
+  /**
+   * 请求商品列表
+   */
+  getGoodsList() {
+
+    let that = this;
+    showLoading();
+    let params = {
+      type: this.data.sortTab,
+      goodsName: this.data.searchValue.trim(),
+      currentPage: this.data.currentPage,
+      enablePage: true,
+      pageSize: 10,
+      shopId: wx.getStorageSync('shopId'),
+    }
+    Api.getSelectGoodsList(params).then(res => {
+      if (res.data.data) {
+        that.setData({
+          goodsList: [...that.data.goodsList, ...res.data.data.content]
+        })
+      }
+    })
+
+  },
+
+  /**
+   * 切换排序tab
+   */
+  changeSortTab(e) {
+
+    if (this.data.searchValue === '') {
+      alertModal1('搜索内容不能为空')
+      return
+    }
+    let type = e.currentTarget.dataset.type;
+    let sortTab = this.data.sortTab;
+    switch (type) {
+      // 点击默认排序
+      case 1:
+        if (sortTab === 1) {
+          return
+        }
+        sortTab = 1
+        break;
+        // 点击销售排序 
+      case 2:
+        if (sortTab === 2) {
+          sortTab = 3;
+        } else {
+          sortTab = 2;
+        }
+        break;
+        // 点击价格排序
+      case 3:
+        if (sortTab === 4) {
+          sortTab = 5;
+        } else {
+          sortTab = 4;
+        }
+        break;
+    }
+    // 赋值
+    this.setData({
+      sortTab
+    })
+    // 请求对应排序商品列表
+    this.data.goodsList = [];
+    this.data.currentPage = 1;
+    this.getGoodsList();
+
+  },
+
+  /**
+   * 点击历史搜索或热门搜索标签
+   */
+  clickSearchTag(e) {
+
+    let searchValue = e.currentTarget.dataset.value;
+    this.setData({
+      searchValue,
+      sortTab: 1
+    })
+    // 请求商品列表
+    this.searchGoods()
+
+  },
+
+  /**
+   * 跳转商品详情
+   */
+  toGoodsDetail(e) {
+
+    let goodsId = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: `../../pages/shopDetail/shopDetail?goodsId=${goodsId}`
+    })
+  },
+
+  /**
+   * 查询开卡状态
+   */
+  checkOpenCardFlag() {
+
+    let that = this
+
+    Api.checkOpenCardFlag().then(res => {
+      if (res.data.status === '0000') {
+        that.setData({
+          openCardFlag: res.data.data
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal1('请求服务失败')
+    })
+
+  }
+  
+})

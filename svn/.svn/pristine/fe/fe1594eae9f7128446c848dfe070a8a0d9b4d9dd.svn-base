@@ -1,0 +1,42 @@
+var activity = {
+  formatStatus: function(item) {
+    if (item.typeId == 0) {
+      switch (item.flag) {
+        case 0:
+          return "未开始";
+        case 1:
+          return "进行中"
+        case 2:
+          return "已结束"
+      }
+    } else {
+      switch (item.auditStatus) {
+        case 0:
+          return "未处理";
+        case 1:
+          return "已处理"
+      }
+    }
+
+  },
+  pageViewNUm: function (x) {
+    //浏览量过滤器    
+    var f = parseFloat(x);
+    if (isNaN(f)) {
+      return;
+    }
+    var f = Math.round(x * 100) / 100;
+    var s = f.toString();
+    var rs = s.indexOf('.');
+    if (s > 10000) {
+      f = s / 10000;
+      s = f.toFixed(1) + '万'
+    }
+    return s;
+  },
+}
+
+module.exports = {
+  formatStatus: activity.formatStatus,
+  pageViewNUm: activity.pageViewNUm
+}

@@ -1,0 +1,33 @@
+<!--index.wxml-->
+<view class="container">
+  <view bindtap='test'>点击</view>
+  <!-- <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+  <view class="usermotto">
+    <text class="user-motto">{{motto}}</text>
+  </view> -->
+<live phone='{{1111111}}' bind:myevent='change'></live>
+  <view>{{value}}</view>
+  <!-- <navigator url="plugin-private://wx2b03c6e691cd7370/pages/live-player-plugin?room_id={{roomId}}&custom_params={{customParams}}">跳转</navigator> -->
+  <navigator url="plugin-private://wx085287d07297583e/pages/live-player-plugin?room_id={{roomId}}&custom_params={{customParams}}"></navigator>
+  <view bindtap="chooseVideo">上传视频</view>
+  	<swiper
+        indicator-dots="true" autoplay="truetrue" circular="true"
+        interval="5000" duration="500" style="height:376rpx;width:100%">
+        <block wx:for="{{shopDoorPic}}" wx:key="index">
+          <swiper-item wx:if='{{item}}'>
+						<image class="logo" src="{{item}}" mode='scaleToFill'></image>
+          </swiper-item>
+        </block>
+      </swiper>
+      <navigator url='../poster/index'>跳转</navigator>
+
+      <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">授权登录</button>
+<view wx:else>请升级微信版本</view>
+<button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">获取手机号</button>
+</view>

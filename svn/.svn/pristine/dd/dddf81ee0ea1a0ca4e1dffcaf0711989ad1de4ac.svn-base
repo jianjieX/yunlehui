@@ -1,0 +1,121 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<view class='order-wapper'>
+  <view class='mode'>
+    <view class='mode-title'>就餐方式</view>
+    <view class='mode-check'>
+      <radio-group class="radio-group" bindchange="radioChange">
+        <radio class="radio" wx:for-items="{{orderMode}}" wx:key="label" color='#FABE00' value="{{item.label}}" checked="{{item.checked}}">
+          <text class='text'>{{item.value}}</text>
+        </radio>
+      </radio-group>
+    </view>
+  </view>
+  <view class='content'>
+    <view class='shopcard'>
+      <view class='iconfont .icon-dianpu shop'></view>
+      <view class='shop-name'>云端马语</view>
+    </view>
+    <view class='goods'>
+      <view wx:for="{{foodsList}}" wx:key="index" class='detail'>
+        <view class='foods'>
+          <image class='image' src='{{item.mainUrl}}'></image>
+          <view class='name'>
+            <text class='title'>{{item.goodsName}}</text>
+            <text class="spec">{{item.spec}}</text>
+            <text class='number'>x{{item.num}}份</text>
+          </view>
+        </view>
+        <view class='price'>
+          <text wx:if="{{item.benefitPrice>=0  &&  item.benefitPrice != numFr.getNum(item.price * item.num)}}">￥{{numFr.getNum(item.benefitPrice)}}</text>
+          <text class="{{item.benefitPrice>=0  &&  item.benefitPrice != numFr.getNum(item.price * item.num)?'benefitPrice':''}}">￥{{numFr.getNum(item.price * item.num)}}</text>
+        </view>
+      </view>
+    </view>
+    <view class='sum'>
+      <text class='title'>小计</text>
+      <text class='total'>￥{{numFr.getNum(payAmount)}}</text>
+    </view>
+  </view>
+
+  <view class="benefit">
+    <view class="item">
+      <view class='title'>乐享权益</view>
+      <view class='title' bindtap="showOpenCardDialog">{{couponText}}
+        <view class="arrow"></view>
+      </view>
+    </view>
+  </view>
+  <view class="contact">
+
+    <view class="person">
+      <view class='title'>用餐人数</view>
+      <input class='name' type="number" maxlength="3" placeholder="请输入（必填）" value='{{num}}' bindinput="handleNum"></input>
+    </view>
+
+    <view class="mobile">
+      <view class='title'>备注</view>
+      <input class='num' maxlength="50" bindinput="handleDesc" value='{{desc}}' placeholder="口味儿、偏好等"></input>
+    </view>
+  </view>
+
+</view>
+<view class='settlement'>
+  <view class='content-left'>
+    <text class='total'>共{{totalCount}}件合计</text>
+    <text class='price'>￥{{numFr.getNum(payAmount)}}</text>
+  </view>
+  <view class='content-right' disabled='{{disabled}}' catchtap='pay'>去结算</view>
+</view>
+<!-- 支付遮罩层 -->
+<view class="pay-mask" wx:if="{{payMask}}"></view>
+
+<view name="fade">
+  <view class="list-mask" wx:if="{{fold}}" bindtap="hideList"></view>
+</view>
+
+<view class='dialog' wx:if="{{deductionDialogFlag}}" animation="{{openDialogAnimation}}">
+  <view class="closeDislog">
+    <view class="closeDislogIcon iconfont icon-guanbi" bindtap="closedeductionDialog"></view>
+  </view>
+  <view class="deductionDialogTitle">
+    <text>乐享权益抵扣明细</text>
+  </view>
+  <view class="deduction-total">
+    <text class="deduction-total-left">共抵扣</text>
+    <view class="deduction-total-right">
+      <text class="deduction-total-right-text"> -￥{{numFr.getNum(specialPrice)}}</text>
+      <view class="folding-view-big" bindtap="foldingClick" data-hiddenlogistics="{{hiddenafterSales}}" data-type="afterSales">
+        <view class="iconfont {{hiddenafterSales ? 'icon-jiantoushang':'icon-jiantouxia'}} shouqi"></view>
+      </view>
+    </view>
+  </view>
+  <view hidden="{{hiddenafterSales}}">
+    <scroll-view scroll-y="true" class="list-content">
+      <view wx:for="{{couponList}}" wx:key="index" class="{{item.isDisable?'undeductionFormItem':'deductionFormItem'}}" bindtap="couponChange" data-coupon="{{index}}">
+        <view class="deductionFormItem-left">
+          <view class="deductionFormItem-left-money">
+            ￥
+            <text class="deductionFormItem-left-money-value">{{numFr.trunc(item.economicalMoney)}}</text>
+            <text style="margin-left:4px;">{{numFr.fract(item.economicalMoney)}}</text>
+          </view>
+          <text class="deductionFormItem-left-text">无金额门槛</text>
+        </view>
+
+        <view class="deductionFormItem-middle">
+          <text class="dedutionFormItem-middle-title">{{item.goodsName}}</text>
+          <text class="dedutionFormItem-middle-data">{{createTime}}至{{validity}}</text>
+        </view>
+        <view class="deductionFormItem-right">
+          <image class="deductionFormItem-right-img" src="{{item.isSelected?'/img/shop/choose.png':'/img/shop/unchoose.png'}}"></image>
+        </view>
+      </view>
+
+    </scroll-view>
+
+  </view>
+  <button class="deductionForm-button" bindtap="submitBenefit">
+    <view class="title">确认</view>
+    <view class="detail">(共省￥{{numFr.getNum(specialPrice)}})</view>
+  </button>
+</view>

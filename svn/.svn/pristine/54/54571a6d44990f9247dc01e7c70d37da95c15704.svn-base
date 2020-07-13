@@ -1,0 +1,66 @@
+// alert.js
+
+// 弹窗  showText : 提示文字
+function alertModal(showText) {
+  wx.showToast({
+    title: showText,
+    icon: 'none',
+    duration: 2000,
+    mask: true,
+  })
+}
+//showModal: 提示文字
+function promptModal(showText){
+  wx.showModal({
+    title: '提示',
+    content: showText,
+    showCancel: false,
+  })
+}
+// 弹窗  showText : 提示文字
+function alertModal1(showText) {
+  wx.showToast({
+    title: showText,
+    icon: 'none',
+    duration: 2000
+  })
+}
+// 弹窗  showText : 提示文字
+function showToast(showText) {
+  wx.showModal({
+    title: '提示',
+    showCancel: false,
+    content: showText
+  })
+}
+
+function showLoading() {
+  wx.showLoading({
+    title: '加载中...',
+    mask: true,
+  })
+}
+
+function showLogin() {
+  wx.showLoading({
+    title: '登录中...',
+    mask: true,
+  })
+}
+
+function loading(showText) {
+  wx.showLoading({
+    title: showText,
+    mask: true,
+  })
+}
+
+module.exports = {
+  alertModal: alertModal,
+  showToast: showToast,
+  promptModal: promptModal,
+  showLoading: showLoading,
+  loading: loading,
+  showLogin: showLogin,
+  alertModal1: alertModal1
+}

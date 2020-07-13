@@ -1,0 +1,452 @@
+page {
+  background-color: #f0f0f0;
+}
+
+.navigation-bar {
+  position: fixed;
+  width: 100%;
+  height: 128rpx;
+  background-color: white;
+  z-index: 10;
+  box-shadow: 0rpx 2rpx 0rpx 0rpx rgba(0, 0, 0, 0.06);
+}
+
+.navigation-bar .back {
+  position: relative;
+  width: 60rpx;
+  font-size: 40rpx;
+  top: 64rpx;
+  left: 24rpx;
+}
+
+.navigation-bar .title {
+  width: 300rpx;
+  position: relative;
+  top: 20rpx;
+  left: 80rpx;
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+}
+
+.order-wapper {
+  border-top: 1rpx solid #dcdcdc;
+  position: relative;
+  width: 100%;
+  padding: 24rpx 24rpx 132rpx 24rpx;
+  box-sizing: border-box;
+  height: auto;
+  /* margin-bottom: 128rpx; */
+}
+
+.order-wapper .take-meal {
+  width: 100%;
+  min-height: 88rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+  margin-bottom: 16rpx;
+}
+
+.order-wapper .take-meal .code {
+  width: 100%;
+  height: 40rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  line-height: 40rpx;
+}
+
+.order-wapper .take-meal .code .title {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.order-wapper .take-meal .code .no {
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+  direction: rtl;
+}
+
+.order-wapper .content {
+  width: 100%;
+  min-height: 320rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  box-sizing: border-box;
+  margin-bottom: 16rpx;
+}
+
+.order-wapper .content .shopcard {
+  width: 100%;
+  height: 40rpx;
+  line-height: 40rpx;
+  display: flex;
+  flex-direction: row;
+}
+
+.order-wapper .content .shopcard .shop {
+  font-size: 36rpx;
+}
+
+.order-wapper .content .shopcard .shop-name {
+  font-size: 32rpx;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: rgba(51, 51, 51, 1);
+  margin-left: 18rpx;
+}
+
+.order-wapper .content .goods {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+
+.order-wapper .content .goods .detail {
+  margin: 30rpx 0 30rpx 0;
+  width: 100%;
+  height: 104rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.order-wapper .content .goods .detail .foods {
+  display: flex;
+  flex-direction: row;
+}
+
+.order-wapper .content .goods .detail .foods .image {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 4rpx;
+}
+
+.order-wapper .content .goods .detail .foods .name {
+  display: flex;
+  flex-direction: column;
+  margin-left: 24rpx;
+}
+
+.order-wapper .content .goods .detail .foods .name .title {
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+}
+
+.order-wapper .content .goods .detail .foods .name .number {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+}
+
+.order-wapper .content .goods .detail .foods .name .spec {
+  margin-top: 4rpx;
+  height: 16px;
+  font-size: 12px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 17px;
+}
+
+.order-wapper .content .goods .detail .price {
+  display: flex;
+  flex-direction: column;
+  font-size: 32rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+}
+
+.order-wapper .content .goods .detail .yprice {
+  text-align: right;
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 34rpx;
+  text-decoration: line-through;
+}
+
+.order-wapper .content .sum {
+  width: 100%;
+  height: 44rpx;
+  margin-top: 20rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.order-wapper .content .sum .title {
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+  margin-right: 32rpx;
+}
+
+.order-wapper .content .sum .total {
+  font-size: 32rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 44rpx;
+}
+
+.order-wapper .edit {
+  width: 100%;
+  min-height: 164rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 0 24rpx 0 24rpx;
+  box-sizing: border-box;
+}
+
+.order-wapper .edit .mode {
+  width: 100%;
+  height: 82rpx;
+  border-bottom: 2rpx solid #f5f5f5;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  line-height: 82rpx;
+}
+
+.order-wapper .edit .mode .title {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 82rpx;
+}
+
+.order-wapper .edit .mode .modes {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 82rpx;
+  direction: rtl;
+}
+
+.order-wapper .edit .number {
+  width: 100%;
+  height: 82rpx;
+  border-bottom: 2rpx solid #f5f5f5;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  line-height: 82rpx;
+}
+
+.order-wapper .edit .number .title {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 82rpx;
+}
+
+.order-wapper .edit .number .persons {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 82rpx;
+  width: 400rpx;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-wapper .edit .desc {
+  width: 100%;
+  min-height: 82rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  line-height: 82rpx;
+}
+
+.order-wapper .edit .desc .title {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 82rpx;
+}
+
+.order-wapper .edit .desc .detail {
+  width: 400rpx;
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 82rpx;
+  text-align: right;
+  text-justify: newspaper;
+  word-break: break-all;
+}
+
+.order-wapper .order-desc {
+  margin-top: 16rpx;
+  width: 100%;
+  height: 164rpx;
+  background-color: #fff;
+  border-radius: 8rpx;
+  padding: 0 24rpx 0 24rpx;
+  box-sizing: border-box;
+}
+
+.order-wapper .order-desc .time {
+  width: 100%;
+  height: 82rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 2rpx solid #f5f5f5;
+  line-height: 82rpx;
+}
+
+.order-wapper .order-desc .time .title {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 82rpx;
+}
+
+.order-wapper .order-desc .time .date {
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+  line-height: 82rpx;
+}
+
+.settlement {
+  position: fixed;
+  left: 0rpx;
+  bottom: 0rpx;
+  z-index: 50;
+  width: 100%;
+  height: 108rpx;
+  background-color: #fff;
+  line-height: 108rpx;
+  border-top: 1rpx solid #dcdcdc;
+}
+
+.settlement .btn {
+  margin-top: 16rpx;
+  width: 180rpx;
+  height: 76rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 76rpx;
+  margin-left: 0rpx;
+  margin-right: 24rpx;
+  overflow: inherit;
+}
+
+.settlement .btns {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.settlement .cancel-btn {
+  width: 180rpx;
+  border-radius: 8rpx;
+  background-color: #fff;
+}
+
+.settlement .cancel-btn::after {
+  border: 2rpx solid rgba(250, 190, 0, 1);
+}
+
+.settlement .pay-btn {
+  width: 180rpx;
+  background: rgba(250, 190, 0, 1);
+  border-radius: 8rpx;
+  border: 0rpx;
+}
+
+.settlement .pay-btn::after {
+  border: 2rpx solid rgba(250, 190, 0, 1);
+}
+
+button[disabled] {
+  background-color: #fabe00 !important;
+  color: rgba(51, 51, 51, 1) !important;
+  border: 0rpx !important;
+  border-radius: 8rpx !important;
+}
+
+button::after {
+  border: 0rpx solid rgba(0, 0, 0, 0.2);
+  border-radius: 8rpx;
+  overflow: inherit;
+}
+
+.settlement .text {
+  line-height: 108rpx;
+  color: rgba(250, 190, 0, 1);
+  margin-right: 20rpx;
+}
+
+@font-face {
+  font-family: "iconfont";
+  src: url('iconfont.eot?t=1573097927774'); /* IE9 */
+  src: url('iconfont.eot?t=1573097927774#iefix') format('embedded-opentype'),
+         /* IE6-IE8 */ url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAAPcAAsAAAAACBwAAAOPAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDHAqDXIMYATYCJAMQCwoABCAFhG0HQhsEBxHVmxHJfiTGtmjyO4M67aMxEzyQnf2bncnd/uQsfkClgQpCRVXK4pwHNipCjeTsyaMvJG03ztJTAPxx77RpnYfzAeUy1rK16Ve2MMBobA1o7EVdHEgBYsvhzKvw6FoNARjxIQpRVFLVhI6CdBKAGDygXw/0lBpVEyrQEViUjFSIBRjQtZnadWC+/3vxkQShg4ZBQnrW9S3uTd4b05tQOcE8gc4uCs54RkAcBxKIAhSI/qXmnsjQG4XEqNdXpAA6OhqMVeH2JtRsxty9iHUqpu8fTwNhAUFaAZAEPglvTDY7lriBEgGSUECgAbyQETpgCcwHTkEIXrxAIJGO1i7Cyy1oyCyXvssmuvZbvnXnCqfefZaudFoy+v79pgcPmh89an34sKW995JlLi21b8xdPtu5uXX5UufspUudxOiJLi2rHpbYzLrt17SEjQ/StbV3km2P3/OVpx+1TdjhZLNsl5BLTbMfxe594DCi2q4Fs27GrNo2a4vbnutGhI1A7Zjx4sOA1s0m2+U7vZs33N9pa73j6uhrgddg9it307xPbu+6vdtJ7zln8f2Zf079/SvPynOC8JzAAKI6p872Oqu+VcfEJF5oWr26yKa4yI5oGjjwz5+k20XxbayKIE+zN8jiDynRFYdXhk/ZUPhBGlRCy4lRloXdp3UvtBx1Qui9+r2N/e1pt+1tev9wiG+KXrEDC3oyxY4V8DHxDj/cQh5qi8c4Dt6sPQwJOuSzeY7T2sPehwLrykuc8989Dl55e8m2ojfBZSUMB8D8TbsrU8B8QZ6X+WBeooQc/D9bUXzg9ctutlm/ddMFpT15f+iSz20n4adwWnP+XpQCzGY1l3hEo5TGt9kmUtGGhNcgNFId/LMgOPByDKlzayQIdJxj0LDEGyQ6QWiFjwIDJpLAAp1cMBJJ6XgTjoxEIlQHIIKpCAR27AcNG86DxI4baIV/AQZc+AwW2AkJRlqE44wmQgQeDkdGJWhB/yCYviOmk0MQekMXG8VJnk96IU/BAXmSZQNX7JDH6DO9XSFCQNy3cEHrYdP0MHBfoZHEiwxlmlLZkxLTt7PD7MioBC3oHwTTd+SmlkPu+zd0sVFck1CnfyFPoXrIk6wF+iruWiVcyznT2xUiBMR9CxdkxIZ6exjKm1VoJPE93EOZ4mTUVpzML22fcB5gnJFd1FwTUihhYEOq8zFsvlF1f9zY4FmGOJsBAA==') format('woff2'),
+         url('iconfont.woff?t=1573097927774') format('woff'),
+         url('iconfont.ttf?t=1573097927774') format('truetype'),
+         /* chrome,
+         firefox,
+         opera,
+         Safari,
+         Android,
+         iOS 4.2+ */ url('iconfont.svg?t=1573097927774#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 32rpx;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-fanhui:before {
+  content: "\e618";
+}
+
+.icon-xuanze:before {
+  content: "\e627";
+}
+
+.icon-dianpu:before {
+  color: #999;
+  content: "\e60b";
+}

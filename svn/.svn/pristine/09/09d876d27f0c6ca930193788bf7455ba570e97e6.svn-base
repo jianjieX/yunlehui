@@ -1,0 +1,40 @@
+<!-- 控制背景色 -->
+<view class="{{serveList==0?'page-style-empty':'page-style'}}">
+  <!-- 自定义tabbar -->
+  <view class='nav'>
+    <block wx:for="{{tabList}}" wx:key="item.value">
+      <view class="{{item.value == focuseItem?'focus':''}}" data-current='{{item.value }}' bindtap='handleTab' data-value="{{item.value}}" data-isDeal="{{item.isDeal}}">{{item.name}} </view>
+    </block>
+  </view>
+  <!-- 主体列表展示部分 -->
+  <view class="serve-all">
+    <view wx:for="{{serveList}}" wx:key="{{item.id}}" class="{{!item.isShow||item.isDeleted?'serve-item serve-outTime-background':'serve-item'}}" bindtap="toServeDetail" data-state="{{item.isShow}}" data-id="{{item.enrolId}}" data-delState="{{item.isDeleted}}">
+      <view class="img-container">
+        <image src="{{item.mainImage}}"></image>
+      </view>
+      <view class="serve-text-container" class="serve-text-container">
+        <view class="{{!item.isShow||item.isDeleted?'serve-title serve-outTime-text':'serve-title'}}">
+          {{item.title}}
+        </view>
+        <view class="{{!item.isShow||item.isDeleted?'serve-remark serve-outTime-text':'serve-remark'}}" wx:if="{{item.memberRemark}}">
+          备注: {{item.memberRemark}}
+        </view>
+        <view class="{{!item.isShow||item.isDeleted?'serve-remark serve-outTime-text':'serve-remark'}}" wx:else="{{item.memberRemark}}">
+        </view>
+        <view class="serve-time-container">
+          <view></view>
+          <view class="{{!item.isShow||item.isDeleted?'serve-time serve-outTime-text':'serve-time'}}">
+            {{item.createTime}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- 插图 -->
+  <view class="illustration-view" wx:if="{{serveList==0}}">
+    <view class="illustration-border">
+      <image class="illustration-style" src="../../img/defaultImg/empty.png"></image>
+      <view class="illustration-text">当前暂无服务～</view>
+    </view>
+  </view>
+</view>

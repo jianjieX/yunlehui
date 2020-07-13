@@ -1,0 +1,123 @@
+.my-inform-view {
+  background-color: white;
+  padding: 0 24rpx;
+}
+
+.my-inform-margin-top{
+  margin-top: 22rpx;
+}
+
+.my-avatar {
+  width: 100%;
+  height: 180rpx;
+  line-height: 180rpx;
+  font-size: 34rpx;
+  font-family: PingFangSC-Regular;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  position: relative;
+  display: flex;
+}
+
+.avatar-view {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  position: absolute;
+  right: 0;
+  top: 30rpx;
+  border: 1px solid #eee;
+}
+
+.my-inform-item {
+  width: 100%;
+  min-height: 100rpx;
+  line-height: 100rpx;
+  font-size: 34rpx;
+  font-family: PingFangSC-Regular;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  position: relative;
+  display: flex;
+}
+
+.my-inform-item-none {
+  width: 100%;
+  min-height: 100rpx;
+  font-size: 34rpx;
+  font-family: PingFangSC-Regular;
+  font-weight: 400;
+  color: rgba(102, 102, 102, 1);
+  position: relative;
+}
+
+.inform-input {
+  width: 70%;
+  position: absolute;
+  right: 0;
+  top: 30rpx;
+  font-size: 15px;
+  color: #999;
+  text-align: right;
+}
+
+.inform-picker {
+  width: 70%;
+  position: absolute;
+  right: 0;
+  font-size: 15px;
+  color: #999;
+  text-align: right;
+}
+
+.inform-textarea {
+  width: 70%;
+  height: 100%;
+  overflow-y: hidden;
+  word-break: break-all;
+  word-wrap: break-word;
+  position: absolute;
+  right: 0;
+  font-size: 15px;
+  color: #999;
+  text-align: right;
+}
+
+.line-view {
+  width: 702rpx;
+  height: 1px;
+  background: rgba(238, 238, 238, 1);
+}
+
+.arrow {
+  width: 14rpx;
+  height: 14rpx;
+  border-bottom: 2px solid #666;
+  border-left: 2px solid #666;
+  transform: rotate(225deg);
+  margin: auto 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/**保存按钮**/
+
+.save-cofirm {
+  width: 702rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  background: rgba(250, 190, 0, 1);
+  border-radius: 8rpx;
+  position: fixed;
+  bottom: 24rpx;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  font-size: 36rpx;
+  font-family: PingFangSC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+}

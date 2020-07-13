@@ -1,0 +1,4 @@
+/* component/live/index.wxss */
+.colorScheme{
+  color: red;
+}

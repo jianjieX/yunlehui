@@ -1,0 +1,92 @@
+<wxs module="handleGoodsTag" src="../../filter/handleGoodsTag.wxs"></wxs>
+<!-- 头部返回 -->
+<navigatorCustom title="我的主页" target="../shopMy/shopMy"></navigatorCustom>
+<!-- 右上角背景图片 -->
+<image src="/img/mine/background.png" class="background-header" style="top:{{backgroundTop}}px;"></image>
+<!-- 我的主页 -->
+<!-- 个人信息 -->
+
+<view class="info-card">
+  <view class="head">
+    <view class="avatar">
+      <image class="avatar-img" src="{{userImg}}"></image>
+    </view>
+    <!-- 个人昵称及描述 -->
+    <view>
+      <view class="nickname">{{userName}}</view>
+      <view class="intro">{{signature}}</view>
+    </view>
+
+    <!--关注 粉丝等信息  -->
+    <!-- <view wx:if="{{userType == 1 && isAttention == 0}}" class="attention-style" catchtap="attention">+关注</view>
+    <view wx:elif="{{userType == 1 && isAttention == 1}}" class="attention-style" catchtap="unsubscribe">已关注</view> -->
+  </view>
+  <view class="user-detail">
+    <view class="user-detail-item">
+      <view class="item-num">{{attentionNumber}}</view>
+      <view class="item-name">关注</view>
+    </view>
+    <view class="user-detail-item">
+      <view class="item-num">{{fansNumber}}</view>
+      <view class="item-name">粉丝</view>
+    </view>
+    <view class="user-detail-item">
+      <view class="item-num">{{thumbUpNumberTotal}}</view>
+      <view class="item-name">获赞</view>
+    </view>
+  </view>
+</view>
+<view class="info-card-seat">
+</view>
+
+<!-- tab切换 -->
+<view class="tabbar">
+  <block wx:if="{{userType == 0}}">
+    <view class="tab-item {{currentTab == 1 ? 'focus' : ''}}" bindtap="changeTab" data-current="1">发布成功</view>
+    <view class="tab-item {{currentTab == 2 ? 'focus' : ''}}" bindtap="changeTab" data-current="2">发布失败</view>
+  </block>
+  <block wx:elif="{{userType == 1}}">
+    <view class="tab-item {{currentTab == 1 ? 'focus' : ''}}" bindtap="changeTab" data-current="1">发布成功</view>
+  </block>
+</view>
+
+<!-------------瀑布流------------->
+<!----currentTab====1发布成功====2发布失败----->
+<view wx:if='{{commodityList.length != 0}}' class="content">
+  <view class="left">
+    <block wx:for="{{commodityList}}" wx:key="">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==0}}"></template>
+    </block>
+  </view>
+  <view class="right">
+    <block wx:for="{{commodityList}}" wx:key="">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==1}}"></template>
+    </block>
+  </view>
+</view>
+<view wx:else class="illustration-view">
+  <view class="illustration-border">
+    <image class="illustration-style" src="../../img/defaultImg/empty.png"></image>
+    <view class="illustration-text">当前暂无发布内容～</view>
+  </view>
+</view>
+<!-------------单一故事模块------------->
+<template name="item">
+  <view class="item" bindtap='jumpToDetails' data-review="{{item.reviewStatus}}" data-id='{{item.id}}' data-page="{{item.page}}">
+    <image wx:if="{{item.reviewStatus != 2}}" class="review-status-style" src="{{handleGoodsTag.getSrc(item.reviewStatus)}}"></image>
+    <image class="item-img" src="{{item.contentBanner}}" mode="widthFix"></image>
+    <view class="item-title-box">
+      <view class="item-title">{{item.title}}</view>
+      <!-- <image class="arrow" src="../../image/arrow.png"></image>   -->
+    </view>
+    <view class="name">
+      <image class="item-ava" src="{{item.editorImg}}"></image>
+      <text class="name-title">{{item.editor}}</text>
+      <view class="heart_" data-id='{{item.id}}' data-index="{{index}}" data-is="{{item.isThumbUp}}" catchtap='likeFave'>
+        <image wx:if="{{item.isThumbUp == 0}}" class="heart" src="../../img/homeImg/favorite.png"></image>
+        <image wx:elif="{{item.isThumbUp == 1}}" class="heart" src="../../img/homeImg/favorite1.png"></image>
+        <text>{{item.thumbUpNumber}}</text>
+      </view>
+    </view>
+  </view>
+</template>

@@ -1,0 +1,266 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="handleGoodsTag" src="../../filter/handleGoodsTag.wxs"></wxs>
+
+<!-- @name: 商品详情页面-->
+<view>
+  <!-- 商品图片轮播 -->
+  <swiper indicator-dots="{{true}}" indicator-color="#fff" autoplay="{{true}}" circular="{{true}}" interval="{{3000}}" class="swiper">
+    <block wx:for="{{goodsPicList}}" wx:key="{{item.id}}">
+      <swiper-item class="swiper-item">
+        <image src="{{item.goodsPicUrl}}" mode="aspectFit" class="slide-image" bindtap="previewSwipe" data-src="{{item.goodsPicUrl}}" />
+      </swiper-item>
+    </block>
+  </swiper>
+
+  <!-- 商品标题价格等信息 -->
+  <view class="content">
+    <!-- 商品标签 -->
+    <image wx:if="{{goodsTag}}" class="goods-tag" src="{{handleGoodsTag.getTagNum(goodsTag)}}"></image>
+    <!-- 商品价格 -->
+    <view class='goodsPrice' wx:if="{{specialPriceEstimate==null}}">
+      <text style='font-size:30rpx;'>￥</text>
+      <text class="selectPriceInteger">{{selectPriceInteger}}</text>
+      <text class="selectPriceInteger">.</text>
+      <text class="selectPriceDecimal">{{selectPriceDecimal}}</text>
+      <text class="goodsPrice-saveMoney" wx:if="{{specialPriceEstimate!=null}}">特权价￥ {{numFr.getNum(specialPriceEstimate)}}</text>
+    </view>
+    <!-- enjoyment module -->
+     <view class="enjoyment-openedCard" wx:if="{{specialPriceEstimate!=null}}">
+      <view class="enjoyment-openedCard-box">
+        <text class="enjoyment-openedCard-box-word">￥</text>
+        <text class="enjoyment-openedCard-box-price">{{numFr.getNum(specialPriceEstimate)}}</text>
+        <text class="enjoyment-openedCard-box-text">特权价</text>
+        <text class="enjoyment-openedCard-box-value">售价￥ {{numFr.getNum(selectPrice)}}</text>
+      </view>
+
+    </view>
+    <!-- 商品名称 -->
+    <view class="goods-name-main">
+      <text wx:if="{{goodsType === 2}}" class="select">严选</text>
+      <text>{{goodsName}}</text>
+    </view>
+    <view wx:if="{{specialPriceEstimate!=null}}">
+       <view class="enjoyment-openedCard-box-saveMoney" wx:if="{{flag}}" >
+        <text class="enjoyment-openedCard-box-txt">乐享权益预计可省￥ {{numFr.getNum(economicalMoneyEstimate)}}</text>
+        <image bindtap="showOpenCardDialog" data-flag="detail" class="enjoyment-openedCard-box-mark" src="/img/shop/mark.png"></image>
+      </view>
+    </view>
+    <!-- 乐享权益 module start -->
+    <view class="enjoyment" wx:if="{{!flag}}">
+      <view class="enjoyment-saveMoney">
+        <text class="enjoyment-saveMoney-left">开通乐享权益后下单预计可省{{numFr.getNum(economicalMoneyEstimate)}}</text>
+        <image class="enjoyment-openedCard-mark" src="/img/shop/mark.png"></image>
+      </view>
+      <view bindtap="showOpenCardDialog" data-flag="openCard">
+        <text class="enjoyment-openCard">立即开卡</text>
+        <image class="enjoyment-openedCard-mark" src="/img/shop/right.png"></image>
+      </view>
+    </view>
+    <view class="enjoyment-openCard"></view>
+    <!-- 乐享权益 module end -->
+    <view wx:if="{{memberGoodsflag === 1}}" class="isMemberGoods">注：该会员礼包不参与卖赚买省活动</view>
+  </view>
+
+  <view class="sell-bar">
+    <view class="freight">运费：{{numFr.getNum(freight)}}</view>
+    <view wx:if="{{totalSale}}" class="sell-count">已售{{totalSale}}</view>
+  </view>
+
+  <!-- tab切换 -->
+  <view class="tabbar">
+    <view class="tab-item {{currentTab == 1 ? 'focus' : ''}}" bindtap="changeTab" data-current="1">商品详情</view>
+  </view>
+
+  <!-- 商品详情和故事 -->
+  <view class='goodsDesc'>
+    <!-- 故事 -->
+    <view class='story' wx:if="{{currentTab == 2}}">
+      <view class="story-item" wx:for="{{goodsStoryList}}" wx:key="{{index}}">
+        <view class="story-banner">
+          <image src="{{item.contentBanner}}"></image>
+        </view>
+        <!-- 内容区 -->
+        <view class="story-detail">
+          <view class="story-title">{{item.storyTitle}}</view>
+          <!-- 富文本 -->
+          <view class="story-content">
+            <import src="../../wxParse/wxParse.wxml" />
+            <template is="wxParse" data="{{wxParseData:storyArticle.nodes}}" />
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 商品详情富文本解析 -->
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" wx:if="{{currentTab == 1}}" />
+  </view>
+
+  <!-- footer 底部按钮-->
+  <view class="footer">
+    <view class="button-group">
+      <!-- 客服 -->
+      <view class="footer-item" bindtap="goCustomerService">
+        <image class='item-img' src='../../img/detailImg/service.png' />
+        <view class="item-text">客服</view>
+      </view>
+      <!-- 购物车 -->
+      <view class="footer-item shopcar-btn" bindtap='goShopCar'>
+        <image class='item-img' src='../../img/detailImg/shopCar.png' />
+        <view class="item-text">购物车</view>
+        <span class="dot">{{shopCarCount}}</span>
+      </view>
+      <!-- 分享 -->
+      <button class="footer-item" bindtap="eventDraw">
+        <image class='item-img' src='../../img/detailImg/share.png' />
+        <view class="item-text">分享</view>
+      </button>
+    </view>
+    <view class="buy-group">
+      <!-- 加入购物车 -->
+      <view class='add-shopcar' data-type='0' bindtap='showDialog'>
+        <view>加入购物车</view>
+      </view>
+      <!-- 立即购买 有买省 -->
+      <view wx:if="{{goodsPriceList[0].buyToProvinceValue}}" class="buy" data-type='1' bindtap='showDialog'>
+        <view>立即购买</view>
+        <view>省￥{{numFr.getNum(goodsPriceList[0].buyToProvinceValue)}}</view>
+      </view>
+      <!-- 立即购买 无买省 -->
+      <view wx:if="{{!goodsPriceList[0].buyToProvinceValue}}" class='buy1' data-type='1' bindtap='showDialog'>
+        <view>立即购买</view>
+      </view>
+
+    </view>
+  </view>
+</view>
+<!-- 分享海报 -->
+<view class='imagePathBox' hidden="{{shareMask == false}}">
+  <view class='closeBtn' catchtap="closeShare">
+    <image src='../../img/detailImg/share_close.png'style='width:100%;height:100%'></image>
+  </view>
+  <view class='share_container'>
+      <image src='{{shareImage}}' class='shengcheng' catchtap="sharePoster"></image>
+      <view class='share-btns'>
+        <button class='share-btn' open-type="share">分享小程序</button>
+        <button class='share-btn' catchtap="sharePoster">分享海报</button>
+      </view>
+  </view>
+</view>
+<!-- 分享商品海报canvas -->
+<view class='share-mask' hidden="{{shareMask == false}}" catchtouchmove='true'></view>
+ <view class='canvas-box'>
+    <canvasdrawer painting="{{painting}}" class="canvasdrawer" bind:getImage="eventGetImage"  bind:myevent='change'/>
+ </view>
+<!-- 规格弹层 -->
+<view class='mask' wx:if="{{showSpecModalStatus}}" bindtap='hideDialog' catchtouchmove='{{true}}'></view>
+<view class='dialog' animation="{{animationData}}" wx:if="{{showSpecModalStatus}}" catchtouchmove='{{true}}'>
+  <!-- 弹窗头部 -->
+  <view class="goods">
+    <image class='spec-img' src='{{specPic}}' bindtap="previewSpecPic"></image>
+    <view class="dialog-goods-info">
+      <view class="dialog-spec-price">￥{{numFr.getNum(specPrice)}}
+        <text class="buy-view" wx:if="{{dialogType===1 && buyPrice}}">买省￥{{numFr.getNum(buyPrice)}}</text>
+        <text wx:if="{{specialPriceEstimate!=null}}">特权价￥ {{numFr.getNum(specialPrice)}}</text>
+      </view>
+      <view class="dialog-spec">
+        <text wx:if="{{mainSpecValue}}">{{mainSpecValue}}</text>；
+        <text wx:if="{{subSpecValue}}">{{subSpecValue}}</text>
+      </view>
+    </view>
+    <!-- 关闭按钮 -->
+    <image src="/img/detailImg/close.png" class="cancel-icon" wx:if="{{searchValue !== ''}}" catchtap="hideDialog" />
+  </view>
+
+  <!-- 规格 -->
+  <view class="spec">
+    <view class="spec-main">
+      <view class="spec-title">{{mainSpecNameList[0]}}</view>
+      <view class="spec-value">
+        <view wx:for="{{mainSpecValueList}}" wx:key="{{index}}" class="spec-value-item {{mainSpecValue === item.goodsSpecsValue? 'checked': ''}} {{invalidmainSpec === item.goodsSpecsValue? 'disabled': ''}}" bindtap="changeMainSpecName" data-disabled="{{invalidmainSpec === item.goodsSpecsValue? true : false}}"
+          data-current="{{item}}">{{item.goodsSpecsValue}}</view>
+      </view>
+    </view>
+
+    <view class="spec-sub" wx:for="{{subSpecNameList}}" wx:key="{{index}}" wx:if="{{subSpecNameList}}">
+      <view class="spec-title">{{subSpecNameList[0]}}</view>
+      <view class="spec-value">
+        <view class="spec-value-item" wx:for="{{subSpecValueList}}" wx:key="{{index}}" class="spec-value-item {{subSpecValue === item.subSpecsValue? 'checked': ''}} {{item.selectedPrice ? '': 'disabled'}} {{item.stock === 0? 'disabled': ''}}" bindtap="changeSubSpecName"
+          data-current="{{item}}" data-index="{{index}}">{{item.subSpecsValue}}</view>
+      </view>
+    </view>
+  </view>
+  <!-- 购买数量组件 -->
+  <view class='num'>
+    <view>购买数量</view>
+    <view class="stepper" style='display:inline-block'>
+      <!-- 减号 -->
+      <text class="{{minusStatus}}" bindtap="bindMinus">-</text>
+      <!-- 数值 -->
+      <input type="number" bindinput="bindManual" value="{{num}}" />
+      <!-- 加号 -->
+      <text class="normal" bindtap="bindPlus">+</text>
+    </view>
+  </view>
+  <!-- 底部按钮 -->
+  <view class="button" wx:if="{{dialogType === 0}}">
+    <view class="add-shopcar" bindtap='addShopcar'>加入购物车</view>
+  </view>
+  <view class="button" wx:if="{{dialogType === 1}}">
+    <view class="add-shopcar" bindtap='confirmOrder'>确定</view>
+  </view>
+</view>
+
+<!-- 分享 -->
+<view animation="{{animationData}}" class="commodity_attr_box" wx:if="{{showModalStatus}}">
+  <view class='share'>分享好友下单~
+    <view class='close' bindtap="hideModal">X</view>
+  </view>
+
+  <view class='sharemoney' wx:if="{{sellPrice}}">赚￥{{sellPrice?sellPrice:'0.00'}}</view>
+  <view class='inlei'>
+    <poster id="poster" hide-loading="{{false}}" preload="{{false}}" config="{{posterConfig}}" bind:success="onPosterSuccess" bind:fail="onPosterFail">
+
+    </poster>
+    <view class='margin' bindtap="onCreatePoster" id='{{goodsName}}'>
+      <image src='/img/detailImg/time.png' class='slide-image'></image>
+      <view class='sma'>微信朋友圈</view>
+
+    </view>
+
+    <view class='margin posi'>
+      <image src='/img/detailImg/friend.png' class='slide-image'></image>
+      <view class='sma'>微信好友</view>
+      <button class='button' open-type='share'> </button>
+    </view>
+
+  </view>
+  <canvas class="canvas-img" canvas-id="myQrcode"></canvas>
+</view>
+
+<!-- openCardDialog start -->
+<view class='mask' wx:if="{{showCardModalStatus}}" bindtap='closeOpenCardDialog' catchtouchmove='{{true}}'></view>
+<view class='dialogBox' wx:if="{{openCardDialogFlag}}" animation="{{openDialogAnimation}}">
+  <view class="openCardDialog">
+    <text class="openCardDialogTitle">乐享权益省钱明细</text>
+  </view>
+  <image src="/img/detailImg/close.png" class="closeCardDialog" catchtap="closeOpenCardDialog" />
+  <view class="openCardFormItem">
+    <text class="openCardFormItem-label">严选价 ￥ {{numFr.getNum(goodsPriceList[0].selectedPrice==null?0.00:goodsPriceList[0].selectedPrice)}}</text>
+    <text class="openCardFormItem-value">乐享卡预计可省 ￥{{numFr.getNum(economicalMoneyEstimate==null?0.00:economicalMoneyEstimate)}}</text>
+  </view>
+  <view class="openCardFormItem">
+    <text class="openCardFormItem-label">乐享卡可抵扣金：</text>
+    <text class="openCardFormItem-value"> - ￥{{numFr.getNum(economicalMoneyEstimate==null?0.00:economicalMoneyEstimate)}}</text>
+  </view>
+  <text class="openCardFormItem-tip">(可与其他乐享权益商品叠加)</text>
+  <text class="openCardFormItem-note">提示：可能会因为参加了其他优惠活动，导致会员省钱数变低，具体以下单时为准</text>
+  <view class="openCardFormSubmit" wx:if="{{buttonFlag}}" bindtap="openCardFormSubmit">立即开卡</view>
+  <view class="openCardFormSubmit" bindtap="closeOpenCardDialog" wx:if="{{!buttonFlag}}">确认</view>
+</view>
+<!-- openCardDialog end -->
+
+<!--回到顶部-->
+<view class='goTop' bindtap="goTop" wx:if="{{isGoTopShow}}">回到顶部</view>
+
+<!-- 遮罩层 -->
+<view class="page-mask" wx:if="{{pageMask}}" catchtouchmove='{{true}}'></view>

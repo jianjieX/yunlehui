@@ -1,0 +1,17 @@
+/* pages/img/img.wxss */
+.share-image {
+  width: 750rpx;
+  height: 1050rpx;
+}
+.submit{
+  width: 70%;
+  margin-left: 15%;
+  height: 90rpx;
+  line-height: 90rpx;
+  border-radius: 45rpx;
+  background:linear-gradient(131deg,rgba(253,224,0,1) 0%,rgba(250,190,0,1) 100%);
+  color: #ffffff;
+}
+.submit::after {
+  border: none
+}

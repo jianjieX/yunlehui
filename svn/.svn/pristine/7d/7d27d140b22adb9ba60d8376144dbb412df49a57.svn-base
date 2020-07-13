@@ -1,0 +1,124 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!-- 空购物车 -->
+<view wx:if="{{carts.length === 0}}" style="text-align:center;">
+  <image class="title-imgs" src="../../img/homeImg/shopCar.png"></image>
+  <view class="title-box">
+    购物车空空如也～
+  </view>
+  <view class="to-index-btn" bindtap="toIndexPage">
+    去逛逛
+  </view>
+
+  <!-- 商品列表 -->
+  <!-- 猜你喜欢标题 -->
+  <view class="like" wx:if="{{goodsList.length}}">
+    <view class="line"></view>
+    <view class="text">热门推荐</view>
+    <view class="line"></view>
+  </view>
+
+  <!-- 猜你喜欢商品列表 -->
+  <view class="goodsList-like">
+    <view style="width:50%;margin-top:14rpx;" data-goods="{{item.goodsId}}" bindtap="goGoodsDetail" wx:for="{{goodsList}}" wx:key="{{item.goodsId}}">
+      <view class='goods-item'>
+        <view class='imgBox'>
+          <image class='goodsImg' src="{{item.mainUrl}}" />
+        </view>
+        <view class='goodsName'>
+          <text wx:if="{{item.goodsType === 2}}" class="select">严选</text>{{item.goodsName}}
+        </view>
+        <view class="price-bar">
+          <view class='goodsPrice'>
+            ￥{{numFr.getNum(item.selectedPrice)}}
+          </view>
+          <span class="total-sale" wx:if="{{item.totalSale}}">已售{{item.totalSale}}</span>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 购物车列表 -->
+<view id='shopCar'>
+  <view class='shop' wx:for="{{carts}}" wx:key="{{shopItem}}" wx:for-item="shopItem" wx:for-index="shopIndex">
+    <view class="shopName">
+      <image wx:if="{{shopItem.selected}}" type="success" color="#FDE500" data-index='{{shopIndex}}' src="/img/shop/choose.png" class="radio_chek" bindtap="selectShop" />
+      <icon wx:else type="circle" color="#D0D0D0" class="radio_chek" data-index='{{shopIndex}}' size='15' bindtap="selectShop" />
+      <image class='shopImg' src='../../img/homeImg/shop.png'></image>
+      <view class="merchantName">{{shopItem.merchantName}}
+      </view>
+    </view>
+    <view wx:for="{{shopItem.cminiShopCarList}}" wx:key="{{item.id}}" class='goodsItem'>
+      <view class='check-group'>
+        <image wx:if="{{item.selected}}" type="success" color="#FDE500" data-index="{{index}}" data-shop='{{shopIndex}}' src="/img/shop/choose.png" class="radio_chek" bindtap="selectList" />
+        <icon wx:else type="circle" class="radio_chek" data-shop='{{shopIndex}}' data-index="{{index}}" size='15' color="#D0D0D0" bindtap="selectList" />
+      </view>
+      <view class='goodsImg' bindtap="goGoodsDetail" data-goods="{{item.goodsId}}">
+        <image mode="aspectFit" src="{{item.mainUrl}}" class="slide-image" />
+      </view>
+      <view class='goodsInfo'>
+        <view class='title' bindtap="goGoodsDetail" data-goods="{{item.goodsId}}">
+          <span wx:if="{{item.goodsType === 2}}" class="select">严选</span>{{item.goodsName}}</view>
+        <view class='spec'>{{item.spec}}</view>
+        <view class='price'>￥{{numFr.getNum(item.price)}}
+          <span wx:if="{{item.buyToProvinceValue}}" style="color:#aaa;font-size:12px;display:block">买省￥{{numFr.getNum(item.buyToProvinceValue)}}</span>
+        </view>
+        <!-- 数量 -->
+        <view class="stepper" style='display:inline-block'>
+          <!-- 减号 -->
+          <text class="{{minusStatus}}" data-goods="{{item.goodsId}}" data-id="{{item.id}}" data-shop='{{shopIndex}}' data-index="{{index}}" catchtap="bindMinus">-</text>
+          <!-- 数值 -->
+          <input disabled type="number" data-id='{{item.id}}' value="{{item.num}}" />
+          <!-- 加号 -->
+          <text class="normal" data-goods="{{item}}" data-id="{{item.id}}" data-shop='{{shopIndex}}' data-index="{{index}}" catchtap="bindPlus">+</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 底部按钮 -->
+<view class="bottomBox" wx:if="{{hasList}}">
+  <view>
+    <image class='bottomIcon' wx:if="{{selectAllStatus}}" type="success" color="#FDE500" bindtap="selectAll" src="/img/shop/choose.png" class="radio_chek" />
+    <!-- <icon class='bottomIcon' wx:else type="circle" color="#D0D0D0" bindtap="selectAll" size="20">全选</icon> -->
+  </view>
+  <view class="sum">
+    <view class="{{total == 0 ? 'totalPrice-gray' : 'totalPrice'}}" data-index="{{index}}" data-total="{{total}}">
+      <text class="total-amount">合计：</text>
+      <text style="font-size:28rpx;color:#FF5850">￥{{numFr.getNum(total-economicalMoney)}}</text>
+      <view wx:if="{{openCardFlag}}" class="sum-saveMoney-box" bindtap="showOpenCardDialog">
+        <text class="sum-saveMoney-txt">乐享权益已省：￥{{numFr.getNum(economicalMoney)}}</text>
+        <image class="sum-saveMoney-pic" src="/img/shop/markRed.png"></image>
+      </view>
+    </view>
+  </view>
+  <view>
+    <button class="{{total == 0 ? 'submitOrder-gray' : 'submitOrder'}}" bindtap="{{total == 0 ? '' : 'submitOrder'}}">结算</button>
+  </view>
+</view>
+
+<!-- openCardDialog start -->
+<view class='mask' wx:if="{{showCardModalStatus}}" bindtap='closeOpenCardDialog' catchtouchmove='{{true}}'></view>
+<view class='dialogBox' wx:if="{{openCardDialogFlag}}" animation="{{openDialogAnimation}}">
+  <view class="openCardDialog">
+    <text class="openCardDialogTitle">乐享权益抵扣明细</text>
+  </view>
+  <image src="/img/detailImg/close.png" class="closeCardDialog" catchtap="closeOpenCardDialog" />
+  <view class="openCardFormItem">
+    <text class="openCardFormItem-label">商品总价</text>
+    <text class="openCardFormItem-value" style="color:#000">￥{{total}}</text>
+  </view>
+  <view class="openCardFormItem">
+    <text class="openCardFormItem-label">乐享权益共抵扣</text>
+    <text class="openCardFormItem-value">-￥{{numFr.getNum(economicalMoney)}}</text>
+  </view>
+  <text class="openCardFormItem-tip">(可与其他乐享权益商品叠加)</text>
+  <view class="openCardFormItem">
+    <text class="openCardFormItem-label">合计</text>
+    <text class="openCardFormItem-value" style="color:#000">￥ {{numFr.getNum(total-economicalMoney)}}</text>
+  </view>
+  <text class="openCardFormItem-note">提示：可能会因为参加了其他优惠活动，导致会员省钱数变低，具体以下单时为准</text>
+</view>
+<!-- openCardDialog end -->

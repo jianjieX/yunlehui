@@ -1,0 +1,243 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+
+  // 开店时读取用户头像和昵称
+  getNickName(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/myOwn/getNickName';
+    return result
+  },
+
+  //申请开店
+  applicationShop(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/myOwn/openShop';
+    return result
+  },
+  //  
+  getUserPhone(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/index/getUserPhone';
+    return result
+  },
+
+  // 是否开过店
+  clickOpenShop(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/myOwn/clickOpenShop';
+    return result
+  },
+
+  // 开店
+  openShop(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/myOwn/openShop';
+    return result
+  },
+
+  // 重新开店
+  updateShop(){
+    let result = {};
+    result.method = "POST";
+    result.url = `/cmini/merchant/updateMerchantShop`;
+    return result
+  },
+
+  // 客服电话
+  showServicePhone(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = `/cmini/member/showServicePhone`
+    return result
+  },
+
+  // 我的财富
+  getVirtualAccount(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/money/getAccountInfo`;
+    return result
+  },
+
+  // 我的邀请会员&我的商户
+  showMemberNum(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = `cmini/member/showMemberNum`;
+    return result
+  },
+
+  // 获取短信验证码
+  sendMessageCode(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `cmini/login/sendMessageCode`;
+    return result
+  },
+
+  // 校验验证码
+  checkMessageCode(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `cmini/login/checkMessageCode`;
+    return result
+  },
+
+  // 绑定手机号
+  binding(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `cmini/member/binding`;
+    return result
+  },
+
+  // 授权 发送iv等
+  decryptData(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/cloudclub/login/decryptData`;
+    return result
+  },
+
+  // 获取门店信息
+  getShopInfo(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = `cmini/index/getShop/${data.id}`;
+    return result
+  },
+
+  // 手机号解码
+  decryptPhone(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/cloudclub/login/decryptPhone`;
+    return result
+  },
+
+  // c端统计某用户发布故事和未发布故事的数量
+  // statistical(data) {
+  //   let result = {};
+  //   result.method = "POST";
+  //   result.url = `/cmini/story/Statistical`;
+  //   return result
+  // },
+
+  /**
+   * 请求银行卡列表
+   */
+  getBankList(data) { 
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/selectBankCode'
+    return result
+  },
+
+  /**
+   * 存储七日浏览记录
+   */
+  setSevenDayRecord(data) {
+    let result = {};
+    result.method = "PUT";
+    result.url = 'cmini/member/insertSevenDayRecord'
+    return result
+  },
+
+  /**
+   * 获取对应用户订单数量
+   */
+  getOrderCount(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/userOrderCount'
+    return result
+  },
+
+  //未读消息有没有
+  totalCountForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/message/totalCountForC';
+    return result
+  },
+
+  /**
+   * 重新开店获取门店详情
+   */
+  getShopDetail(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = `/cmini/member/echoDisplayOpenShop/${data.merchantShopId}`
+    return result
+  },
+
+
+   /**
+   * 获取首页banner
+   */
+  getIndexBanner() {
+    let result = {};
+    result.method = "Post";
+    result.url = '/adv/rotationAdvert';
+    return result
+  },
+
+
+  /**
+   * 查询是否开卡
+   */
+  checkOpenCardFlag() {
+    let result = {};
+    result.method = "POST";
+    result.url = '/interest/findInterestsByUserId';
+    return result
+  },
+  /**
+   * 疫情活动商品列表
+   */
+  getActiveGoodsList() {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/sarsGoodsList'
+    return result
+  },
+
+  /**
+   * 获取弹幕列表
+   */
+  getActivityDMlist(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/activityPray/list'
+    return result
+  },
+
+  /**
+   * 发送弹幕
+   */
+  sendDM(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/activityPray/save'
+    return result
+  },
+
+  /**
+   * 统计点击次数
+   */
+  activityClick(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/activityClick/save'
+    return result
+  }
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

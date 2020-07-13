@@ -1,0 +1,101 @@
+/**
+ * @fileoverview 收货地址列表页面
+ * @author liyujie
+ */
+
+// 引入api
+import Api from '../../utils/config/Api/address.js'
+// 引入全局app对象
+const app = getApp();
+// 引入toast等提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+
+import tools from '../../utils/tools/util.js'
+// emojy 转字符
+let utf16toEntities = tools.utf16toEntities;
+// 字符转emojy
+let uncodeUtf16 = tools.uncodeUtf16;
+
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 收货地址列表
+    addressList: []
+  },
+
+  onShow() {
+    let _this = this;
+    Api.getAddressList({}).then(res => {
+      console.log(res)
+      if (res.data.status === "0000") {
+        let data = res.data.data;
+        for (let i = 0; i < data.length; i++) {
+          data[i].selected = false;
+          if (data[i].isDefault === 1) {
+            data[i].selected = true;
+          }
+          data[i].address = uncodeUtf16(data[i].address);
+          data[i].receiver = uncodeUtf16(data[i].receiver);
+        }
+        _this.setData({
+          addressList: data
+        })
+      }
+    })
+  },
+
+  /**
+   * 选中地址
+   */
+  selectList(e) {
+    console.log("列表id", e.currentTarget.dataset.index)
+    let addressList = this.data.addressList;
+    let index = e.currentTarget.dataset.index;
+    let selected = addressList[index].selected;
+    for (let i = 0; i < addressList.length; i++) {
+      addressList[i].selected = false;
+      this.setData({
+        addressList: addressList
+      })
+    }
+    addressList[index].selected = !selected
+    this.setData({
+      addressList:addressList
+    })
+  },
+
+  /**
+   * 跳转编辑地址
+   */
+  editAddress(e) {
+    console.log(e.currentTarget.dataset.id)
+    wx.navigateTo({
+      url: `../shopEditAddress/shopEditAddress?id=${e.currentTarget.dataset.id}`,
+    })
+  },
+
+  /**
+   * 跳转新建地址
+   */
+  newAddress() {
+    wx.navigateTo({
+      url: '../shopAddAddress/shopAddAddress',
+    })
+  },
+
+  /**
+   * 选择地址 
+   */
+  selectAddress(e) {
+    console.log(e.currentTarget.dataset.item)
+    wx.setStorageSync('address', JSON.stringify(e.currentTarget.dataset.item))
+    app.data.chooseAddressFlag = true
+    wx.navigateBack({
+      delta: 1
+    })
+  }
+})

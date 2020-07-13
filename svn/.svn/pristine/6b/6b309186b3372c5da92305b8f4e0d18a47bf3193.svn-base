@@ -1,0 +1,174 @@
+/**
+ * 待结算，收益
+ * 
+ * @author wanghongli
+ * @date 2019-09-09
+ */
+
+let app = getApp();
+let baseUrl = require('../../utils/base.js')
+import Api from '/../../utils/config/Api/withdrawal.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let sl = alert.showLoading;
+
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //全机型适配
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    fixedTop: '',
+    //当前类型
+    currentTab: 0,
+    //待结算金额
+    settAmount :0,
+    //流水列表
+    dataList: [],
+    //显示内容数据
+    hasInform: false, 
+    //当前页
+    currentPage: 1,
+    //每页多少条
+    pageSize: 10,
+    //总页数
+    totalPages: null,
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(option) {
+    console.log(option);
+    let _this = this
+    // 头部适配
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      fixedTop: app.data.fixedTop + 46,
+      settAmount:option.settAmount
+    });
+    this.getList();
+  },
+
+  //返回页面
+  backPage() {
+    let that = this;
+    wx.navigateBack({
+      detal: 1
+    })
+  },
+
+  //获取流水列表
+  getList() {
+    var that = this;
+    sl("加载中")
+    let _parms = {
+      isCompleteSett:0,
+      currentPage: that.data.currentPage,
+      pageSize: that.data.pageSize
+    }
+    if (that.data.currentTab != 0) {
+      _parms = {
+        isCompleteSett: 0,
+        trxType: that.data.currentTab,
+        currentPage: that.data.currentPage,
+        pageSize: that.data.pageSize
+      }
+    }
+    
+    Api.getAccountDetail(_parms).then((res) => {
+      if (res.data.data != null) {
+        if (res.data.data.content.length == 0) {
+          that.setData({
+            hasInform: false,
+          })
+        }else{
+          that.setData({
+            hasInform: true,
+          })
+        }
+        that.data.currentPage++;
+        that.data.totalPages = res.data.data.totalPages;
+        that.setData({
+          dataList: res.data.data.content
+        })
+        wx.hideLoading();
+      } else {
+        wx.hideLoading();
+        // alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败");
+    })
+  },
+
+  //切换流水类型
+  handleTab(e) {
+    var that = this;
+    that.data.currentPage = 1;
+    if (this.data.currentTab === e.target.dataset.current) {
+      return false;
+    } else {
+      that.setData({
+        currentTab: e.target.dataset.current
+      })
+      that.getList();
+    }
+  },
+
+  //分页获取更多
+  getMore() {
+    let that = this;
+    if (that.data.currentPage > that.data.totalPages) {
+      return
+    }
+    sl("加载中")
+    let _parms = {
+      isCompleteSett: 0,
+      currentPage: that.data.currentPage,
+      pageSize: that.data.pageSize
+    }
+    if (that.data.currentTab != 0) {
+      _parms = {
+        isCompleteSett: 0,
+        trxType: that.data.currentTab,
+        currentPage: that.data.currentPage,
+        pageSize: that.data.pageSize
+      }
+    }
+    Api.getAccountDetail(_parms).then((res) => {
+      if (res.data.data != null) {
+        if (res.data.data.content.length == 0) {
+          alertModal1("无查询结果");
+        } 
+        that.data.currentPage++;
+        that.data.totalPages = res.data.data.totalPages
+        let list = that.data.dataList.concat(res.data.data.content)
+        that.setData({
+          dataList: list
+        })
+        wx.hideLoading();
+      } else {
+        wx.hideLoading();
+        // alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  /** 
+   * 页面上拉触底事件的处理函数 
+   */
+  onReachBottom: function () {
+    this.getMore();
+  },
+})

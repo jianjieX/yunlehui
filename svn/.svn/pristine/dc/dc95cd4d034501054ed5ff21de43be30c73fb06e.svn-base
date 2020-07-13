@@ -1,0 +1,51 @@
+<!-- 标头 -->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view style="margin-left:30rpx;line-height:88rpx" class='label'>
+      <view bindtap='goBack' style='width:60rpx;'>
+        <span class='arrow' bindtap='goBack' style="margin-left:10rpx;"></span>
+      </view>
+      <view  >
+        <span class='title' wx:if="{{moudelType == '1'}}">邀请会员</span>
+        <span class='title' wx:if="{{moudelType == '0'}}">普通会员</span>
+        <span class='title' wx:if="{{moudelType == '2'}}">我的商户</span>
+      </view>
+    </view>
+  </view>
+</view>
+<!-- 内容列表 -->
+<view class='content-view'>
+  <view class='members-item' wx:for="{{memberList}}" wx:key="{{item.id}}" wx:if="{{isBottomShow}}">
+    <view class='avatar'>
+      <image src='{{item.memberImg||item.merchantLogo}}'></image>
+    </view>
+    <view class='info'>
+      <p>
+        <span style="font-weight: bold;">{{item.nickName||item.merchantName}}</span>
+        <span wx:if="{{moudelType == '1'}}" class='lable'>终身绑定</span>
+        <span wx:if="{{item.memberLevelName !=null}}" class='level'>{{memberLevelName}}</span>
+      </p>
+      <!-- <p>
+        <span style="font-weight: bold;">贡献值</span>
+        <span style="margin-left:50rpx;color:red;opacity: 0.7">￥{{item.recordMoney}}</span>
+      </p> -->
+      <p>
+        <span style="font-weight: bold;">成交记录</span>
+        <span style="margin-left:25rpx;color:#b8b8b8">￥{{item.recordMoney}}元({{item.recordNum}}次)</span>
+      </p>
+      <p>
+        <span style="font-weight: bold;">最近下单</span>
+        <span style="margin-left:25rpx;color:#b8b8b8">{{item.recentlyOrder}}</span>
+      </p>
+    </view>
+    <!--TODO 暂时隐藏 -->
+    <view class='button'>
+      <input type='button' value='立即召回' hidden bindtap='submit'></input>
+    </view>
+  </view>
+  <view wx:if="{{!isBottomShow}}" style='text-align:center;margin-top:170rpx;color:#a5a5a5'>您暂时还没有邀请会员</view>
+</view>

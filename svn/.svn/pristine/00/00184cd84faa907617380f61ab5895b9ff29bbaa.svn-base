@@ -1,0 +1,149 @@
+<wxs module="handleOrder" src="../../filter/handleOrder.wxs"></wxs>
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 未被核销 -->
+<view wx:if="{{belongOwnFlag && orderDetail.verificationStatus==1}}" class="verificationCode-card">
+  <image src="../../img/mine/customer_service.png" class="customer_service" bindtap="toPsdManage"></image>
+  <view class="verificationStatus">等待核销</view>
+  <view class="verificationCode-disc">您可凭核销码去商户处核销消费</view>
+  <view class="verificationCode-show">
+    <span>核销码 </span>
+    <span>{{numFr.format(orderDetail.verificationCode)}}</span>
+  </view>
+  <canvas class="canvas-code" canvas-id="myQrcode" style="background:#ffffff;width: 128px;height: 128px;" />
+</view>
+<!-- 已被核销 -->
+<!-- <view wx:elif="{{orderDetail.verificationCode && orderDetail.verificationStatus==1}}">
+
+</view> -->
+
+<!-- 非到店自取商品 -->
+<!-- 收货地址 -->
+<view class="address" wx:if="{{!belongOwnFlag}}">
+  <!-- 收货人信息 -->
+  <view class="person-info">
+    <view class="name">{{orderDetail.receiverName}}</view>
+    <view class="name phone">{{orderDetail.receiverPhone}}</view>
+    <span wx:if="{{isDefault}}" class="isDefault">默认</span>
+  </view>
+  <view class="address-info">
+    <image class="address-img" src='../../img/order/address.png'></image>
+    <view class="address-text">{{orderDetail.receiverProvinceName}} {{orderDetail.receiverCityName}} {{orderDetail.receiverRegionName}} {{orderDetail.receiverDetailAddress}}</view>
+  </view>
+</view>
+
+<!-- 订单信息 -->
+<view class="order-list">
+  <!-- <view wx:if="{{orderDetail.verificationCode && orderDetail.verificationStatus==0}}" class="verficationcode-out">
+		核销码: {{orderDetail.verificationCode}}
+</view> -->
+  <view class="shop-title">
+    <view>
+      <image src='../../img/homeImg/shop.png'></image>
+      {{orderDetail.merchantName}} <text style="color:rgba(51,51,51,1);font-size:26rpx;font-weight:500;" wx-if="{{belongOwnFlag}}">(核销订单)</text>
+    </view>
+    <text wx:if="{{orderDetail.verificationStatus == 0}}" style="font-size:26rpx;font-weight:400;color:rgba(255,88,80,1);">已核销</text>
+    <!-- <text wx:if="{{orderDetail.verificationStatus == 1}}" style="font-size:26rpx;font-weight:400;color:rgba(255,88,80,1);">未核销</text> -->
+    <text wx:if="{{orderDetail.verificationStatus == 2}}" style="font-size:26rpx;font-weight:400;color:rgba(255,88,80,1);">已失效</text>
+    <!-- <view class="order-status">{{handleOrder.getOrder(orderDetail.orderStatus)}}</view> -->
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-item" wx:for="{{orderDetail.orderResList}}" wx:key="{{item}}" bindtap="goGoodsDetail" data-goods="{{item.productId}}">
+    <view class="goods-img">
+      <image src="{{item.productPic}}"></image>
+    </view>
+    <view class="goods-info">
+      <view>
+        <view class="goods-name">{{item.productName}}</view>
+        <view class="goods-spec">
+          <text>{{item.specs}}</text>
+        </view>
+        <!-- <view class="discount-price" wx:if="{{item.totalDiscountAmount}}">优惠金额￥{{numFr.getNum(item.totalDiscountAmount)}}</view> -->
+      </view>
+      <view class='price'>
+        <view>￥{{numFr.getNum(item.saleAmount)}}</view>
+        <view>x{{item.productQuantity}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+
+<!-- 小计信息 -->
+<view class="total-list-dis">
+  <view class="total-item total-item-dis">
+    <view class="item-title">商品金额</view>
+    <view class="item-value">￥{{numFr.getNum(orderDetail.totalAmount)}}</view>
+  </view>
+  <!-- <view class="total-item total-item-dis" wx:if="{{orderDetail.totalDiscountAmount}}">
+    <view class="item-title">优惠金额</view>
+    <view class="item-value">-￥{{numFr.getNum(orderDetail.totalDiscountAmount)}}</view>
+  </view> -->
+  <view class="total-item total-item-dis" wx:if="{{orderDetail.enjoyTotalDiscountAmount}}">
+    <view class="item-title">乐享权益抵扣</view>
+    <view class="item-value">-￥{{numFr.getNum(orderDetail.enjoyTotalDiscountAmount)}}</view>
+  </view>
+  <view class="total-item total-item-dis">
+    <view class="item-title">运费</view>
+     <view class="item-value" wx:if="orderDetail.freightAmount == 0">免运费</view>
+    <view wx:else class="item-value">￥{{numFr.getNum(orderDetail.freightAmount)}}</view>
+  </view>
+
+  <view class="total-item total-item-dis">
+    <view class="item-title  item-title-total" style="font-size:24rpx; color:rgba(51,51,51,1);">实付总额</view>
+    <view class="item-value item-value-total">
+      <span>￥</span>{{numFr.getNum(orderDetail.payAmount)}}</view>
+  </view>
+</view>
+
+<view class="total-list">
+  <view class="total-item" style="border-bottom: 1px solid #F0F0F0">
+    <view class="item-title">下单时间</view>
+    <view class="item-value">{{orderDetail.orderTime}}</view>
+  </view>
+  <view class="total-item">
+    <view class="item-title">订单编号</view>
+    <view class="item-value">{{orderDetail.orderId}}</view>
+  </view>
+  <view class="total-item" wx:if="{{belongOwnFlag && (orderDetail.verificationStatus==0||orderDetail.verificationStatus == 2)}}" style="border-top: 1px solid #F0F0F0">
+    <view class="item-title">核销码</view>
+    <view class="item-value">{{numFr.format(orderDetail.verificationCode)}}</view>
+  </view>
+</view>
+<!-- 底部按钮 -->
+
+<!-- <view class='footer' wx:if="{{(orderDetail.orderStatus === 0)||(item.orderStatus === 0|| item.orderStatus === 1 && !item.isActivateCard && !item.enjoyTotalDiscountAmount)||(item.orderStatus === 3 && !item.isMealsOrder && !item.isActivateCard &&!item.enjoyTotalDiscountAmount && !orderDetail.verificationCode)||((orderDetail.orderStatus === 2 || orderDetail.orderStatus === 3||orderDetail.orderStatus === 4) &&  orderDetail.deliverySn)||(orderDetail.orderStatus === 2 && !orderDetail.verificationCode)}}"> -->
+
+<view class='footer'>
+  <view></view>
+  <view class="btn-all">
+    <!-- <view class="total-item">合计:
+      <view style="font-size:20rpx; color:#FF5850">￥</view>
+      <view style="font-size:26  rpx; color:#FF5850">{{numFr.getNum(orderDetail.payAmount)}}</view>
+    </view> -->
+    <view class='btn' wx:if="{{orderDetail.orderStatus === 0}}" bindtap='pay' data-id='{{orderDetail.orderId}}'>继续支付</view>
+    <!-- 选择取消订单原因 -->
+
+
+    <picker style="display:inline-block" bindchange="bindPickerChange" range-key="name" range="{{cancelReasonList}}" data-id="{{orderDetail.orderId}}" data-status="{{orderDetail.orderStatus}}">
+      <view class='btn btn-cancel' wx:if="{{(orderDetail.orderStatus === 0|| orderDetail.orderStatus === 1) && !orderDetail.isActivateCard && !belongOwnFlag}}">取消订单</view>
+    </picker>
+    <view class='btn btn-cancel' wx:if="{{ (orderDetail.orderStatus === 1||orderDetail.orderStatus===0) && belongOwnFlag &&  !orderDetail.isMealsOrder && !orderDetail.isActivateCard}}" data-id="{{orderDetail.orderId}}" data-status="{{orderDetail.orderStatus}}" bindtap="cancelMyOrder"  >取消订单</view>
+
+    <view wx:if="{{numFr.canReturn(orderDetail.orderResList)}}">
+      <view class='btn' wx:if="{{ item.orderStatus === 3 && !item.isMealsOrder && !item.isActivateCard &&!item.enjoyTotalDiscountAmount && !belongOwnFlag}}" bindtap='applyAfterSale' data-id="{{orderDetail.orderId}}">申请售后</view>
+    </view>
+
+    <view class='btn' wx:if="{{(orderDetail.orderStatus === 2 || orderDetail.orderStatus === 3||orderDetail.orderStatus === 4) &&  orderDetail.deliverySn}}" bindtap='logistics' data-id='{{orderDetail.orderId}}'>查看物流</view>
+
+    <view class='btn' wx:if="{{orderDetail.orderStatus === 2 && !belongOwnFlag}}" data-id='{{orderDetail.orderId}}' bindtap='receiveGoods'>确认收货</view>
+
+  </view>
+</view>
+
+
+<!-- 引入物流弹窗 -->
+<import src="../../components/dialog/dialog.wxml" />
+<view hidden="{{logisticsHidden}}">
+  <template is="logistics" data='{{...logisticsMessage}}' />
+</view>

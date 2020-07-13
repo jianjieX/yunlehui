@@ -1,0 +1,269 @@
+/**
+ * 排位等级
+ * 
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+let baseUrl = require('../../utils/base.js')
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let promptModal = alert.promptModal;
+let sl = alert.showLoading;
+let loading = alert.loading;
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    currentTab: 0,
+    currentRankTab: 0,
+    giftInfos:[],
+    memberRankInfos:[],
+    rankRecordList:[],
+    pageSize: 10,
+    currentPage: 1,
+    loading: false,
+    loaded: false,
+    dataList: [],
+    isLoading: true,
+    // winHeight: '',
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function (options) {
+    var that = this;
+    this.getRankList()
+    this.setData({
+      loading: true,  
+    })
+    // wx.getSystemInfo({
+    //   success: function (res) {
+    //     that.setData({
+    //       winWidth: res.windowWidth,
+    //       winHeight: res.windowHeight
+    //     });
+    //   }
+    // });
+    this.getRankRecord(1)
+    this.getGiftList()
+  },
+  getGiftList:function(){
+    const that = this
+    wx.request({
+      url: `${baseUrl.URL}goods/memberGoodsList`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + wx.getStorageSync("token")
+      },
+      data: {
+        "currentPage": 1,
+        "enablePage": true,
+        "pageSize": 30
+      },
+      success: (res) => {
+
+        if (res.data.status == '0000') {
+          if (res.data.data.content != []) {
+            that.setData({
+              giftInfos: res.data.data.content,
+            })
+          }
+        }
+        console.log('=============', that.data.giftInfos)
+      }
+    })
+  },
+  getRankList: function(){
+    var that = this
+    wx.request({
+      url: `${baseUrl.URL }rank/infoToC`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + wx.getStorageSync("token")
+      },
+      success: (res) => {
+        if (res.data.status === '0000') {
+          if (res.data.data != null) {
+            if (res.data.data.memberRankInfos != undefined) {
+              that.setData({
+                memberRankInfos: res.data.data.memberRankInfos
+              })
+            }
+            console.log(that.data.memberRankInfos)
+          }
+        }
+      }   
+    })
+  },
+  getRankRecord: function (val) {
+    let that = this;
+    let currentPage = that.data.currentPage;
+    wx.request({
+      url: `${baseUrl.URL }rank/getGrandListToC`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + wx.getStorageSync("token")
+      },
+      data: {
+        currentPage: that.data.currentPage,
+        enablePage: true,
+        pageSize: 10,
+        rankLevel: val
+      },
+      success: (res) => {
+        if (res.data.status === '0000') {
+          if (res.data.data != null) {
+            var rankRecordList = that.data.rankRecordList;
+            for (var i = 0; i < res.data.data.length; i++) {
+              rankRecordList.push(res.data.data[i]);
+            }
+            console.log(that.data.rankRecordList)
+            setTimeout(function () {
+              that.setData({
+                rankRecordList: rankRecordList,
+                loading: false,  //把"上拉加载"的变量设为true，隐藏
+              })
+            }, 1000)
+
+            if (res.data.data.length == 0) {
+              setTimeout(function () {
+                that.setData({
+                  loaded: true
+                })
+              }, 1000)
+            }
+            console.log(that.data.rankRecordList)
+          } else {
+            setTimeout(function () {
+              that.setData({
+                loading: false,  //把"上拉加载"的变量设为true，隐藏
+                loaded: true
+              })
+            }, 1000)
+          }
+        }
+        else {
+          setTimeout(function () {
+            that.setData({
+              loading: false,  //把"上拉加载"的变量设为true，隐藏
+              loaded: true
+            })
+          }, 1000)
+        }
+      },
+      fail() {
+        that.setData({
+          loading: false,  //把"上拉加载"的变量设为true，隐藏
+          loaded: true
+        })
+      }
+    })
+  },
+  swichNav: function (e) { //点击tab切换 
+    this.setData({
+      currentTab: e.target.dataset.current
+    })
+  },
+  currentTabChange: function (e) {//我的滑动切换tab 
+    var that = this;
+    that.setData({ currentTab: e.detail.current });
+  },
+  swichRankNav: function (e) { //点击tab切换 
+    this.setData({
+      currentRankTab: e.target.dataset.current,
+      currentPage:1,
+      rankRecordList:[],
+      loading: true,  //把"上拉加载"的变量设为false，显示 
+      isLoading: false,
+      loaded: false
+    })
+    this.getRankRecord(parseInt(this.data.currentRankTab) + 1)
+  },
+  //禁止选项卡的左右滑动 
+  stopTouchMove: function () {
+    return false;
+  },
+  scrollToLower:function(){
+    let that = this;
+    that.setData({
+      loading: true,  //把"上拉加载"的变量设为false，显示 
+      currentPage: that.data.currentPage + 1,
+      isLoading: false,
+      loaded:false
+    })
+    // 上拉获取更多数据
+    this.getRankRecord(parseInt(this.data.currentRankTab) + 1) 
+  },
+
+  buyNow(e) {
+    wx.navigateTo({
+      url: `../shopDetail/shopDetail?goodsId=${e.currentTarget.dataset.id}`,
+    })
+  },
+
+  //提现走人
+  withdrawLeave(e){
+    var that = this;
+    var id = e.currentTarget.dataset.id;
+    var serial = e.currentTarget.dataset.serial;
+    if(id == null || id == undefined){
+      return;
+    }
+    wx.showModal({
+      title: '提示',
+      content: '确定提现退场吗',
+      success(res) {
+        if (res.confirm) {
+          console.log('用户点击确定')
+          loading("处理中");
+          wx.request({
+            url: `${baseUrl.URL}rank/rankWithDrawalForC`,
+            method: "POST",
+            header: {
+              "Authorization": "Bearer " + wx.getStorageSync("token")
+            },
+            data: {
+              id: id
+            },
+            success: (res) => {
+              wx.hideLoading();
+              if (res.data.status === '0000') {
+                wx.showModal({
+                  title: '红包提现',
+                  content: '您的小红包抽奖号【' + serial + '号】已提现 该金额已到达您的【可提现】收益中',
+                  confirmText: '立即查看',
+                  confirmColor: '#F4BB2E',
+                  cancelText: '返回活动',
+                  success(res) {
+                    if (res.confirm) {
+                      console.log('用户点击确定')
+                      wx.redirectTo({
+                        url: '../../pages/cashOutRecord/cashOutRecord',
+                      })
+                    } else if (res.cancel) {
+                      console.log('用户点击取消')
+                    }
+                  }
+                })
+                that.getRankList();
+              } else {
+                alertModal(res.data.msg)
+              }
+            },
+            fail: function (res) {
+              wx.hideLoading();
+              alertModal("接口失败")
+            }
+          })
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  }
+})

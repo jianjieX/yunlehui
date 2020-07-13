@@ -1,0 +1,209 @@
+/**
+ * 编辑地址页面
+ * 
+ * @author liyujie
+ * @date 2019-08-29
+ */
+
+// 引入接口api 
+import Api from '../../utils/config/Api/address.js';
+// 引入toast方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+
+import tools from '../../utils/tools/util.js'
+// emojy 转字符
+let utf16toEntities = tools.utf16toEntities;
+// 字符转emojy
+let uncodeUtf16 = tools.uncodeUtf16;
+
+Page({
+  data: {
+    // 地址picker
+    region: ['北京市', '北京市', '东城区'],
+    regionCode: ["110000", "110100", "110101"],
+    // 收货人姓名
+    name: '',
+    // 收货人电话
+    phone: '',
+    // 详细地址
+    address: '',
+    // 是否默认
+    isDefault: false,
+    // 地址id
+    addressId: null,
+  },
+
+  /**
+   * 页面加载完成
+   */
+  onLoad(option) {
+
+    let _this = this;
+    console.log(option.id)
+    this.setData({
+      addressId: option.id
+    })
+    // 请求地址信息
+    this.getAddressInfo(option.id)
+  },
+
+  /**
+   * 获取地址详情
+   */
+  getAddressInfo(id) {
+
+    let _this = this
+    let params = {
+      id: id
+    }
+    Api.addressDetail(params).then(res => {
+      console.log("地址详情", res)
+      if (res.data.status === '0000') {
+        _this.setData({
+          name: uncodeUtf16(res.data.data.receiver),
+          region: [res.data.data.provinceName, res.data.data.cityName, res.data.data.areaName],
+          phone: res.data.data.mobile,
+          address: uncodeUtf16(res.data.data.address),
+          isDefault: res.data.data.isDefault === 1 ? true : false
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * picker选择方法
+   */
+  bindRegionChange(e) {
+
+    console.log(e)
+    this.setData({
+      region: e.detail.value,
+      regionCode: e.detail.code
+    })
+  },
+
+  /**
+   * 用户输入名字电话地址等
+   */
+  handleName(e) {
+
+    this.setData({
+      name: e.detail.value.trim()
+    })
+  },
+
+  handlePhone(e) {
+
+    this.setData({
+      phone: e.detail.value
+    })
+  },
+
+  handleAddress(e) {
+
+    this.setData({
+      address: e.detail.value.trim()
+    })
+  },
+
+  /**
+   * 是否默认
+   */
+  switchChange(e) {
+
+    this.setData({
+      isDefault: e.detail.value
+    })
+  },
+
+  /**
+   * 提交修改信息
+   */
+  submit(e) {
+
+    if (this.data.name === '') {
+      wx.showToast({
+        title: '收货人不能为空',
+        icon: 'none'
+      })
+      return;
+    }
+    if (this.data.phone === '') {
+      wx.showToast({
+        title: '联系电话不能为空',
+        icon: 'none'
+      })
+      return;
+    }
+    if (!/^1[3456789]\d{9}$/.test(this.data.phone)) {
+      alertModal1("请输入正确的手机号")
+      return;
+    }
+    if (this.data.address === '') {
+      wx.showToast({
+        title: '地址信息不能为空',
+        icon: 'none'
+      })
+      return;
+    }
+    let _this = this;
+    let params = {
+      id: this.data.addressId,
+      address: utf16toEntities(this.data.address),
+      province: this.data.regionCode[0],
+      city: this.data.regionCode[1],
+      area: this.data.regionCode[2],
+      provinceName: this.data.region[0],
+      cityName: this.data.region[1],
+      areaName: this.data.region[2],
+      isDefault: this.data.isDefault ? '1' : '0',
+      mobile: this.data.phone,
+      receiver: utf16toEntities(this.data.name)
+    }
+    console.log(params)
+    if (this.data.isDefault) {
+      Api.validateDefaultAddress().then(res => {
+        if (res.data.status === '0000') {
+          Api.updateAddress(params).then(result => {
+            console.log(result)
+            if (result.data.status === '0000') {
+              wx.showToast({
+                title: '修改地址成功',
+                icon: 'success',
+                duration: 2000
+              })
+              wx.navigateBack({
+                delta: 1
+              })
+            } else {
+              alertModal1(result.data.msg)
+            }
+          })
+        } else {
+          alertModal1(res.data.msg)
+        }
+      })
+    } else {
+      Api.updateAddress(params).then(result => {
+        console.log(result)
+        if (result.data.status === '0000') {
+          wx.showToast({
+            title: '修改地址成功',
+            icon: 'success',
+            duration: 2000
+          })
+          wx.navigateBack({
+            delta: 1
+          })
+        } else {
+          alertModal1(result.data.msg)
+        }
+      })
+    }
+  }
+
+})

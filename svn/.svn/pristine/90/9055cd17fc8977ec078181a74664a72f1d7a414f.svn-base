@@ -1,0 +1,89 @@
+<!-- 搜索商品页面 -->
+
+<!-- 格式化金钱 -->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 处理商品标签 -->
+<wxs module="handleGoodsTag" src="../../filter/handleGoodsTag.wxs"></wxs>
+
+
+<view class="fix">
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <view class="input-view">
+      <input placeholder="搜索您想要的商品" bindinput="inputSearchValue" value="{{searchValue}}" focus="{{true}}" maxlength="30" bindconfirm="searchGoods" confirm-type="search" />
+      <image src="/img/homeImg/search.png" class="search-icon" />
+      <view class="cancle-view">
+        <image src="/img/detailImg/close.png" class="cancel-icon" wx:if="{{searchValue !== ''}}" catchtap="cancelInput" />
+      </view>
+    </view>
+    <view class="search-btn" bindtap="searchGoods">搜索</view>
+  </view>
+
+  <!-- 排序框 -->
+  <view class="sort-bar" wx:if="{{sortTab !== 0}}">
+    <view class="sort-btn {{sortTab === 1? 'focus' : ''}}" bindtap="changeSortTab" data-type="{{1}}">
+      <view class="btn-text">默认</view>
+    </view>
+    <view class="sort-btn {{sortTab === 2||sortTab === 3? 'focus' : ''}}" bindtap="changeSortTab" data-type="{{2}}">
+      <view class="btn-text">销售</view>
+      <view class="sort-icon">
+        <view class="arrow-top {{sortTab === 2? 'focus' : ''}}"></view>
+        <view class="arrow-bottom {{sortTab === 3? 'focus' : ''}}"></view>
+      </view>
+    </view>
+    <view class="sort-btn {{sortTab === 4||sortTab === 5? 'focus' : ''}}" bindtap="changeSortTab" data-type="{{3}}">
+      <view class="btn-text">价格</view>
+      <view class="sort-icon">
+        <view class="arrow-top {{sortTab === 4? 'focus' : ''}}"></view>
+        <view class="arrow-bottom {{sortTab === 5? 'focus' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+</view>
+
+
+<!-- 搜索历史 -->
+<view class="tag-bar" wx:if="{{sortTab === 0 && historyList.length !== 0}}">
+  <view class="title">
+    <view class="text">历史搜索</view>
+    <image src="/img/homeImg/delete.png" class="clear-icon" bindtap="clearHistoryList" />
+  </view>
+  <view class="tag-list">
+    <view class="tag-item" wx:for="{{historyList}}" wx:key="{{index}}" data-value="{{item}}" bindtap="clickSearchTag">{{item}}</view>
+  </view>
+</view>
+
+<!-- 商品列表 -->
+<view class="goods-list" wx:if="{{sortTab !== 0 && goodsList.length !== 0}}">
+  <view style="width:50%;margin-top:14rpx;" data-id="{{item.goodsId}}" bindtap="toGoodsDetail" wx:for="{{goodsList}}" wx:key="{{item.goodsId}}">
+    <view class='goods-item'>
+      <image wx:if="{{item.goodsTag}}" class="goods-tag" src="{{handleGoodsTag.getTagNum(item.goodsTag)}}"></image>
+      <view class='imgBox'>
+        <image class='goodsImg' src="{{item.mainUrl}}" />
+      </view>
+      <view class='goodsName'>
+        <!-- <text wx:if="{{!item.goodsType}}" class="select">严选</text> -->
+        <text wx:if="{{item.selectionType === 2 || item.selectionType === 4}}" class="select">严选</text>{{item.goodsName}}
+      </view>
+      <!-- 乐享权益模块 start -->
+      <view class="enjoyment" wx:if="{{item.specialPrice!=null}}">
+        <view class="enjoyment-price"><text style="font-size:20rpx;">￥</text>{{numFr.getNum(item.specialPrice)}}<text style="font-size:20rpx;margin-left:4rpx;">特权价</text></view>
+        <view class='enjoyment-saveMoney'>售价
+          <text >￥{{numFr.getNum(item.selectedPrice)}}</text></view>
+      </view>
+      <!-- 乐享权益模块 end -->
+      <view class="price-bar" wx:if="{{item.specialPrice==null}}">
+        <view class='goodsPrice'>
+          ￥{{numFr.getNum(item.selectedPrice)}}
+        </view>
+        <span class="total-sale" wx:if="{{item.totalSale}}">已售{{item.totalSale}}</span>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 页面搜索结果为空 -->
+<view class="empty-view" wx:if="{{sortTab !== 0 && goodsList.length === 0}}">
+  <image src="/img/defaultImg/empty.png" class="empty-img" />
+  <view class="empty-text">没有搜到这个宝贝，换个词试试吧～</view>
+</view>

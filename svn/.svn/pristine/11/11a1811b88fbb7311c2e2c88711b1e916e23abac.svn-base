@@ -1,0 +1,171 @@
+<!--pages/enjoyCard/enjoyCard.wxml-->
+<!-- 乐享卡 -->
+<wxs module="authority" src="../../filter/enjoyCard.wxs"></wxs>
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!-- 蒙层 -->
+<view class="mask" wx:if="{{showMask}}" catchtouchmove="{{true}}" style="height:{{screenHeight}}px">
+
+</view>
+<!-- 协议 -->
+<view class="mask-up" wx:if="{{showProtocolMak}}" catchtouchmove="{{true}}" style="height:{{screenHeight}}px">
+<view class="mask-showAuthority" wx:if="{{showProtocolMak}}" catchtouchmove="{{true}}">
+  <view class="cancelMask">
+    <view></view>
+    <image src="../../img/enjoyCard/close.png" bindtap="cancelMask"></image>
+  </view>
+  <view class="authorityTitle">乐享权益协议</view>
+  <scroll-view scroll-y="{{true}}" style="height:456rpx; width:504rpx;margin:0 auto;">
+  <image mode="widthFix"  style="width:504rpx;" src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20191226113915AS.png" ></image>
+  <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20191226113944tX.png" mode="widthFix"  style="width:504rpx;"></image>
+  <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20191226114014Gn.png" mode="widthFix"  style="width:504rpx;"></image>
+  <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20191226114037DM.png" mode="widthFix"  style="width:504rpx;"></image>
+  </scroll-view>
+  <view class="openCard" bindtap="agreeProtocol">同意协议并开通会员</view>
+</view>
+</view>
+<!-- 权益 -->
+<view class="mask-up" wx:if="{{showAuthorMask}}" catchtouchmove="{{true}}" style="height:{{screenHeight}}px">
+<view class="mask-showAuthority" wx:if="{{showAuthorMask}}" catchtouchmove="{{true}}">
+  <view class="cancelMask">
+    <view></view>
+    <image src="../../img/enjoyCard/close.png" bindtap="cancelMask"></image>
+  </view>
+  <view class="authorityTitle">{{authority.authorityTitle(index+1)}}</view>
+  <view class="authorityDesc">
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:description.nodes}}" />
+  </view>
+  <view class="openCardAuthority" bindtap="openCard">{{haveAuthority?'我知道了':'立即开卡，抢先特权'}}</view>
+</view>
+</view>
+<view class="enjoy-card-container enjoy-font-color" wx:if='{{!haveAuthority}}'>
+  <image src="https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216092920.png" class="enjoy-card-background"></image>
+  <view class="enjoy-card">
+    <view class="enjoy-title">乐享权益</view>
+    <view class="enjoy-text" style="margin-bottom:4rpx">好物特权 尖货专享</view>
+    <view class="enjoy-text">开通后可获得乐享金</view>
+    <view class="open-card">
+      <view class="price-enjoy">¥5000</view>
+      <view class="open-card-botton" bindtap="openCard">
+        <image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/merchant/merchantLogo/20200326180021Ai.png" class="open-card-img"></image>
+        <view class="opencard-text">限时免费开通</view>
+      </view>
+    </view>
+  </view>
+</view>
+<view class="enjoy-card-container enjoy-font-color" wx:if='{{haveAuthority}}'>
+  <image src="https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216092920.png" class="enjoy-card-background"></image>
+  <view class="have-enjoy-card">
+    <view class="enjoyCardId">卡号：{{interestsNo}}</view>
+    <view class="user-container">
+      <image src="{{userAvatar}}" class="user-icon"></image>
+      <view class="user-content">
+        <view class="user-top-content">
+          <view class="user-name">{{nickName}}</view>
+          <image src="../../img/enjoyCard/crown.png" class="crown"></image>
+          <view class="enjoy-center">乐享权益使用中</view>
+        </view>
+        <view class="valid-date">有效期：{{authority.deal(validity)}}到期</view>
+      </view>
+    </view>
+    <view class="show-card-num">
+      <view class="show-num-item" bindtap="jumpEnjoyCardRecord">
+        <view class="show-card-title">累计已省</view>
+        <view class="show-num">￥{{useSum}}</view>
+      </view>
+      <view class="show-num-item" style="text-align:right;">
+        <view class="show-card-title">乐享金余额</view>
+        <view class="show-num">{{remainingSum}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+<!-- 乐享六大特权 -->
+<view class="six-vip-authority">
+  <view class="authority-title">乐享权益</view>
+  <view class="authority-discrip" bindtap=""> </view>
+</view>
+<!-- 特权展示 -->
+<view scroll-x="true" class="scroll-container scroll-flex" style="width: 100%" bindscroll="scroll">
+  <view class="scroll-items-container" wx:for="{{authorityList}}" bindtap="showAuthority" data-type="{{index}}" wx:key="{{index}}">
+    <view class="scroll-items">
+      <image src="{{item.imgSrc}}"></image>
+      <view class="authority-item-title">{{item.title}}</view>
+      <view class="authority-item-desc">{{item.desc}}</view>
+    </view>
+  </view>
+</view>
+<!-- 开卡选好礼 -->
+<!-- <view class="open-card-text" wx:if='{{!haveAuthority}}'>
+  <view class="open-card-heard"> 开卡赚回会员费</view>
+  <view class="open-card-body">好物任你选，开通年卡后，可免费领取专属礼包</view>
+</view>
+<view wx:if='{{!haveAuthority}}' class="gift-content">
+  <scroll-view scroll-x="true" class="scroll-container" bindscroll="scroll">
+    <view wx:for="{{commodityList}}" wx:key="{{item.key}}" class="product-item" bindtap="jumpToEnjoyProduct" data-goodsId="{{item.goodsId}}"  data-enjoymentPrice="{{item.salePrice}}"  data-selectedPrice="{{item.selectedPrice}}">
+      <view class="product-image-container">
+        <image class="product-image" src="{{item.goodsPicUrl}}"></image>
+        <image class="free-get-image" src="https://ylhdev.oss-cn-beijing.aliyuncs.com/goods/20191218121317429fn.png"></image>
+      </view>
+      <view class="product-title">
+        <view class="product-type" wx:if="{{item.goodsType==2}}">严选</view>{{item.goodsName}}
+      </view>
+      <view class="enjoy-price">
+        <view class="enjoy-price-text">特权价</view>
+        <view class="enjoy-price-now">¥{{item.salePrice}}</view>
+        <view class="enjoy-price-old">¥{{item.selectedPrice}}</view>
+      </view>
+      <view class="go-rec" >
+        <view class="rec-text">去领取</view>
+        <view class="rec-arrow"></view>
+      </view>
+    </view>
+  </scroll-view>
+</view> -->
+
+
+<!-- 乐享专区 -->
+<view class="enjoy-self-text">好物特权专属区</view>
+<view class="enjoy-self-container">
+  <view class="left">
+    <block wx:for="{{enjoyProList}}" wx:key="{{item.key}}">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==0}}"></template>
+    </block>
+  </view>
+  <view class="right">
+    <block wx:for="{{enjoyProList}}" wx:key="{{item.key}}">
+      <template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==1}}"></template>
+    </block>
+  </view>
+</view>
+
+<!-- 占位 -->
+<view class="footer-empty" wx:if="{{!haveAuthority}}">
+
+</view>
+<view class="footer" wx:if="{{!haveAuthority}}">
+  <view class="footer-bottom" bindtap="openCard" >立即开卡，抢先享特权</view>
+</view>
+
+<template name="item">
+  <view class="product-item" bindtap="jumpToproduct" data-goodsId="{{item.goodsId}}" data-enjoymentPrice="{{item.enjoymentPrice}}" >
+    <view class="product-image-container">
+      <image class="product-image" src="{{item.goodsPicUrl}}"></image>
+      <view class="free-get-image" wx:if="{{}}"></view>
+    </view>
+    <view class="product-title">
+      <view class="product-type" wx:if="{{item.goodsType==2}}">严选</view>{{item.goodsName}}
+    </view>
+    <view class="enjoy-price">
+      <view class="enjoy-price-now"><text style="font-size:20rpx;">¥</text>{{numFr.getNum(item.enjoymentPrice)}}<text style="font-size:20rpx;margin-left:4rpx;">特权价</text></view>
+      <view class="enjoy-price-dis">
+          
+
+          <text style="color:rgba(245, 35, 64, 1)" class="enjoy-price-disText">售价</text>
+          <text style="color:rgba(245, 35, 64, 1)"  class="enjoy-price-disText">¥{{numFr.getNum(item.selectedPrice)}}</text>
+      </view>
+
+    </view>
+  </view>
+</template>

@@ -1,0 +1,97 @@
+<!--总收入页面-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="income" src="../../filter/income.wxs"></wxs>
+<!-- 导航栏 -->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view bindtap='backPage' class='arrow-view'>
+        <view class='arrow'></view>
+      </view>
+      <view class="label">总收入</view>
+    </view>
+  </view>
+</view>
+<view style="height:{{fixedTop}}px;"></view>
+
+<view class='mywealth'>
+  <view class='wealth-item'>
+    <view>
+      <view class='mid'>总收入(元)</view>
+      <image class='display' bindtap="isDisplay" wx:if="{{displayFlag==0}}" src="../../img/mine/btn_open.png"></image>
+      <image class='hide' bindtap="isDisplay" wx:if="{{displayFlag==1}}" src="../../img/mine/btn_close.png"></image>
+      <view class='wealth-record' bindtap="withdrawalRecord">提现记录
+        <icon class="wealth-record-icon" type="info_circle" color="#ffffff" size="10"></icon>
+      </view>
+
+    </view>
+    <view>
+      <view class='total-price' wx:if="{{displayFlag==0}}">{{numFr.getNum(wait)}}</view>
+      <view class='total-price' wx:if="{{displayFlag==1}}">****</view>
+      <text class="withdraw-button-view" bindtap='cashOut'>提现</text>
+    </view>
+  </view>
+  <view class="line-view"></view>
+  <view class="display-content">
+    <view class='wealth-item' bindtap='clearing'>
+      <view class='price' wx:if="{{displayFlag==1}}">****</view>
+      <view class='price' wx:if="{{displayFlag==0}}">{{numFr.getNum(shellwait)}}</view>
+      <view class="lable">待结算(元)</view>
+    </view>
+    <view style="width:1px;height:20px;background-color:white;margin:auto;"></view>
+    <view class='wealth-item' bindtap='settled'>
+      <view class='price' wx:if="{{displayFlag==1}}">****</view>
+      <view class='price' wx:if="{{displayFlag==0}}">{{numFr.getNum(positionwait)}}</view>
+      <view class="lable">已结算(元)</view>
+    </view>
+  </view>
+</view>
+<!--奖励list-->
+<view class='list'>
+  <!--滚动tab栏-->
+  <scroll-view scroll-x class='nav'>
+    <view class="{{currentTab === 0?'focus':'scroll-item'}}" data-current='{{0}}' bindtap='handleTab'>全部</view>
+    <view class="{{currentTab === '22-36'?'focus':'scroll-item'}}" data-current="{{'22-36'}}" bindtap='handleTab'>内容创作</view>
+    <view class="{{currentTab === '23-37'?'focus':'scroll-item'}}" data-current="{{'23-37'}}" bindtap='handleTab'>创客招商</view>
+     <!-- <view class="{{currentTab === '43'?'focus':'scroll-item'}}" data-current="{{'43'}}" bindtap='handleTab'>乐享权益分佣</view> -->
+  </scroll-view>
+  <view class="line" wx:if='{{currentTab === 0}}'></view>
+  <view class="line1" wx:if="{{currentTab === '22-36'}}"></view>
+  <view class="line2" wx:if="{{currentTab === '23-37'}}"></view>
+  <!-- <view class="line3" wx:if="{{currentTab === '43'}}"></view> -->
+  <!-- 有收益的 -->
+  <view wx:if="{{hasInform}}">
+    <view class='content' wx:for="{{dataList}}" wx:key="item">
+      <view class='content-item'>
+        <view class="item">
+          <view>
+            <view class="item-id">{{income.trxType(item.trxType)}}</view>
+            <view class="item-time">{{numFr.dateFormat(item.updateTime)}}</view>
+          </view>
+          <view class="price">
+            <text class="add-icon" wx:if="{{item.fundDirection=='ADD'}}">+￥{{numFr.getNum(item.amount)}}</text>
+            <text class="sub-icon" wx:else>-￥{{numFr.getNum(item.amount)}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <!-- 没有收益的 -->
+  <view wx:else>
+    <view class="no-content-view">
+      <image class="no-content-image" src="../../img/withdraw/earnings _withdrawal_ settlement_null.png"></image>
+      <view class="no-content-text" wx:if="{{currentTab === 0}}">您当前暂无收益~</view>
+      <view class="no-content-text" wx:if="{{currentTab === '22-36'}}">内容创作暂无收益哦~</view>
+      <view class="no-content-text" wx:if="{{currentTab === '23-37'}}">
+        <text>创客招商暂无收益哦~</text>
+        <text class="text">咨询热线：400-765-665</text>
+      </view>
+      <!-- <view class="no-content-text" wx:if="{{currentTab === '43'}}">乐享权益暂无数据~</view> -->
+    </view>
+  </view>
+</view>
+<!--list-->

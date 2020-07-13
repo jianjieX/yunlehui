@@ -1,0 +1,27 @@
+function getType(obj) {
+  if (Object.prototype.toString.call(obj) == '[object Object]') {
+    return 'Object';
+  } else if (Object.prototype.toString.call(obj) == '[object Array]') {
+    return 'Array';
+  } else {
+    return 'nomal';
+  }
+}
+
+function deepCopy(obj) {
+  if (getType(obj) == 'nomal') {
+    return obj;
+  } else {
+    var newObj = getType(obj) == 'Object' ? {} : [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        newObj[key] = deepCopy(obj[key]);
+      }
+    }
+  }
+  return newObj;
+}
+
+module.exports = {
+  deepCopy: deepCopy
+}

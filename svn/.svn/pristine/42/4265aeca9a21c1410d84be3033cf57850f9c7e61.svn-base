@@ -1,0 +1,138 @@
+/**
+ * 未发布的故事
+ * 
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+let app = getApp();
+var baseUrl = require("../../utils/base.js");
+import Api from '/../../utils/config/Api/story.js';
+import WxParse from '../../wxParse/wxParse.js'
+import util from '../../utils/tools/util.js';
+let uncodeUtf16 = util.uncodeUtf16 // emojy 转字符
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let showLoading = alert.showLoading;
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //故事id
+    id: '',
+    //请求到的数据结构体
+    data: {}, 
+    //预览图片的list
+    imglist: [],
+    //来源类型
+    shareType: '0', 
+    //用于回显数据，故事是之前列表页第几页数据
+    page: null,
+    //作者昵称
+    editor: "", 
+    //作者签名
+    signature: "",
+    //0查看详情，1编辑
+    editType: 0, 
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function (options) {
+    var id = options.id;
+    //故事id
+    this.data.id = options.id;
+    //传来的故事在列表页哪个页，用于传回回显，本页没用
+    this.data.page = options.page;
+    this.getDetail(id);
+  },
+
+  //获取故事详情
+  getDetail(id) {
+    var that = this;
+    showLoading();
+    let _parms = {
+      storyId: id,
+      shopId: wx.getStorageSync("shopId"),
+      type: 0
+    }
+    Api.searchOneStoryForC(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        if (res.data.data != null) {
+          that.data.imglist.push(res.data.data.contentBanner)
+          if (res.data.data.editorImg == null) {
+            res.data.data.editorImg = "../../img/LOGO.png"
+          }
+          let signature = "";
+          if (res.data.data.signature != null && res.data.data.signature != undefined) {
+            signature = uncodeUtf16(res.data.data.signature)
+          }
+          res.data.data.title = uncodeUtf16(res.data.data.title)
+          res.data.data.contentDetail = uncodeUtf16(res.data.data.contentDetail)
+          that.setData({
+            data: res.data.data,
+            editor: uncodeUtf16(res.data.data.editor),
+            signature: signature,
+          })
+          let article = res.data.data.contentDetail;
+          // 解析html
+          WxParse.wxParse('article', 'html', article, that, 5);
+        }
+        wx.hideLoading();
+      } else {
+        wx.hideLoading();
+        alertModal(res.data.msg)
+      }
+    }).catch((res) => {
+      wx.hideLoading();
+      alertModal("请求服务失败")
+    })
+  },
+
+  //图片预览
+  previewImage: function (e) {
+    var that = this;
+    var current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.imglist
+    })
+  },
+
+  //跳回前一页
+  backPage() {
+    let that = this;
+    wx.navigateBack({
+      detal: 1
+    })
+  },
+
+  //编辑故事
+  editStory(){
+    wx.redirectTo({
+      url: '../../pages/storyWriter/storyWriter?id=' + this.data.id,
+    })
+  },
+
+  //跳到分类
+  toClassion(e) {
+    let that = this;
+    let currentTab = e.currentTarget.dataset.id;
+    app.globalData.currentTab = currentTab;
+    wx.switchTab({
+      url: '../../pages/strictShop/strictShop?source=1',
+    })
+  },
+
+  //去购买
+  toPay(e) {
+    let id = e.currentTarget.dataset.id;
+    wx.redirectTo({
+      url: '../../pages/shopDetail/shopDetail?goodsId=' + id,
+    })
+  }
+})

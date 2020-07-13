@@ -1,0 +1,366 @@
+// 引入全局app对象
+const app = getApp()
+// 引入WxValidate
+import WxValidate from '../../wxValidate/wxValidate.js'
+// 引入api
+import commonApi from '../../utils/config/Api/common.js'
+// 引入上传图片方法
+import upload from '../../utils/tools/uploadFile.js';
+let uploadFile = upload.uploadFile;
+// 转字符
+import util from '../../utils/tools/util.js';
+let uncodeUtf16 = util.uncodeUtf16 // emojy 转字符
+// 引入toast提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    topTips1: [{
+        id: 1,
+        title: "为您提供小程序，链接您线下实体店，帮助您把线下店搬到线上，实现线上和线下打通，完成新零售转型。",
+      },
+      {
+        id: 2,
+        title: "为您提供银行支付系统，可享受减免政策。"
+      },
+      {
+        id: 3,
+        title: "为您提供会员卡体系，通过会员卡权益，激活您的存量会员，发展增量会员，享受平台分利。",
+      },
+      {
+        id: 4,
+        title: "为您提供以会员卡为核心精准获客方案，留存客户，复购消费，效益倍增。",
+      },
+      {
+        id: 5,
+        title: "为您提供专属ID会员绑定，一次绑定，终身受益。",
+      },
+      {
+        id: 6,
+        title: "一卡在手，全域享受。您的持卡会员在所有合伙人异地联盟会员单位均可享受特权优惠。",
+      },
+      {
+        id: 7,
+        title: "为您提供特训营专属服务。",
+      },
+    ],
+    topTips2: [{
+        id: 1,
+        title: "会员源头分佣",
+        content: "引导顾客在您的店铺小程序消费，即刻绑定成为您的终身会员，您可以持续获得您会员在任何店铺消费的源头绑定分佣，轻松实现躺着挣钱。"
+      },
+      {
+        id: 2,
+        title: "销售商品分佣",
+        content: "商家间打通货源，互为分销，无需囤货，多多挣钱"
+      },
+    ],
+    merchantShopId: '',
+    listForm: {
+      // 平台ID
+      platformId: 2,
+      // 商户类型
+      merchantType: 1,
+      // 公司头像
+      shopHeader: '',
+      // 公司名称
+      shopName: '',
+      // 统一社会信用代码
+      uniformSocialCreditCode: '',
+      // 店主手机号
+      legalPersonPhone: ''
+    },
+    // 协议勾选状态
+    agreementStatus: false,
+    // 校验规则
+    rules: {
+      // 公司头像
+      shopHeader: {
+        required: true
+      },
+      // 店铺名称
+      shopName: {
+        required: true
+      },
+      // 统一社会信用代码
+      uniformSocialCreditCode: {
+        required: true,
+        uniformSocialCreditCode: true
+      },
+      // 店长手机号
+      legalPersonPhone: {
+        required: true,
+        tel: true
+      },
+    },
+    // 校验规则提示信息
+    messages: {
+      shopHeader: {
+        required: '请上传公司头像'
+      },
+      shopName: {
+        required: '请输入店铺名称'
+      },
+      legalPersonPhone: {
+        required: '请输入手机号',
+        tel: '请输入正确手机号'
+      },
+      uniformSocialCreditCode: {
+        required: '请输入统一社会信用代码',
+        numberA: '统一社会信用代码长度15位或18位'
+      }
+    }
+  },
+
+  onLoad(options) {
+
+    // 初始化校验函数
+    this.initValidate();
+    // 请求用户信息
+    this.getUserDetail();
+    // 从新申请开店
+    this.setData({
+      reApply: options.reApply,
+      merchantShopId: options.merchantShopId
+    })
+    // 如果重新开店,请求原有数据
+    if (options.reApply == '1') {
+      console.log('重新开店id是', options.merchantShopId);
+      this.getShopDetail(options.merchantShopId);
+    }
+  },
+
+  /**
+   * 拨打客服电话
+   */
+  makePhoneCall() {
+
+    wx.makePhoneCall({
+      phoneNumber: '18599094242'
+    })
+  },
+
+  /**
+   * 表单提交
+   */
+  formSubmit(e) {
+
+    let data = e.detail.value;
+    let params = this.data.listForm;
+
+    params = {
+      ...params,
+      ...data
+    };
+
+    this.initValidate();
+
+    // 表单校验
+    if (!this.WxValidate.checkForm(params)) {
+
+      const error = this.WxValidate.errorList[0];
+      this.showModal(error);
+      return false;
+    }
+
+    // 未勾选云乐会入驻协议
+    if (!this.data.agreementStatus) {
+      alertModal1('请勾选异业联盟会员章程');
+      return
+    }
+
+    if (this.data.reApply == '1') {
+      this.updateShopInfo(params);
+    } else {
+      console.log('----params--',params)
+      this.submitShopInfo(params);
+    }
+
+
+  },
+
+  /**
+   * 提交开店信息
+   * @param {Object} params 
+   */
+  submitShopInfo(params) {
+
+    wx.showLoading({
+      title: '提交中',
+    })
+    commonApi.applicationShop(params).then(res => {
+      if (res.data.status === '0000') {
+
+        let data = res.data.data;
+        let openShopId = data.merchantShopId;
+        let shopStatus = data.auditStatus;
+        let rejectReason = data.rejectReason;
+
+        wx.redirectTo({
+          url: `../shopopen/shopopen?shopId=${openShopId}&shopStatus=${shopStatus}&rejectReason=${rejectReason}`
+        })
+      }
+    })
+  },
+
+  /**
+   * 修改开店信息
+   * @param {Object} params 
+   */
+  updateShopInfo(params) {
+
+    var _this = this;
+    params.merchantId = _this.data.merchantShopId
+    wx.showLoading({
+      title: '提交中',
+    })
+    commonApi.updateShop(params).then(res => {
+      if (res.data.status === '0000') {
+
+        let data = res.data.data;
+        let openShopId = data.merchantShopId;
+        let shopStatus = data.auditStatus;
+        let rejectReason = data.rejectReason;
+
+        wx.redirectTo({
+          url: `../shopopen/shopopen?shopId=${openShopId}&shopStatus=${shopStatus}&rejectReason=${rejectReason}`
+        })
+      }
+    })
+  },
+
+  /**
+   * 重新开店获取详情
+   * @param {*} merchantId 
+   */
+  getShopDetail(merchantShopId) {
+
+    let _this = this;
+    let params = {
+      merchantShopId: merchantShopId
+    }
+    commonApi.getShopDetail(params).then(res => {
+      if (res.data.status === '0000') {
+        _this.setData({
+          listForm: res.data.data
+        })
+      }
+    })
+  },
+
+  /**
+   * 校验规则函数
+   */
+  initValidate() {
+
+    const rules = this.data.rules;
+    const messages = this.data.messages;
+
+    this.WxValidate = new WxValidate(rules, messages)
+  },
+
+
+  /**
+   * 校验错误提示
+   */
+  showModal(error) {
+
+    alertModal1(error.msg)
+  },
+
+
+  /**
+   * 获取用户名和头像
+   */
+  getUserDetail() {
+
+    let _this = this;
+    commonApi.getNickName().then(res => {
+      if (res.data.status === '0000') {
+        let {
+          avatalUrl,
+          nickName
+        } = res.data.data;
+
+        _this.setData({
+          ['listForm.shopHeader']: avatalUrl,
+          ['listForm.shopName']: `${uncodeUtf16(nickName)}的小店`
+        })
+      }
+    })
+  },
+
+  /**
+   * 上传公司头像
+   */
+  uploadMerchantHeader() {
+
+    let _this = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success(res) {
+        if (res.tempFiles[0].size > 2097152) {
+          alertModal1("您上传的图片需小于2MB");
+          return;
+        }
+        let tempFilePaths = res.tempFilePaths;
+        wx.navigateTo({
+          url: "/pages/center/upload?src=" + res.tempFilePaths[0]
+        });
+      },
+    })
+  },
+
+  /**
+   * 裁剪完成后执行上传
+   */
+  submitImg() {
+
+    let _this = this;
+    let tempFilePaths = app.globalData.imgs;
+    uploadFile(tempFilePaths, 20).then(res => {
+      _this.setData({
+        ['listForm.shopHeader']: res
+      })
+    })
+  },
+
+  /**
+   * 改变协议勾选状态
+   */
+  changeAgreementStatus() {
+
+    let agreementStatus = this.data.agreementStatus;
+    agreementStatus = !agreementStatus;
+
+    this.setData({
+      agreementStatus
+    })
+  },
+
+  /**
+   * 跳转协议页面
+   */
+  goAgreementPage() {
+
+    wx.navigateTo({
+      url: '../agreement/agreement?type=3',
+    })
+  },
+
+  /**
+   * 阅读协议后返回同意协议
+   */
+  agreeTo() {
+
+    this.setData({
+      agreementStatus: true
+    })
+  }
+})

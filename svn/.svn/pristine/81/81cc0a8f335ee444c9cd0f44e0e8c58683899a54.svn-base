@@ -1,0 +1,167 @@
+/* pages/activityMyDetail/activityMyDetail.wxss */
+
+page {
+  background: #f0f0f0;
+}
+
+.Summary-activity {
+  display: flex;
+  box-sizing: border-box;
+  margin-top: 2rpx;
+  padding: 24rpx 24rpx 0rpx 24rpx;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.1);
+  height: 200rpx;
+}
+
+.Summary-activity .image-container {
+  margin-right: 24rpx;
+}
+
+.Summary-activity .image-container image {
+  width: 264rpx;
+  height: 152rpx;
+  border-radius: 4rpx;
+}
+
+/* 活动简介内容 */
+
+.text-container .activity-title {
+  height: 40rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 40rpx;
+}
+
+.text-container .join-num {
+  margin-top: 12rpx;
+  height: 34rpx;
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 34rpx;
+}
+
+.text-container .activity-remark {
+  margin-top: 4rpx;
+  margin-bottom: 8rpx;
+  width: 414rpx;
+  height: 34rpx;
+  font-size: 24rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 34rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-container .activity-time {
+  display: flex;
+  justify-content: space-between;
+}
+
+.text-container .activity-time .contain-time {
+  height: 28px;
+  font-size: 20rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 28rpx;
+}
+
+/* 参与信息 */
+
+.join-info {
+  background: #fff;
+  margin-top: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.join-info .join-info-item {
+  height: 72rpx;
+  font-size: 28rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 72rpx;
+}
+
+/* 盒子阴影 */
+
+.box-shadow {
+  padding: 0rpx 24rpx;
+  box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.06), 0px 0px 0px 0px rgba(0, 0, 0, 0.06);
+}
+
+/* 左右布局 */
+
+.show-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 公共项 */
+
+.show-item {
+  height: 88rpx;
+  align-items: center;
+}
+
+/* 属性名 */
+
+.show-key {
+  height: 17px;
+  font-size: 13px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 18px;
+}
+
+/* 属性值 */
+
+.show-val {
+  height: 18px;
+  font-size: 13px;
+  font-family: PingFang-SC-Medium, PingFang-SC;
+  font-weight: 500;
+  color: rgba(153, 153, 153, 1);
+  line-height: 18px;
+}
+
+/* 备注部分 */
+
+.show-info-remake {
+  padding: 24rpx;
+}
+
+.remark-detailed {
+  width: 80rpx;
+  height: 34rpx;
+  font-size: 26rpx;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 36rpx;
+}
+
+.remark-area {
+  width: 622rpx;
+  font-size: 26rpx;
+  font-family: PingFang-SC-Medium, PingFang-SC;
+  font-weight: 500;
+  color: rgba(153, 153, 153, 1);
+  line-height: 36rpx;
+  word-break: break-all;
+}
+
+/* 参与时间 */
+
+.join-time {
+  background: #fff;
+}

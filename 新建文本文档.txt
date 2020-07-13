@@ -1,0 +1,53 @@
+eyJjdXJyZW50VGltZSI6IjIwMjAtMDQtMDIgMTA6MDE6MjQiLCJ1SWQiOjIyNiwiZmxhZyI6MSwibWVyY2hhbnRJZCI6MjM0LCJ1c2VyUGhvbmUiOiIxMzUyMTk4NTU2MyIsImxvZ2luRmxhZyI6MCwidXNlclR5cGUiOjMsIm1lcmNoYW50U2hvcElkIjoxODV9
+
+
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjdXJyZW50VGltZSI6IjIwMjAtMDQtMDIgMTA6MTg6NDQiLCJ1SWQiOjY2NTEwMDU1MzI1MjMyMjIwMTksImZsYWciOjEsIm1lcmNoYW50SWQiOjAsInVzZXJQaG9uZSI6IjEzODg4ODg4ODg4IiwibG9naW5GbGFnIjowLCJ1c2VyVHlwZSI6NCwibWVyY2hhbnRTaG9wSWQiOjB9.TDgKkQxoSShcC14_wzY_m9M_1PPcyMXsqUco2Ak_lOs
+
+goodsName: "≤‚ ‘"
+goodsTag: 2
+selectProtocolList: []
+shopMethod: 2
+brandId: "6546643785792902147"
+merchantId: "1"
+merchantName: "‘∆¿÷ª„√≈µÍ"
+goodsRecommend: ""
+goodsCode: ""
+applySelectFlag: 2
+memberGoodsflag: 2
+goodsDesc: "<p>≤‚ ‘≤‚ ‘≤‚ ‘</p>"
+categoryFirstId: 2302
+categorySecondId: 2303
+categoryThirdId: 2306
+goodsPicList: [{goodsPicName: "20200407111438uN.jpg",°≠}]
+0: {goodsPicName: "20200407111438uN.jpg",°≠}
+goodsPicName: "20200407111438uN.jpg"
+goodsPicUrl: "https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200407111438uN.jpg"
+goodsPicMain: 1
+specsList: [{specsName: "º˛", isSpecsMain: 1,°≠}]
+0: {specsName: "º˛", isSpecsMain: 1,°≠}
+specsName: "º˛"
+isSpecsMain: 1
+specsValList: [{goodsSpecsValue: "1", specsPicName: "", specsPicUrl: ""}]
+0: {goodsSpecsValue: "1", specsPicName: "", specsPicUrl: ""}
+goodsSpecsValue: "1"
+specsPicName: ""
+specsPicUrl: ""
+goodsPriceList: [{goodsSpecs: "1", grossMargin: 0, grossProfit: 0, sourceBindAmount: 0, invitingRegistAmount: 0,°≠}]
+0: {goodsSpecs: "1", grossMargin: 0, grossProfit: 0, sourceBindAmount: 0, invitingRegistAmount: 0,°≠}
+goodsSpecs: "1"
+grossMargin: 0
+grossProfit: 0
+sourceBindAmount: 0
+invitingRegistAmount: 0
+platformCommissionAmount: 0
+sellToEarnValueAmount: 0
+buyToProvinceAmount: 0
+contentAmount: 0
+saleAmount: 0
+separatAmount: 0
+supplyPrice: "1"
+selectedPrice: "1"
+stock: 1
+goodsKind: 1
+freight: "1"
+sourceType: 2

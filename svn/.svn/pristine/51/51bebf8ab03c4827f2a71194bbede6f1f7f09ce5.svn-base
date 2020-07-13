@@ -1,0 +1,249 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!-- 无默认地址-->
+<view wx:if="{{!belongOwnFlag}}">
+  <view wx:if="{{!hasDefaultAddress&&!chooseAddressFlag}}">
+    <view class='address' bindtap='selectAddressList'>
+      <view class='address-info'>
+        <!-- icon -->
+        <view class='icon'>
+          <image src='../../img/order/address.png'></image>
+        </view>
+        <!-- 地址信息 -->
+        <view class='info-no-address'>
+          <text>请填写您的收货地址</text>
+        </view>
+        <!-- 向右箭头 -->
+        <view class="arrow"></view>
+      </view>
+    </view>
+  </view>
+</view>
+<!-- 有默认地址 -->
+<view wx:if="{{!belongOwnFlag}}">
+  <view wx:if="{{hasDefaultAddress||chooseAddressFlag}}">
+    <view class='address' bindtap='selectAddressList'>
+      <view class='address-info'>
+        <!-- icon -->
+        <view class='icon'>
+          <image src='../../img/order/address.png'></image>
+        </view>
+        <!-- 地址信息 -->
+        <view class='info'>
+          <view class='name'>{{name}}</view>
+          <view class='phone'>{{phone}}</view>
+          <span wx:if="{{isDefault}}" class="isDefault">默认</span>
+          <view class='addressInfo'>{{region[0]}}{{region[1]}}{{region[2]}} {{address}}</view>
+
+        </view>
+        <!-- 向右箭头 -->
+        <view class="arrow"></view>
+      </view>
+    </view>
+  </view>
+</view>
+
+
+<!-- 订单列表 -->
+<view class="shop-item" wx:for="{{cartsList}}" wx:key="{{item}}">
+  <view class="shop-title">
+    <image class="shop-icon" src="/img/homeImg/shop.png" />
+    <view class="shop-name">{{item.merchantName}}</view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goods-item" wx:for="{{item.cminiShopCarList}}" wx:for-item="goodsItem" wx:key="{{goodsItem.id}}">
+    <image class="goods-pic" src="{{goodsItem.mainUrl}}"></image>
+    <view class="goods-info">
+      <view class="goods-head">
+        <view class="goods-name">
+          <span wx:if="{{goodsItem.goodsType === 2}}" class="select">严选</span>
+          {{goodsItem.goodsName}}
+        </view>
+        <view class="price-num">
+          <view class="price">
+            ￥{{numFr.getNum(goodsItem.price)}}
+          </view>
+          <view class="num">
+            x{{goodsItem.num}}
+          </view>
+        </view>
+      </view>
+
+      <view class="goods-spec">
+        <text class="spec">{{goodsItem.spec}}</text>
+      </view>
+      <view class="buy-sale" wx:if="{{goodsItem.buyToProvinceValue}}">
+        等级权益(买省)￥{{numFr.getNum(goodsItem.buyToProvinceValue)}}
+      </view>
+    </view>
+  </view>
+  <!-- 运费 -->
+  <view class="item">
+    <view class="title">运费：</view>
+    <view class="value freightAmount">{{numFr.getNum(item.freightAmount)}}</view>
+  </view>
+
+  <!-- 留言 -->
+  <view class="item">
+    <view class="title">留言：</view>
+    <input class="value" data-shop="{{index}}" placeholder="给商家留言" bindblur="inputMessage" maxlength="50"></input>
+  </view>
+
+  <!-- 小计 -->
+  <view class="count">
+    <text class="all"></text>
+    <text class="total">小计：<text class="total-price">￥{{numFr.getNum(item.totalAmount)}}</text></text>
+  </view>
+</view>
+
+<!-- deduction module -->
+<view class="bottom-box">
+  <view class="item">
+    <view class="title">乐享权益抵扣</view>
+    <view class="value-noUse" wx:if="{{!discountFlag}}" bindtap="noOpenCardDialog">暂无可用 ></view>
+    <view class="value-noUse" style="color:#ff5850" wx:else bindtap="showOpenCardDialog">￥ {{numFr.getNum(discount)}}</view>
+  </view>
+</view>
+
+<!-- 结算金额 -->
+<view class="bottom-box">
+  <view class="item">
+    <view class="title">商品金额</view>
+    <view class="value">￥{{numFr.getNum(goodsAmount)}}</view>
+  </view>
+  <view class="item">
+    <view class="title">运费</view>
+    <view class="value">￥{{numFr.getNum(totalFreightAmount)}}</view>
+  </view>
+  <view class="item" wx:if="{{buyToProvinceValue !== 0}}">
+    <view class="title">等级权益（买省）</view>
+    <view class="value" style="color:#FF5850">￥{{numFr.getNum(buyToProvinceValue)}}</view>
+  </view>
+</view>
+
+<!-- 发票信息 -->
+<!-- <view class="bottom-box">
+  <view class="item">
+    <view class="title">发票类型</view>
+    <view class="value">
+      <view class="type {{invoiceType == 1?'focus':''}}" data-type='{{1}}' data-no='{{1}}' bindtap='changeTabType'>
+        <icon wx:if="{{invoiceType == 1}}" type="success" size="16" color="#FABE00" />
+        <icon wx:else type="circle" size="18" color="#999" />
+        <text>普通发票</text>
+      </view>
+      <view class="type {{invoiceType == 2?'focus':''}}" data-type='{{2}}' data-no='{{1}}' bindtap='changeTabType'>
+        <icon wx:if="{{invoiceType == 2}}" type="success" size="16" color="#FABE00" />
+        <icon wx:else type="circle" size="18" color="#999" />
+        <text>不开发票</text>
+      </view>
+    </view>
+  </view>
+  <view class="item" wx:if="{{invoiceType == 1}}">
+    <view class="title">发票信息</view>
+    <view class="value">
+      <view class="type {{invoiceInfo == 1?'focus':''}}" data-type='{{1}}' data-no='{{2}}' bindtap='changeTabType'>
+        <icon wx:if="{{invoiceInfo == 1}}" type="success" size="16" color="#FABE00" />
+        <icon wx:else type="circle" size="18" color="#999" />
+        <text>个人</text>
+      </view>
+      <view class="type {{invoiceInfo == 2?'focus':''}}" data-type='{{2}}' data-no='{{2}}' bindtap='changeTabType'>
+        <icon wx:if="{{invoiceInfo == 2}}" type="success" size="16" color="#FABE00" />
+        <icon wx:else type="circle" size="18" color="#999" />
+        <text>企业单位</text>
+      </view>
+    </view>
+  </view>
+  <view class="item" wx:if="{{invoiceType == 1}}">
+    <view class="title">发票抬头</view>
+    <view class="value">
+      <input bindinput="invoiceInput" data-type="{{1}}" placeholder="请填写发票抬头"></input>
+    </view>
+  </view>
+  <view class="item" wx:if="{{invoiceType == 1 && invoiceInfo == 2}}">
+    <view class="title">发票税号</view>
+    <view class="value">
+      <input bindinput="invoiceInput" data-type="{{2}}" placeholder="请填写发票税号"></input>
+    </view>
+  </view>
+</view> -->
+<view name="fade" wx:if="{{deductionDialogFlag||noDeductionDialogFlag}}">
+  <view class="list-mask" bindtap="hideList"></view>
+</view>
+
+<!-- 占位 -->
+<view style="height:40rpx;"></view>
+
+<!-- 底部 -->
+<view class='footer'>
+  <view class='all'>实付款:
+    <span style="color:#FE4646">￥{{numFr.getNum(totalPayAmount)}}</span>
+  </view>
+  <!-- <view class='freight'>含运费:
+    <span style="color:#FE4646">￥{{totalFreightAmount}}</span>
+  </view> -->
+  <!-- <view class="num">共计{{}}件</view> -->
+  <view class='pay' bindtap='submit'>立即支付</view>
+</view>
+
+<!-- 支付遮罩层 -->
+<view class="pay-mask" wx:if="{{payMask}}"></view>
+<!-- deductionDialog start -->
+<view class='dialog' wx:if="{{deductionDialogFlag}}" animation="{{openDialogAnimation}}">
+  <view class="deductionDialogTitle">
+    <text>乐享权益抵扣明细</text>
+  </view>
+  <image src="/img/detailImg/close.png" class="closeCardDialog" catchtap="closedeductionDialog" />
+  <view class="deduction-total">
+    <text class="deduction-total-left">共抵扣</text>
+    <view class="deduction-total-right">
+      <text class="deduction-total-right-text"> -￥{{numFr.getNum(discount)}}</text>
+      <view class="folding-view-big" bindtap="foldingClick" data-hiddenlogistics="{{hiddenafterSales}}" data-type="afterSales">
+        <view class="{{hiddenafterSales == false ? 'folding-view-status' : 'folding-view'}}"></view>
+      </view>
+    </view>
+  </view>
+  <scroll-view scroll-y="true" class="deductionFormScroll" hidden="{{hiddenafterSales}}">
+    <view class="deductionFormItem" wx:for="{{cardList}}" wx:for-item="item">
+      <view class="deductionFormItem-left">
+        <view class="deductionFormItem-left-money">
+          <text class="selectPriceDecimal">￥</text>
+          <!-- <text class="deductionFormItem-left-money-value">{{numFr.getNum(item.economicalMoney)}}</text> -->
+          <text class="selectPriceInteger">{{item.selectPriceInteger}}</text>
+          <text class="selectPriceDecimal">.</text>
+          <text class="selectPriceDecimal">{{item.selectPriceDecimal}}</text>
+        </view>
+        <text class="deductionFormItem-left-text">无金额门槛</text>
+      </view>
+      <view class="deductionFormItem-middle">
+        <text class="dedutionFormItem-middle-title">{{item.goodsName}}</text>
+        <text class="dedutionFormItem-middle-data">{{limitDate}}</text>
+      </view>
+      <view class="deductionFormItem-right">
+        <image wx:if="{{item.checked}}" class="deductionFormItem-right-img" bindtap="chooseCard" data-item="{{item}}" src='/img/shop/choose.png'></image>
+
+        <icon wx:else type="circle" color="#000" class="deductionFormItem-right-img" data-item='{{item}}' size='20' bindtap="chooseCard" />
+      </view>
+    </view>
+  </scroll-view>
+  <button class="deductionForm-button" bindtap="closedeductionDialog">
+    <view class="title">确认</view>
+    <view class="detail">(共省￥ {{numFr.getNum(discount)}})</view>
+  </button>
+</view>
+<!-- gfg -->
+
+
+<!-- openCardDialog end -->
+
+<view class='dialog' wx:if="{{noDeductionDialogFlag}}" animation="{{openDialogAnimation}}">
+  <image src="/img/detailImg/close.png" class="closeCardDialog" catchtap="closeNoDeductionDialog" />
+  <view class="deductionDialogTitle">
+    <text>乐享权益抵扣明细</text>
+  </view>
+  <view>
+    <image class="enjoyment-openedCard-box-mark" src="/img/shop/mark.png"></image>
+    <text class="noCardDialog-text">查看抵扣金使用规则</text>
+  </view>
+  <button class="deductionForm-button" bindtap="closeNoDeductionDialog">确认</button>
+</view>

@@ -1,0 +1,104 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+
+  //查询全部故事
+  story(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/story?currentPage=' + data.currentPage + "&pageSize=" + data.pageSize + "&enablePage=" + data.enablePage + "&shopId=" + data.shopId;
+    return result
+  },
+
+  //根据用户查询全部故事
+  search(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/search';
+    return result
+  },
+
+  //点赞
+  thumbUpForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/thumbUpForC';
+    return result
+  },
+
+  //取消点赞
+  deleteThumbUpForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/deleteThumbUpForC';
+    return result
+  },
+
+  //关注
+  attentionForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/attentionForC';
+    return result
+  },
+
+  //取消关注
+  deleteAttentionForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/deleteAttentionForC';
+    return result
+  },
+
+
+  //查询单个故事详情
+  searchOneStoryForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/searchOneStoryForC';
+    return result
+  },
+
+  //添加故事
+  addStoryDetailForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/addStoryDetailForC';
+    return result
+  },
+
+  //编辑故事
+  updateStoryDetailForC(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/updateStoryDetailForC';
+    return result
+  },
+
+  //请求编辑故事一级分类
+  cateGoryFirstStoryGoodsList(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/goods/CloudcateGoryFirstStoryGoodsList';
+    return result
+  },
+
+  //c端故事分享数据库维护该故事分享数量
+  updateShareNumber(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/updateShareNumber';
+    return result
+  },
+
+  //判断故事是否上下线
+  judgeStatus(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/story/judgeStatus';
+    return result
+  },
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

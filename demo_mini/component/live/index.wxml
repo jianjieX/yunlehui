@@ -1,0 +1,7 @@
+<!--component/live/index.wxml-->
+<view>
+  <live-player id="player" src="rtmp://12097.liveplay.myqcloud.com/live/12097_e7d5973b53" mode="RTC" autoplay='true' bindstatechange="statechange" binderror="error" />
+   <!-- <live-pusher url="https://domain/push_stream" mode="RTC" autopush bindstatechange="statechange" style="width: 300px; height: 225px;" /> -->
+  <view class='colorScheme' bindtap="onTab" bindtap="changeParent">组件内点击按钮{{phone}}{{msg}}</view>
+</view>
+

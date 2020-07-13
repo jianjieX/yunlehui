@@ -1,0 +1,783 @@
+// 引入全局app对象
+const app = getApp();
+import deepCopy from '../../utils/tools/deepCopy.js'
+import Api from '/../../utils/config/Api/foods.js';
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let loading = alert.loading;
+// 引入编码和解码表情方法
+import tools from '../../utils/tools/util.js'
+// emojy 转字符
+let utf16toEntities = tools.utf16toEntities
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    orderMode: [{
+        label: 1,
+        value: '堂食',
+        checked: 'true'
+      },
+      {
+        label: 0,
+        value: '外带',
+      },
+    ],
+    //商品列表
+    foodsList: [],
+    //原价总价
+    totalPrice: '',
+    //优惠后总价
+    payAmount: '',
+    //总数
+    totalCount: '',
+    //店铺id
+    shopId: '',
+    //默认就餐方式
+    mode: '1',
+    //就餐人数
+    num: '',
+    //备注
+    desc: '',
+    //购物车信息
+    shopCarInfo: '',
+    //遮罩层
+    payMask: false,
+    //按钮禁用
+    disabled: false,
+    //是否显示遮罩层
+    fold: false,
+    // 优惠券list
+    couponList: [],
+    //剩余额度
+    lastQuoto: 0,
+    // 乐享框提示文字
+    couponText: '',
+    // 优惠金额
+    specialPrice: 0,
+    //是否开卡
+    openCards: false,
+    // 开卡时间
+    createTime: '',
+    // 卡到期时间
+    validity: ''
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    //this.getShopList(options.shopId);
+    this.setData({
+      shopId: options.shopId
+    })
+    this.getQuoto();
+  },
+
+
+  /**
+   * 获取剩余额度
+   */
+  getQuoto() {
+    var that = this;
+    var lastQuoto = that.data.lastQuoto;
+    var openCards = that.data.openCards;
+    var createTime = that.data.createTime;
+    var validity = that.data.validity;
+    Api.getQuoto().then((res) => {
+      if (res.data.status == "0000") {
+        lastQuoto = res.data.data.totalSum;
+        createTime = /\d{4}-\d{1,2}-\d{1,2}/g.exec(res.data.data.createTime);
+        validity = /\d{4}-\d{1,2}-\d{1,2}/g.exec(res.data.data.validity);
+
+        //当前时间时间戳
+        var myDate = Date.parse(new Date());
+
+        var thisTime = 0;
+        var time = 0;
+        if (res.data.data.validity) {
+          thisTime = res.data.data.validity.replace(/-/g, '/');
+          time = new Date(thisTime).getTime();
+        }
+        // 判断是否开卡
+        if (res.data.data.id && myDate < time) {
+          openCards = true;
+        } else {
+          openCards = false;
+        }
+        that.setData({
+          lastQuoto: lastQuoto,
+          openCards: openCards,
+          createTime: createTime,
+          validity: validity
+        })
+      }
+    }).catch((error) => {
+      console.log(error)
+    })
+    // 获取商品列表
+    that.getShopList(that.data.shopId);
+  },
+
+  /**
+   * 获取购物车数据
+   */
+  getShopList(id) {
+    var that = this;
+    var obj = {
+      shopId: id
+    }
+    Api.getShopCar(obj).then((res) => {
+      if (res.data.status == "0000") {
+        var foodsList = [];
+        var couponList = [];
+        foodsList = res.data.data[0].cminiShopCarList;
+        // for (let i = 0; i < foodsList.length; i++) {
+        //   foodsList[i].isBenefit = false;
+        //   if (foodsList[i].economicalMoney) {
+        //     couponList.push(foodsList[i]);
+        //   }
+        // }
+
+        // 同一个商品购买多个，生成多个券
+        for (let i = 0; i < foodsList.length; i++) {
+          // foodsList[i].isBenefit = false;
+          if (foodsList[i].economicalMoney) {
+            for (let j = 0; j < foodsList[i].num; j++) {
+              couponList.push(deepCopy.deepCopy(foodsList[i]));
+            }
+          }
+        }
+
+        for (let j = 0; j < couponList.length; j++) {
+          couponList[j].isDisable = false;
+          couponList[j].isSelected = false;
+          couponList[j].num = 1;
+        }
+        // 优惠券根据减钱金额排序
+        couponList = couponList.sort(function(a, b) {
+          return a.economicalMoney - b.economicalMoney
+        });
+        that.setData({
+          foodsList: foodsList,
+          shopCarInfo: res.data.data[0],
+          couponList: couponList
+        })
+        that.checkCoupon(foodsList, couponList);
+        that.getTotalPrice();
+      }
+    }).catch((error) => {
+      console.log(error)
+    })
+  },
+
+  /**
+   * 优惠卷默认选中
+   */
+  checkCoupon(foodsList, couponList) {
+    var that = this;
+    var lastQuoto = that.data.lastQuoto;
+    var couponText = that.data.couponText;
+    var specialPrice = that.data.specialPrice;
+    var openCards = that.data.openCards;
+    console.log('------', !lastQuoto)
+    // if (!lastQuoto) {
+    //   couponText = '暂无可用';
+    // }
+
+    //开卡了并且有优惠商品
+    if (couponList.length > 0 && openCards) {
+      // 剩余额度小于最小的优惠金额
+      if (lastQuoto < couponList[0].economicalMoney) {
+        couponText = '暂无可用';
+        // for (let i = 0; i < foodsList.length; i++) {
+        //   foodsList[i].isBenefit = false;
+        // }
+        for (let j = 0; j < couponList.length; j++) {
+          couponList[j].isDisable = true;
+          couponList[j].isSelected = false;
+        }
+      };
+      // 剩余额度等于最小的优惠金额
+      if (lastQuoto == couponList[0].economicalMoney) {
+        couponText = '-￥' + couponList[0].economicalMoney;
+        couponList[0].isDisable = false;
+        couponList[0].isSelected = true;
+
+        that.computedFoodsPrice(couponList[0].priceId);
+        specialPrice = lastQuoto;
+        // for (let i = 0; i < foodsList.length; i++) {
+        //   if (foodsList[i].goodsId == couponList[0].goodsId) {
+        //     foodsList[i].isBenefit = true;
+        //   } else {
+        //     foodsList[i].isBenefit = false;
+        //   }
+        // }
+        for (let j = 1; j < couponList.length; j++) {
+          if (lastQuoto == couponList[j].economicalMoney) {
+            couponList[j].isDisable = false;
+            couponList[j].isSelected = false;
+          } else {
+            couponList[j].isDisable = true;
+            couponList[j].isSelected = false;
+          }
+        }
+      };
+      // 剩余额度大于最小的优惠金额
+      if (lastQuoto > couponList[0].economicalMoney) {
+        var lastIndex = 0;
+        //判断有几张可用卡
+        for (let j = 0; j < couponList.length; j++) {
+          if (lastQuoto >= couponList[j].economicalMoney) {
+            lastIndex = j;
+          }
+        }
+        //不可用置灰
+        if (lastIndex >= 1) {
+          couponText = lastQuoto + '元可用，请选择';
+          for (let i = 0; i < couponList.length; i++) {
+            if (i > lastIndex) {
+              couponList[i].isDisable = true;
+              couponList[i].isSelected = false;
+            } else {
+              couponList[i].isDisable = false;
+              couponList[i].isSelected = false;
+            }
+          }
+        } else {
+          couponText = '-￥' + couponList[0].economicalMoney.toFixed(2);
+          couponList[0].isDisable = false;
+          couponList[0].isSelected = true;
+          that.computedFoodsPrice(couponList[0].priceId);
+          // for (let i = 0; i < foodsList.length; i++) {
+          //   if (foodsList[i].goodsId == couponList[0].goodsId) {
+          //     foodsList[i].isBenefit = true;
+          //   } else {
+          //     foodsList[i].isBenefit = false;
+          //   }
+          // }
+          for (let j = 1; j < couponList.length; j++) {
+            couponList[j].isDisable = true;
+            couponList[j].isSelected = false;
+          }
+          specialPrice = that.getBenefitPrice(couponList);
+        }
+      }
+
+    }
+    //没有优惠商品
+    if (couponList.length == 0) {
+      couponText = '暂无可用';
+    }
+    //有优惠商品但是没开卡
+    if (couponList.length > 0 && !openCards) {
+      couponList = [];
+      couponText = '暂无可用';
+    }
+
+    that.setData({
+      foodsList: foodsList,
+      couponList: couponList,
+      couponText: couponText,
+      specialPrice: specialPrice
+    })
+    that.getTotalPrice();
+  },
+
+  /**
+   * 切换优惠卷
+   */
+  couponChange(e) {
+    var that = this;
+    var foodsList = that.data.foodsList;
+    var couponList = that.data.couponList;
+    var lastQuoto = that.data.lastQuoto;
+    var couponText = that.data.couponText;
+    var index = e.currentTarget.dataset.coupon;
+    var sumPrice = 0;
+
+    // 取消选中
+    if (couponList[index].isSelected) {
+      couponList[index].isSelected = false;
+      // 商品显示回原价
+      // for (let i = 0; i < foodsList.length; i++) {
+      //   if (foodsList[i].priceId == couponList[index].priceId) {
+      //     foodsList[i].isBenefit = false;
+      //   }
+      // }
+      for (let j = 0; j < couponList.length; j++) {
+        if (couponList[j].economicalMoney <= lastQuoto - that.getBenefitPrice(couponList)) {
+          if (couponList[j].isSelected == false) {
+            couponList[j].isDisable = false;
+          }
+        } else {
+          if (couponList[j].isSelected == false) {
+            couponList[j].isDisable = true;
+          }
+        }
+      }
+
+      that.computedFoodsPrice(couponList[index].priceId);
+
+    } else {
+      if (couponList[index].isDisable == false) {
+        // if (lastQuoto >= that.data.specialPrice + couponList[index].economicalMoney * couponList[index].num) {
+        if (lastQuoto >= that.data.specialPrice + couponList[index].economicalMoney) {
+          console.log('-*----', index)
+          couponList[index].isSelected = true;
+          console.log(couponList)
+          // for (let i = 0; i < foodsList.length; i++) {
+          //   if (foodsList[i].priceId == couponList[index].priceId) {
+          //     foodsList[i].isBenefit = true;
+          //   }
+          // }
+          for (let j = 0; j < couponList.length; j++) {
+            if (couponList[j].economicalMoney > lastQuoto - that.getBenefitPrice(couponList)) {
+              if (couponList[j].isSelected == false) {
+                couponList[j].isDisable = true;
+              }
+            }
+          }
+        } else {
+          console.log("额度不够");
+        }
+
+        that.computedFoodsPrice(couponList[index].priceId);
+      }
+    }
+
+    sumPrice = that.getBenefitPrice(couponList);
+    if (sumPrice == 0) {
+      couponText = lastQuoto + '元可用，请选择';
+    } else {
+      couponText = '-￥' + sumPrice.toFixed(2);
+    }
+
+    that.setData({
+      foodsList: foodsList,
+      couponList: couponList,
+      specialPrice: sumPrice,
+      couponText: couponText
+    });
+    that.getTotalPrice();
+  },
+
+  /**
+   * 重新计算商品价格
+   */
+  computedFoodsPrice(id) {
+    var that = this;
+    var couponList = that.data.couponList;
+    var foodsList = that.data.foodsList;
+    let sum = 0;
+    let selSum = 0;
+
+    for (let i = 0; i < couponList.length; i++) {
+      if (couponList[i].priceId == id) {
+        sum++;
+        if (couponList[i].isSelected) {
+          selSum++;
+        }
+      }
+    }
+
+    for (let j = 0; j < foodsList.length; j++) {
+      if (foodsList[j].priceId == id) {
+        foodsList[j].benefitPrice = (selSum * foodsList[j].specialPrice) + ((sum - selSum) * foodsList[j].price);
+      }
+    }
+    console.log(foodsList)
+    that.setData({
+      foodsList: foodsList
+    })
+  },
+
+  /**
+   * 提交修改优惠券
+   */
+  submitBenefit() {
+    var that = this;
+    that.closedeductionDialog();
+  },
+
+  /**
+   * 计算优惠的金额
+   */
+  getBenefitPrice(couponList) {
+    var sumPrice = 0;
+    for (let i = 0; i < couponList.length; i++) {
+      if (couponList[i].isSelected) {
+        sumPrice += couponList[i].economicalMoney
+      }
+    };
+    return sumPrice;
+  },
+
+  /**
+   * 计算总价和总数
+   */
+  getTotalPrice() {
+    let price = 0;
+    let count = 0;
+    for (let i = 0; i < this.data.foodsList.length; i++) {
+      price += this.data.foodsList[i].price * this.data.foodsList[i].num;
+      count += this.data.foodsList[i].num;
+    }
+    this.setData({
+      totalPrice: price.toFixed(2),
+      payAmount: (price - this.data.specialPrice).toFixed(2),
+      totalCount: count
+    })
+  },
+
+  /**
+   * 切换就餐方式
+   */
+  radioChange: function(e) {
+    this.setData({
+      mode: e.detail.value
+    })
+  },
+
+  /**
+   * 输入人数
+   */
+  handleNum(e) {
+    var val = e.detail.value.trim();
+    if (val > 100) {
+      wx.showToast({
+        title: '就餐人数最多不可超过100人',
+        icon: 'none'
+      });
+    }
+    this.setData({
+      num: e.detail.value.trim()
+    })
+  },
+
+  /**
+   * 输入备注
+   */
+  handleDesc(e) {
+    this.setData({
+      desc: e.detail.value.trim()
+    })
+  },
+
+  /**
+   * 支付
+   */
+  pay() {
+    var that = this;
+    if (that.data.num === '') {
+      wx.showToast({
+        title: '请输入用餐人数',
+        icon: 'none'
+      })
+      return;
+    }
+    if (that.data.num > 100) {
+      wx.showToast({
+        title: '就餐人数最多不可超过100人',
+        icon: 'none'
+      })
+      return;
+    }
+
+    let desc = {
+      mode: that.data.mode,
+      num: that.data.num,
+      desc: utf16toEntities(that.data.desc)
+    }
+    let obj = {
+      billFlag: 0,
+      cminiShopCarList: that.data.foodsList,
+      freightAmount: 0,
+      merchantId: that.data.shopId,
+      merchantName: that.data.shopCarInfo.merchantName,
+      note: JSON.stringify(desc),
+      payAmount: that.data.payAmount,
+      totalAmount: that.data.totalPrice,
+    }
+
+    let couponList = that.data.couponList;
+    let benefitCoupon = []
+    for (let i = 0; i < couponList.length; i++) {
+      let obj = {};
+      if (couponList[i].isSelected) {
+        obj.priceId = couponList[i].priceId;
+        obj.specs = couponList[i].spec;
+        obj.goodsId = couponList[i].goodsId;
+        obj.num = couponList[i].num;
+        obj.discountAmount = couponList[i].economicalMoney;
+        obj.goodsIdSpecs = String(couponList[i].goodsId) + couponList[i].spec;
+
+        console.log('lalalalal', benefitCoupon)
+        console.log('obj', obj)
+        let isHere = benefitCoupon.find(_item => _item.priceId === obj.priceId);
+        console.log('hahahah1', benefitCoupon)
+        if (isHere) {
+          for (let j = 0; j < benefitCoupon.length; j++) {
+            if (benefitCoupon[j].priceId == obj.priceId) {
+              benefitCoupon[j].num += obj.num
+            }
+          }
+        } else {
+          benefitCoupon.push(obj);
+        }
+      }
+    }
+
+    let orderInfo = {
+      payType: 2, // 微信支付
+      receiverCity: 0,
+      receiverCityName: 0,
+      receiverDetailAddress: 0,
+      receiverName: 0,
+      receiverPhone: 0,
+      receiverProvince: 0,
+      receiverProvinceName: 0,
+      receiverRegion: 0,
+      receiverRegionName: 0,
+      shopCarOrderList: [obj],
+      totalAmount: that.data.totalPrice,
+      totalFreightAmount: 0, //总运费
+      totalPayAmount: that.data.payAmount, //实际支付
+      shopId: that.data.shopId, // 门店id
+      sourceType: that.data.foodsList[0].sourceType
+    }
+
+    let params = {
+      tranList: [orderInfo],
+      benefitCoupon: benefitCoupon,
+    }
+    loading("结算中");
+    that.setData({
+      disabled: true
+    })
+    Api.placeOrder(params).then((result) => {
+      if (result.data.status == '0000') {
+        wx.hideToast()
+        // 显示支付遮罩层
+        that.setData({
+          payMask: false
+        })
+        console.log(result)
+        app.data.orderId = result.data.data.tranId;
+        if (result.data.data.isZeroPty) {
+          let parms = {
+            "id": app.data.orderId,
+          }
+          Api.queryPay(parms).then((resa) => {
+            if (resa.data.status == '0000') {
+              // 跳转支付成功页面
+              wx.redirectTo({
+                url: `../foodsPaymentRes/foodsPaymentRes?orderId=${result.data.data.orderId}`,
+              })
+            } else {
+              alertModal1(resa.data.msg)
+            }
+          }).catch((resa) => {
+            alertModal("请求服务失败")
+          })
+        } else {
+          wx.requestPayment({
+            timeStamp: result.data.data.timeStamp,
+            nonceStr: result.data.data.nonceStr,
+            package: result.data.data.packAge,
+            signType: result.data.data.signType,
+            paySign: result.data.data.paySign,
+            success(res) {
+              loading("生成订单中~");
+              let _parms = {
+                "id": app.data.orderId,
+              }
+              Api.queryPay(_parms).then((resa) => {
+                if (resa.data.status == '0000') {
+                  // 跳转支付成功页面
+                  wx.redirectTo({
+                    url: `../foodsPaymentRes/foodsPaymentRes?orderId=${result.data.data.orderId}`,
+                  })
+                } else {
+                  alertModal1(resa.data.msg)
+                }
+              }).catch((resa) => {
+                alertModal("请求服务失败")
+              })
+
+            },
+            fail(res) {
+              console.log(res)
+              alertModal("支付取消")
+              that.setData({
+                payMask: false
+              })
+              // 取消支付跳转订单列表页面
+              setTimeout(() => {
+                wx.redirectTo({
+                  url: `../foodsOrderDetail/foodsOrderDetail?orderId=${result.data.data.orderId}`,
+                })
+              }, 800)
+            }
+          })
+        }
+
+      } else {
+        alertModal(result.data.msg)
+        wx.hideLoading();
+        that.setData({
+          disabled: false
+        })
+        that.setData({
+          payMask: false
+        })
+        setTimeout(() => {
+          wx.navigateBack({
+            detal: 1
+          })
+        }, 2000)
+      }
+    }).catch((error) => {
+      wx.hideLoading();
+      that.setData({
+        disabled: false
+      })
+      console.log(error)
+    })
+  },
+
+  /**
+   * 打开折扣对话窗函数
+   */
+  showOpenCardDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(600).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+      deductionDialogFlag: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step();
+      that.setData({
+        openDialogAnimation: animation.export(),
+        fold: true,
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 关闭折扣对话窗函数
+   */
+  closedeductionDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(600).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      that.setData({
+        openDialogAnimation: animation.export(),
+        deductionDialogFlag: false,
+        fold: false,
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 是否折叠
+   */
+  foldingClick(e) {
+
+    var type = e.currentTarget.dataset.type;
+    var that = this;
+    that.data.hiddenafterSales = !that.data.hiddenafterSales; //隐藏物流信息
+
+    this.setData({
+      hiddenafterSales: that.data.hiddenafterSales,
+    })
+  },
+
+  hideList() {
+    this.closedeductionDialog();
+    this.setData({
+      fold: false
+    })
+  },
+
+  /**
+   * 返回
+   */
+  goback() {
+    wx.navigateBack({
+      delta: 1
+    })
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function() {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function() {
+
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function() {
+
+  }
+})

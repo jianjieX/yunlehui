@@ -1,0 +1,222 @@
+.header {
+  width: 750rpx;
+  background: white;
+  font-size: 32rpx;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
+.header .navigation {
+  padding-top: 12rpx;
+  padding-left: 30rpx;
+  display: flex;
+}
+
+.label {
+  margin-left: 16rpx;
+  color: #333;
+  font-size: 36rpx;
+  font-family: PingFangSC-Medium;
+}
+
+.arrow-view {
+  width: 5%;
+  height: 100%;
+  left: 0;
+  z-index: 999;
+  position: relative;
+}
+
+.arrow {
+  width: 22rpx;
+  height: 22rpx;
+  border-bottom: 2px solid black;
+  border-left: 2px solid black;
+  position: absolute;
+  transform: rotate(45deg);
+  top: 18rpx;
+  left: 2rpx;
+}
+
+.mywealth {
+  width: 760rpx;
+  height: 96rpx;
+  background: #fff;
+  margin: 24rpx 0 16rpx 0;
+}
+
+.mywealth .wealth-item {
+  flex: 1;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 13px;
+  height: 100%;
+}
+
+.display-content {
+  display: flex;
+}
+
+.mywealth .wealth-item .total-price {
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  color: #333;
+  line-height: 96rpx;
+}
+
+.mywealth .wealth-item .price {
+  color: white;
+  font-size: 24rpx;
+}
+
+.mywealth .wealth-item .mid {
+  font-size: 28rpx;
+  font-family: PingFang-SC-Regular;
+  font-weight: 400;
+  color: #333;
+  line-height: 96rpx;
+  padding: 0 24rpx;
+}
+
+.mywealth .wealth-item image {
+  width: 100%;
+}
+
+.list {
+  box-sizing: border-box;
+  margin-top: 24rpx;
+  height: 1182rpx;
+  background-color: #fff;
+}
+
+.line {
+  width: 32rpx;
+  height: 4rpx;
+  background-color: #fabe00;
+  margin-top: -4rpx;
+  margin-left: 175rpx;
+}
+
+.line1 {
+  width: 32rpx;
+  height: 4rpx;
+  background-color: #fabe00;
+  margin-top: -4rpx;
+  margin-left: 550rpx;
+}
+
+.list .nav {
+  display: flex;
+  height: 96rpx;
+  border-bottom: 2px solid #f1f1f1;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  white-space: nowrap;
+  background: #fff;
+}
+.list .nav view{
+  width: 50%;
+}
+
+.list .scroll-item {
+  height: 96rpx;
+  line-height: 96rpx;
+  text-align: center;
+  font-size: 30rpx;
+  display: inline-block;
+  color: #333;
+  width: 45%;
+  font-family: PingFangSC-Medium;
+}
+
+.list .focus {
+  height: 82rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 32rpx;
+  display: inline-block;
+  width: 45%;
+  color: #fabe00;
+}
+
+.list .focus::after {
+  content: '';
+  display: block;
+  width: 70%;
+  height: 4rpx;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+.list .content-item {
+  width: 100%;
+  height: 112rpx;
+  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+}
+
+.content{
+  margin-top: 2rpx;
+}
+
+.list .content-item .item {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 38rpx;
+}
+
+.list .content-item .item .item-fee {
+  color: #666;
+  font-size: 24rpx;
+}
+
+.list .content-item .item .item-time {
+  color: #333;
+  font-size: 26rpx;
+  padding: 26rpx 0 10rpx 0;
+}
+
+.list .content-item .item .price {
+  line-height: 112rpx;
+  color: rgba(51, 51, 51, 1);
+  font-size: 24rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+}
+
+.no-content-view {
+  width: 100%;
+  margin-top: 40%;
+}
+
+.no-content-image {
+  width: 262rpx;
+  height: 196rpx;
+  margin: 0 auto;
+  display: block;
+}
+
+.no-content-text {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-family: PingFang-SC-Medium;
+  font-weight: 500;
+  color: rgba(153, 153, 153, 1);
+  margin-top: 48rpx;
+}

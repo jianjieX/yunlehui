@@ -1,0 +1,613 @@
+/**
+ * 订单列表页面
+ * 
+ * @author liyujie
+ * @date 2019-08-28
+ */
+
+// 引入全局app对象
+const app = getApp();
+// 引入接口api
+import Api from '/../../utils/config/Api/order.js';
+import goodsApi from '/../../utils/config/Api/goods.js';
+//引入qrcode
+import QRCode from '../../utils/weapp-qrcode'
+// 引入toast等提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let loading = alert.showLoading;
+
+Page({
+  data: {
+    // 是否有订单
+    hasOrder: false,
+    // 当前页码
+    currentPage: 1,
+    // 当前订单状态tab
+    currentTab: 0,
+    // 订单列表数据
+    dataList: [],
+    // 售后列表数据
+    returnOrderList: [],
+    // 物流弹窗
+    logisticsHidden: true,
+    // 取消订单原因
+    cancelReasonList: [],
+    // 取消订单原因名字
+    cancelReasonName: '',
+    // 取消订单原因code
+    cancelReasonCode: '',
+    // 支付遮罩层状态
+    payMask: false,
+    //普通商品是否可以售后
+    canAfterSale: false,
+    // 餐饮商品是否可以售后
+    foodCanAfterSale: false,
+    //展示二维码
+    isShowQrcode:false,
+    //12位核销码
+    verficationcode:''
+  },
+
+  /**
+   * 页面加载状态
+   */
+  onLoad(options) {
+    
+    console.log(options);
+    this.setData({
+      currentTab: options.currentTab
+    })
+    if (this.data.currentTab == 0) {
+      let params = {
+        currentPage: this.data.currentPage,
+        enablePage: true,
+        orderStatus: '',
+        pageSize: 10
+      }
+      this.getOrderList(params);
+    } else {
+      if (this.data.currentTab == 8) {
+        this.getReturnOrderList();
+      } else {
+        let params = {
+          currentPage: this.data.currentPage,
+          enablePage: true,
+          orderStatus: this.data.currentTab - 1,
+          pageSize: 10
+        }
+        this.getOrderList(params);
+      }
+    }
+    this.getCancelReasonList();
+  },
+    /**
+   * 取消遮罩层
+   */
+  cancel(){
+    this.setData({
+      isShowQrcode:false
+    })
+  },
+
+  /**
+   * tab切换方法
+   */
+  handleTab(e) {
+    this.setData({
+      dataList: []
+    })
+    let _this = this;
+    this.data.dataList = [];
+    this.data.returnOrderList = [];
+    if (this.data.currentTab === e.target.dataset.current) {
+      return false;
+    } else {
+      _this.setData({
+        currentTab: e.target.dataset.current,
+        currentPage: 1,
+
+      })
+      if (e.target.dataset.current == 0) {
+        let params = {
+          currentPage: this.data.currentPage,
+          enablePage: true,
+          orderStatus: '',
+          pageSize: 10
+        }
+        this.getOrderList(params);
+      } else {
+        if (e.target.dataset.current === 8) {
+          this.getReturnOrderList();
+        } else {
+          let params = {
+            currentPage: this.data.currentPage,
+            enablePage: true,
+            orderStatus: e.target.dataset.current - 1,
+            pageSize: 10
+          }
+          this.getOrderList(params);
+        }
+      }
+    }
+  },
+  /**
+   * 二维码
+   */
+  showQrcode(e) {
+    this.setData({
+      isShowQrcode: true
+    })
+    console.log('22222222222222222')
+    let _this = this
+    new QRCode('myQrcode', {
+      text: e.currentTarget.dataset.vericode,
+      width: 128,
+      height: 128,
+      padding: 8, // 生成二维码四周自动留边宽度，不传入默认为0
+      correctLevel: QRCode.CorrectLevel.Q, // 二维码可辨识度
+      callback: (res) => {
+        console.log(res.path)
+        _this.setData({
+          verficationcode:e.currentTarget.dataset.vericode
+        })
+        // 接下来就可以直接调用微信小程序的api保存到本地或者将这张二维码直接画在海报上面去，看各自需求
+      }
+    })
+  },
+
+  /**
+   * 继续支付方法
+   */
+  pay(e) {
+
+    let that = this;
+    this.setData({
+      payMask: true
+    })
+    let _parms = {
+      id: e.currentTarget.dataset.id
+    }
+    Api.restartPay(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        app.data.orderId = res.data.data.tranId
+        wx.requestPayment({
+          timeStamp: res.data.data.timeStamp,
+          nonceStr: res.data.data.nonceStr,
+          package: res.data.data.packAge,
+          signType: res.data.data.signType,
+          paySign: res.data.data.paySign,
+          success(res) {
+            that.setData({
+              payMask: false
+            })
+            wx.navigateTo({
+              url: `../orderPaySuccess/orderPaySuccess?totalPayAmount=${e.currentTarget.dataset.price}`,
+            })
+          },
+          fail(res) {
+            console.log(res)
+            that.setData({
+              payMask: false
+            })
+            alertModal("支付失败")
+          }
+        })
+      } else {
+        that.setData({
+          payMask: false
+        })
+        alertModal1(res.data.msg)
+      }
+    }).catch((err) => {
+      that.setData({
+        payMask: false
+      })
+      alertModal("请求服务失败")
+    })
+  },
+  /**
+   * 跳转订单详情
+   */
+  goOrderDetail(e) {
+    let {
+      id,
+      mode
+    } = e.currentTarget.dataset;
+    if (!mode) {
+      wx.navigateTo({
+        url: `../orderDetail/orderDetail?orderId=${id}`,
+      })
+    } else {
+      wx.navigateTo({
+        url: `../foodsOrderDetail/foodsOrderDetail?orderId=${id}`
+      })
+    }
+  },
+
+  /**
+   * 跳转售后订单详情
+   */
+  goAfterSaleDetail(e) {
+
+    let returnId = e.currentTarget.dataset.id;
+    let mode = e.currentTarget.dataset.mode;
+    if (mode) {
+      wx.navigateTo({
+        url: `../foodsAfterSaleDetail/foodsAfterSaleDetail?returnId=${returnId}`,
+      })
+    } else {
+      wx.navigateTo({
+        url: `../afterSaleDetail/afterSaleDetail?returnId=${returnId}`,
+      })
+    }
+  },
+
+  /**
+   * 取消订单方法
+   */
+  cancelOrder(orderId, cancelReasonCode, orderStatus) {
+
+    let _this = this;
+    let data = {
+      orderId: orderId,
+      cancelReason: cancelReasonCode,
+      orderStatus: orderStatus
+    }
+    this.data.currentPage = 1;
+    Api.cancelOrder(data).then(res => {
+      if (res.data.status === "0000") {
+        if (_this.data.currentTab == 0) {
+          let params = {
+            currentPage: _this.data.currentPage,
+            enablePage: true,
+            orderStatus: '',
+            pageSize: 10
+          }
+          _this.data.dataList = []
+          _this.getOrderList(params)
+        } else {
+          let params = {
+            currentPage: _this.data.currentPage,
+            enablePage: true,
+            orderStatus: _this.data.currentTab - 1,
+            pageSize: 10
+          }
+          _this.data.dataList = []
+          _this.getOrderList(params)
+        }
+        alertModal1("取消订单成功")
+      } else {
+        alertModal(res.data.msg)
+      }
+    }).catch((err) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  /**
+   * 查询物流
+   */
+  logistics(e) {
+
+    let _this = this;
+    loading();
+    let params = {
+      orderId: e.target.dataset.id
+    }
+    Api.viewLogistics(params).then(res => {
+      console.log(res)
+      if (res.data.status === '0000') {
+        _this.setData({
+          logisticsHidden: false,
+          logisticsMessage: {
+            stepList: res.data.data
+          }
+        })
+      } else {
+        logisticsMessage: {
+          stepList: null
+        }
+        alertModal1(res.data.msg)
+      }
+    }).catch(err => {
+      logisticsMessage: {
+        stepList: null
+      }
+    })
+  },
+
+  /**
+   * 关闭物流弹层
+   */
+  cancelClick() {
+
+    this.setData({
+      logisticsHidden: true,
+      logisticsMessage: {
+        stepList: null
+      }
+    })
+  },
+
+  /**
+   * 确认收货
+   */
+  receiveGoods(e) {
+
+    let _this = this;
+    wx.showModal({
+      content: '是否确认收货',
+      confirmText: '确认收货',
+      cancelText: '我再想想',
+      success(res) {
+        if (res.confirm) {
+          let data = {
+            confirmStatus: 1,
+            orderId: e.currentTarget.dataset.id
+          }
+          _this.data.currentPage = 1
+          Api.confirmReceipt(data).then(res => {
+            console.log(res)
+            if (res.data.status === '0000') {
+              if (_this.data.currentTab == 0) {
+                // 全部
+                let params = {
+                  currentPage: _this.data.currentPage,
+                  enablePage: true,
+                  orderStatus: '',
+                  pageSize: 10
+                }
+                _this.data.dataList = []
+                _this.getOrderList(params)
+              } else {
+                // 订单状态列表
+                let params = {
+                  currentPage: _this.data.currentPage,
+                  enablePage: true,
+                  orderStatus: _this.data.currentTab - 1,
+                  pageSize: 10
+                }
+                _this.setData({
+                  dataList: []
+                })
+                _this.getOrderList(params)
+              }
+              alertModal1("确认收货成功")
+            } else {
+              alertModal(res.data.msg)
+            }
+          }).catch((err) => {
+            alertModal("请求服务失败")
+          })
+        }
+      }
+    })
+  },
+
+  /**
+   * 请求订单列表
+   */
+  getOrderList(params) {
+
+    let _this = this;
+    Api.getOrderList(params).then(res => {
+      console.log(res)
+      if (res.data.status === '0000') {
+        if (res.data.data) {
+          _this.setData({
+            dataList: [..._this.data.dataList, ...res.data.data.content],
+            hasOrder: true
+          })
+          if (res.data.data.content.length === 0) {
+            _this.setData({
+              hasOrder: false
+            })
+          }
+        } else {
+          _this.setData({
+            dataList: []
+          })
+        }
+        wx.hideLoading()
+        // 隐藏导航栏加载框
+        wx.hideNavigationBarLoading();
+        // 停止下拉动作
+        wx.stopPullDownRefresh();
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 请求售后列表
+   */
+  getReturnOrderList() {
+
+    let _this = this;
+    let params = {
+      currentPage: this.data.currentPage,
+      enablePage: true,
+      pageSize: 10
+    }
+    Api.getReturnList(params).then(res => {
+      if (res.data.status === '0000') {
+        if (res.data.data) {
+          _this.setData({
+            returnOrderList: [..._this.data.returnOrderList, ...res.data.data.content],
+            hasOrder: true
+          })
+        } else {
+          _this.setData({
+            returnOrderList: []
+          })
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 请求取消订单原因列表
+   */
+  getCancelReasonList() {
+
+    let _this = this;
+    Api.getCancelReasonList({}).then(res => {
+      if (res.data.status === '0000') {
+        _this.setData({
+          cancelReasonList: res.data.data
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 选择取消订单原因
+   */
+  bindPickerChange(e) {
+
+    console.log(e);
+    let orderId = e.target.dataset.id;
+    let index = e.detail.value;
+    let orderStatus = e.target.dataset.status;
+    let cancelReasonCode = this.data.cancelReasonList[index].code;
+    this.setData({
+      cancelReasonName: this.data.cancelReasonList[index].name,
+      cancelReasonCode: cancelReasonCode
+    })
+    this.cancelOrder(orderId, cancelReasonCode, orderStatus);
+  },
+
+  /**
+   * 取消订单confirm
+   */
+  cancelMyOrder(e){
+    let that = this;
+    wx.showModal({
+      title: '取消订单',
+      content: '您确定要取消订单吗？',
+      success: function (sm) {
+        if (sm.confirm) {
+          console.log('----ssss',e)
+          let orderId = e.target.dataset.id;
+          let orderStatus = e.target.dataset.status;
+          let cancelReasonCode = 7;
+          that.cancelOrder(orderId, cancelReasonCode, orderStatus);
+          // 用户点击了确定 可以调用删除方法了
+
+        } else if (sm.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+  /**
+   * 请求分页
+   */
+  onReachBottom() {
+
+    wx.showLoading({
+      title: '加载中',
+    })
+    let currentPage = this.data.currentPage;
+    let _this = this;
+    let params;
+    currentPage++;
+    this.setData({
+      currentPage: currentPage
+    })
+    console.log("当前页", this.data.currentPage)
+    if (this.data.currentTab == 0) {
+      params = {
+        currentPage: this.data.currentPage,
+        enablePage: true,
+        orderStatus: '',
+        pageSize: 10
+      }
+      this.getOrderList(params)
+    } else {
+      if (this.data.currentTab == 8) {
+        this.getReturnOrderList()
+      } else {
+        params = {
+          currentPage: this.data.currentPage,
+          enablePage: true,
+          orderStatus: this.data.currentTab - 1,
+          pageSize: 10,
+        }
+        this.getOrderList(params)
+      }
+    }
+
+  },
+
+  /**
+   * 申请售后
+   */
+  applyAfterSale(e) {
+
+    let orderId = e.target.dataset.id;
+    wx.navigateTo({
+      url: `../applyAfterSale/applyAfterSale?orderId=${orderId}`,
+    })
+  },
+
+  /**
+   * 返回后请求售后列表
+   */
+  backGetReturnList() {
+
+    console.log("上个页面的方法");
+    this.data.returnOrderList = [],
+      this.setData({
+        currentPage: 1
+      })
+    this.getReturnOrderList();
+  },
+
+  /**
+   * 下拉刷新
+   */
+  onPullDownRefresh: function () {
+    this.setData({
+      dataList: []
+    })
+    wx.showLoading({
+      title: '加载中',
+    })
+    this.data.currentPage = 1;
+    this.data.dataList = [];
+    this.data.returnOrderList = [];
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    if (this.data.currentTab == 0) {
+      let params = {
+        currentPage: this.data.currentPage,
+        enablePage: true,
+        orderStatus: '',
+        pageSize: 10
+      }
+      this.getOrderList(params);
+    } else {
+      if (this.data.currentTab == 8) {
+        this.getReturnOrderList();
+      } else {
+        let params = {
+          currentPage: this.data.currentPage,
+          enablePage: true,
+          orderStatus: this.data.currentTab - 1,
+          pageSize: 10
+        }
+        this.getOrderList(params);
+      }
+
+    }
+    this.getCancelReasonList();
+  },
+})

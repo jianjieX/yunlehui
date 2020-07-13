@@ -1,0 +1,73 @@
+<!-- 好物页面 wxml -->
+
+<!-- 格式化金钱 -->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 处理商品标签 -->
+<wxs module="handleGoodsTag" src="../../filter/handleGoodsTag.wxs"></wxs>
+
+<!-- 自定义头部 -->
+<view class="header">
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view class="search-bar" bindtap="goSearchPage">
+        <image src="/img/homeImg/search.png" class="search-icon" />
+        <text class="placeholder">搜索您想要的内容</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 头部占位 -->
+<view class="bar">
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <view class="navigation-bar" style="{{ navigationBarStyle }}" />
+</view>
+
+<!-- 内容 -->
+<view class="content">
+  <!-- 菜单 -->
+  <view class="menu">
+    <view class="category-item {{currentTab == 0? 'focus': ''}}" data-current="{{0}}" bindtap="handleTab">全部</view>
+    <scroll-view scroll-y="{{true}}" style="{{mHeight}}" class="scroll-view" scroll-into-view="{{scrollTo}}" scroll-with-animation="{{true}}">
+      <view id="String{{item.id}}" wx:for="{{categoryList}}" wx:key="id" wx:if="{{item.categoryName != ''}}" data-current="{{item.id}}" class="category-item {{currentTab == item.id? 'focus': ''}}" bindtap="handleTab">{{item.categoryName}}</view>
+    </scroll-view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="goodsList">
+    <view class="categoryName">{{categoryName}}</view>
+    <view style="margin-top:14rpx;" data-id="{{item.goodsId}}" bindtap="toGoodsDetail" wx:for="{{goodsList}}" wx:key="goodsId">
+      <view class='goods-item'>
+        <view class='imgBox'>
+          <image class='goodsImg' mode="aspectFit" src="{{item.mainUrl}}" />
+          <image wx:if="{{item.goodsTag}}" class="goods-tag" src="{{handleGoodsTag.getTagNum(item.goodsTag)}}"></image>
+        </view>
+        <view class="right">
+          <view class='goodsName'>
+            <view class="goodsName-box">
+              <text wx:if="{{item.selectionType === 2 || item.selectionType === 4}}" class="select">严选</text>
+              <text>{{item.goodsName}}</text>
+            </view>
+          </view>
+          <!-- 乐享权益模块 start -->
+          <view class="enjoyment" wx:if="{{item.specialPrice!=null}}">
+            <view class="enjoyment-price"><text style="font-size:20rpx;">￥</text>{{numFr.getNum(item.specialPrice)}}<text style="margin-left:4rpx;">特权价</text></view>
+            <view class='enjoyment-saveMoney'>售价<text >￥{{numFr.getNum(item.selectedPrice)}}</text> </view>
+          </view>
+          <!-- 乐享权益模块 end -->
+          <view class="price-bar" wx:if="{{item.specialPrice==null}}">
+            <view class="total-sale" wx:if="{{item.totalSale}}">已售{{item.totalSale}}</view>
+            <view class='goodsPrice'>
+              ￥{{numFr.getNum(item.selectedPrice)}}
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 底部 -->
+<view wx:if="{{isBottomShow}}" style='text-align:center;height: 20rpx;color:#a5a5a5'></view>
+<view wx:if="{{!isBottomShow}}" style='text-align:center;margin:50rpx 0;color:#a5a5a5'>暂无商品~</view>

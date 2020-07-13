@@ -1,0 +1,49 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 订单支付成功页面 -->
+
+<!-- 头部 -->
+<view class="header_bg">
+	<image class="success-img" src="/img/submitOrder/form_succeed@2x.png"></image>
+	<view class="success-text">支付成功</view>
+	<view class='desc'>我们将尽快为您发货！</view>
+	<view class='btn'>
+		<view bindtap='goHome'>返回首页</view>
+		<view bindtap='goOrderDetail'>查看订单</view>
+	</view>
+</view>
+
+<!-- 猜你喜欢标题 -->
+<view class="like" wx:if="{{goodsList.length}}">
+	<view class="line"></view>
+	<view class="text">热门推荐</view>
+	<view class="line"></view>
+</view>
+
+<!-- 乐享专区列表 -->
+
+<view class="goods-wrap" wx:if="enjoyProList.length!=0">
+	<view class="goods-header">
+		<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200103093421vv.png" class="privilege-decorate"></image>
+		<text class="title">好物特权专属区</text>
+		<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200103093230Km.png" class="privilege-decorate"></image>
+	</view>
+	<view class="goods-content">
+		<view class="goods-row">
+			<block wx:for="{{enjoyProList}}" wx:key="{{item.key}}">
+				<view class='item' data-id="{{item.goodsId}}" bindtap="toGoodsDetail">
+					<image class='goodsImg' src="{{item.goodsPicUrl}}" />
+					<view class="name">
+						<text class="tag">严选</text>{{item.goodsName}}
+					</view>
+					<view class="bottom">
+						<text class="price">¥{{numFr.getNum(item.enjoymentPrice)}}<text style="font-size:20rpx">特权价</text></text>
+						<view class="enjoy-wrap">
+							<text>售价</text>
+							<text >¥{{numFr.getNum(item.discountAmount)}}</text>
+						</view>
+					</view>
+				</view>
+			</block>
+		</view>
+	</view>
+</view>

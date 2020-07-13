@@ -1,0 +1,114 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+
+  // 获取商品列表
+  getFoods(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/goods/getRestMerchantShopCateGoryList';
+    return result
+  },
+
+  getGoodsInfo(data) {  // 获取商品规格
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/getGoodsInfo';
+    return result
+  },
+
+  /**
+   * 校验数量
+   */
+  validGoodsSpecs(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/validGoodsSpecs';
+    return result
+  },
+  // 添加购物车
+  addShopCar(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar';
+    return result
+  },
+  // 更新购物车
+  upShopCar(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/updateShopCarNum';
+    return result
+  },
+  //获取购物车
+  getShopCar(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/shopcar/getShopcarList';
+    return result
+  },
+  //清空购物车
+  delShopCar(data) {
+    let result = {};
+    result.method = "DELETE";
+    result.url = '/cmini/shopcar/clear';
+    return result
+  },
+  placeOrder(data) { // 下单
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order';
+    return result
+  },
+  getOrderDetail(data) { // 订单详情
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/detail';
+    return result
+  },
+  /**
+   * 取消订单
+   */
+  cancelOrder(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/cancelOrder';
+    return result
+  },
+  /**
+   * 申请售后
+   */
+  applyAfterSale(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/return';
+    return result
+  },
+  /**
+   * 继续支付
+   */
+  restartPay(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/restartPay/' + data.id;
+    return result
+  },
+  queryPay(data) { // 查询支付
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/order/queryPay/' + data.id;
+    return result
+  },
+  /**
+   * 查询额度
+   */
+  getQuoto() {
+    let result = {};
+    result.method = "GET";
+    result.url = '/interest/interestsUserDetail';
+    return result
+  },
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

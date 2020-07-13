@@ -1,0 +1,24 @@
+<!--工具页面==客服和修改密码-->
+
+<!--平台客服-->
+<view class="my-inform-view" >
+  <view class="my-inform-item" bindtap="callPhone" data-phone="400-7065-665">
+    <view>官方电话</view>
+    <view class="phone-style">400-7065-665</view>
+    <view class="arrow"></view>
+  </view>
+  <view class="line-view"></view>
+  <button class="my-inform-item" open-type="contact">
+    <view>官方在线客服</view>
+    <view class="phone-style">24小时在线</view>
+    <view class="arrow"></view>
+  </button>
+</view>
+
+<view class="my-inform-view my-inform-margin-top" >
+  <view class="my-inform-item" bindtap="callPhone" data-phone="{{shopTel}}">
+    <view>店铺客服</view>
+    <view class="phone-style">{{shopTel}}</view>
+    <view class="arrow"></view>
+  </view>
+</view>

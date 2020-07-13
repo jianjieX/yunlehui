@@ -1,0 +1,22 @@
+<!-- 自定义头部 -->
+<view class="header pb100">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- 返回按钮 -->
+    <view class="arrow-view" bindtap='goBack'>
+      <view class='arrow'></view>
+    </view>
+    <view class="page-title">{{title}}</view>
+  </view>
+</view>
+
+<!-- 头部占位 -->
+<view class="bar">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}" />
+  <view class="menu-bar" />
+</view>

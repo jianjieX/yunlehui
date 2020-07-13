@@ -1,0 +1,44 @@
+// 小程序跳转版本
+const envVersion = "release" // 开发板: develop 体验版: trial 正式版: release
+// 默认的shopId
+const defaultShopId = '6611195966457664515'
+
+// WebSocket连接地址
+//const socketUrl = "wss://s.server.test.joymoma.com/websocket/"
+const socketUrl = "wss://c.joymoma.com/websocket/"
+
+//图片上传地址
+
+const uploadUrl = 'https://imageservice.cloudjoyclub.com/imagesUploadService/upload'
+
+// // 正式地址
+//const base = "https://c.joymoma.com/"
+
+
+// 测试服务器 
+//const base = "http://192.168.1.199:20001/cloudclub-server"
+
+// 测试何士平
+//const base = "http://192.168.1.158:20001/cloudclub-server"
+// 测试曲晓日
+//const base = "http://192.168.1.10 4:20001/cloudclub-server"
+// 测试昆哥
+ //const base = "http://192.168.1.253:20001/cloudclub-server"
+// 测试张哥
+//  const base = "http://192.168.1.182:20001/cloudclub-server"
+// 测试服务器
+const base = "http://gateway.server.test.cloudjoyclub.com/cloudclub-server"
+//const base = "http://gateway.server.demo.cloudjoyclub.com/cloudclub-server"
+// const base = "http://s.test.cloudjoyclub.com/"
+// const base = "http://zzztzzzz.vipgz2.idcfengye.com/cloudclub-server"
+// const base = "http://to.free.idcfengye.com/cloudclub-server"
+// const base = "https://public.rthinkingsoft.cn/cloudclub-server"
+
+
+module.exports = {
+  base,
+  envVersion,
+  shopId: defaultShopId,
+  socketUrl,
+  uploadUrl
+}

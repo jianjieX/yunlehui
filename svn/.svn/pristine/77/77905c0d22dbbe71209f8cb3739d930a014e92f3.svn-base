@@ -1,0 +1,236 @@
+
+.header {
+  width: 750rpx;
+  background: white;
+  font-size: 32rpx;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
+.header .navigation {
+  padding-top: 12rpx;
+  padding-left: 30rpx;
+  display: flex;
+}
+
+.arrow-view {
+  width: 5%;
+  height: 100%;
+  left: 0;
+  z-index: 999;
+  position: relative;
+}
+
+.label {
+  margin-left: 16rpx;
+  color: #333;
+  font-size: 36rpx;
+  font-family: PingFangSC-Medium;
+}
+
+.arrow {
+  width: 22rpx;
+  height: 22rpx;
+  border-bottom: 2px solid black;
+  border-left: 2px solid black;
+  position: absolute;
+  transform: rotate(45deg);
+  top: 18rpx;
+  left: 2rpx;
+}
+
+.mywealth {
+  width: 760rpx;
+  height: 96rpx;
+  background: #fff;
+  margin: 24rpx 0 16rpx 0;
+}
+
+.mywealth .wealth-item {
+  flex: 1;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 13px;
+  height: 100%;
+}
+
+.display-content {
+  display: flex;
+}
+
+.mywealth .wealth-item .total-price {
+  font-size: 32rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  color: #333;
+  line-height: 96rpx;
+}
+
+.mywealth .wealth-item .price {
+  color: white;
+  font-size: 24rpx;
+}
+
+.mywealth .wealth-item .mid {
+  font-size: 28rpx;
+  font-family: PingFang-SC-Regular;
+  font-weight: 400;
+  color: #333;
+  line-height: 96rpx;
+  padding: 0 24rpx;
+}
+
+.mywealth .wealth-item image {
+  width: 100%;
+}
+
+
+.list {
+  width: 100%;
+  height: 1070rpx;
+  background: #fff;
+  box-sizing: border-box;
+  box-shadow: 1px 1px 3px #f1f1f1, -1px -1px 3px #f1f1f1;
+}
+
+.list .nav {
+  width: 100%;
+  display: flex;
+  height: 80rpx;
+  border-bottom: 1px solid #f1f1f1;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.list .scroll-item {
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  display: inline-block;
+  width: 250rpx;
+  color: #333333;
+  font-size: 32rpx;
+}
+
+.list .focus {
+  height: 78rpx;
+  line-height: 80rpx;
+  text-align: center;
+  font-size: 32rpx;
+  flex-wrap: 600;
+  font-family: PingFang-SC-Medium;
+  display: inline-block;
+  width: 250rpx;
+  color: #f5bb2e;
+}
+.line {
+  width: 32rpx;
+  height: 4rpx;
+  background-color: #FABE00;
+  margin-top: -4rpx ;
+  margin-left: 106rpx;
+}
+
+.line1 {
+  width: 32rpx;
+  height: 4rpx;
+  background-color: #FABE00;
+  margin-top: -4rpx ;
+  margin-left: 355rpx;
+}
+
+.line2 {
+  width: 32rpx;
+  height: 4rpx;
+  background-color: #FABE00;
+  margin-top: -4rpx ;
+  margin-left: 603rpx;
+}
+
+.list .focus::after {
+  content: '';
+  display: block;
+  width: 70%;
+  height: 4rpx;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+.list .content-item {
+  width: 100%;
+  height: 112rpx;
+  border-bottom: 1px solid #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list .content-item .item{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0 50rpx;
+}
+
+.add-icon {
+  color: red;
+  font-size: 24rpx;
+}
+
+.sub-icon {
+  color: green;
+  font-size: 24rpx;
+}
+.list .content-item .item .item-id{
+  color: #333333;
+  font-size: 26rpx;
+  padding: 24rpx 0 16rpx 0;
+}
+
+.list .content-item .item .item-time{
+  color: rgba(102, 102, 102, 1);
+  font-size: 24rpx;
+}
+
+
+.list .content-item .item .price{
+  line-height: 112rpx;
+  color: rgba(51, 51, 51, 1);
+  font-size: 24rpx;
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+}
+
+.no-content-view {
+  width: 100%;
+  margin-top: 40%;
+  height: 100%;
+}
+
+.no-content-image {
+  width: 262rpx;
+  height: 196rpx;
+  margin: 0 auto;
+  display: block;
+}
+
+.no-content-text {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-family: PingFang-SC-Medium;
+  font-weight: 500;
+  color: rgba(153, 153, 153, 1);
+  margin-top: 48rpx;
+}

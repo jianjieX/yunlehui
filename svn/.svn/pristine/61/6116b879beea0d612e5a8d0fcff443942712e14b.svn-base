@@ -1,0 +1,5 @@
+<!--pages/img/img.wxml-->
+<view>
+  <image src="{{imgurl}}" class="share-image"></image>
+  <button class='submit' bindtap='dow'>保存图片</button>
+</view>

@@ -1,0 +1,104 @@
+/* pages/inviteMember/inviteMember.wxss */
+
+/* page {
+  background-color: #f3f6fd;
+} */
+
+.header {
+  width: 750rpx;
+  background: white;
+  font-size: 32rpx;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
+.arrow {
+  content: "";
+  display: inline-block;
+  height: 20rpx;
+  width: 20rpx;
+  border-width: 0 0 4rpx 4rpx;
+  border-color: #222;
+  border-style: solid;
+  transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+  -webkit-transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0);
+}
+
+
+
+.label {
+  display: flex;
+  flex-direction: row;
+}
+
+.content-view {
+  margin-top: 130rpx;
+}
+
+.members-item {
+  padding: 20rpx 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  background-color: #fff;
+  border-bottom: 1rpx #ececec solid;
+  font-size: 26rpx;
+}
+
+.members-item .avatar {
+  padding: 20rpx;
+  width: 100rpx;
+  height: 100rpx;
+}
+
+image {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+}
+
+.members-item .info {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+.members-item .info p {
+  padding: 5rpx 0;
+}
+
+.lable {
+  padding: 5rpx;
+  margin-left: 25rpx;
+  background: #526aff;
+  color: white;
+  border-radius: 10rpx;
+  text-align: center;
+}
+
+.level {
+  padding: 5rpx;
+  margin-left: 25rpx;
+  background: #f5c44c;
+  color: white;
+  border-radius: 10rpx;
+  text-align: center;
+}
+
+.members-item .button {
+  padding-top: 30rpx;
+  padding-right: 20rpx;
+  width: 25%;
+}
+
+.members-item .button input {
+  height: 60rpx;
+  font-size: 25rpx;
+  border-radius: 55rpx;
+  background: linear-gradient(to right, #fdf500, #fac000);
+  border: none;
+  text-align: center;
+  color: #fff;
+}

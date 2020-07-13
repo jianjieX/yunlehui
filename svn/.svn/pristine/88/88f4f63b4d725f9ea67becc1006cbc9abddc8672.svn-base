@@ -1,0 +1,56 @@
+<view class="top-view">
+  <view class="top-box">
+    <view class="top-title-view">会员营销平台</view>
+    <view class="top-title-bar"></view>
+  </view>
+
+  <view class="n-title">提供以会员体系为核心的SaaS工具，促活原有会员，增加高质会员。</view>
+
+  <view class="bottom-box">
+    <view class="icon-box">
+      <view class="icon-box-item">
+        <image class="item-icon" src="/img/openImg/IMG1.png"></image>
+        <view class="item-text">增流量</view>
+      </view>
+      <view class="icon-box-item">
+        <image class="item-icon" src="/img/openImg/IMG2.png"></image>
+        <view class="item-text">多赚钱</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 顶部提示文案1 -->
+<view class="tips-view">
+  <view class="s-title">
+    <view class="s-line-left"></view>
+    <view class="s-title-text">如何增流量?</view>
+    <view class="s-line-right"></view>
+  </view>
+
+  <view class="tips" wx:for="{{topTips1}}">
+    <view class="tips-title">
+      <image class="tips-title-num" src="/img/openImg/num{{item.id}}.png"></image>
+      <view class="tips-title-text">{{item.title}}</view>
+    </view>
+    <view class="tips-content">{{item.content}}</view>
+  </view>
+</view>
+<view class="empty-bar"></view>
+
+<!-- 顶部提示文案2 -->
+<view class="tips-view">
+  <view class="s-title">
+    <view class="s-line-left"></view>
+    <view class="s-title-text">如何多挣钱?</view>
+    <view class="s-line-right"></view>
+  </view>
+
+  <view class="tips" wx:for="{{topTips2}}">
+    <view class="tips-title">
+      <image class="tips-title-num" src="/img/openImg/num{{item.id}}.png"></image>
+      <view class="tips-title-text">{{item.title}}</view>
+    </view>
+    <view class="tips-content">{{item.content}}</view>
+  </view>
+</view>

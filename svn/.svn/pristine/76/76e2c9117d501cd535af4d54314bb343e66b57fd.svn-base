@@ -1,0 +1,6 @@
+{
+  "navigationBarBackgroundColor": "#F6F6F6",
+  "navigationBarTitleText": "确认授权",
+  "enablePullDownRefresh":false,
+  "navigationStyle": "custom"
+}

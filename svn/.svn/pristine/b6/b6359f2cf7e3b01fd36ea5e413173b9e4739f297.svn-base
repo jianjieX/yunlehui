@@ -1,0 +1,33 @@
+<!--公益详情页面-->
+
+<!-- 返回按钮 -->
+<view class="arrow-view" style="top:{{arrowTop}}px" bindtap="goBack">
+  <view class="arrow" />
+</view>
+
+<!-- 顶部封面图 -->
+<view class="top-img">
+  <image src="{{detail.puPhoto}}"></image>
+</view>
+
+<!-- 内容区 -->
+<view class="content">
+  <view class="article-title">
+    {{detail.title}}
+  </view>
+  <!-- 富文本 -->
+  <view class="article">
+    <import src="../../wxParse/wxParse.wxml" />
+    <template is="wxParse" data="{{wxParseData:article.nodes}}" />
+  </view>
+</view>
+
+<!-- footer 点赞分享等 -->
+<view class="footer">
+  <view class="like" bindtap="like">
+    <image class="like-img" wx:if="{{likeStatus == 1}}" src="/img/homeImg/favorite1.png"></image>
+    <image class="like-img" wx:else src="/img/homeImg/favorite.png"></image>
+    <text class="like-num">{{likeNum || 0}}</text>
+  </view>
+  <button class="share-btn" open-type="share">立即分享</button>
+</view>

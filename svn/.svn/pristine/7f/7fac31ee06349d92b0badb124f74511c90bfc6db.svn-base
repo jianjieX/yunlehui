@@ -1,0 +1,55 @@
+<!-- 关联商品页面 -->
+
+<view class="fix">
+  <!-- <view class="fix-gray-top"></view> -->
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <view class="input-view">
+      <input placeholder="搜索您想要的商品" bindinput="inputSearchValue" value="{{searchValue}}" bindconfirm="searchGoods" confirm-type="search" />
+      <image src="/img/homeImg/search.png" class="search-icon" />
+      <view class="cancle-view">
+        <image src="/img/detailImg/close.png" class="cancel-icon" wx:if="{{searchValue !== ''}}" catchtap="cancelInput" />
+      </view>
+    </view>
+    <view class="search-btn" bindtap="searchGoods">搜索</view>
+  </view>
+</view>
+
+<!--占位-->
+<view class="commodity-list-top"></view>
+
+<!--关联商品列表-->
+<view class="commodity-list-view">
+  <block wx:for="{{goodsList}}" wx:key="relaGoods{{index}}">
+    <!--消息每条-->
+    <view class="commodity-item-view">
+      <view class="commodity-img-view tip-parent">
+        <image class="commodity-img-style" src='{{item.goodsPicUrl}}'></image>
+        <view class="tip-view strict-select-color">严选</view>
+      </view>
+      <view class="copywriting-view">
+        <!--商品标题-->
+        <view class="commodity-title-style">{{item.goodsName}}</view>
+        <!--关联选择-->
+        <view class="commodity-select-view">
+          <view bindtap="{{item.selectType == 999 ? 'unSelectGoods' : 'selectGoods'}}" class="select-btn {{item.selectType == 999 ? 'already-select' : 'un-select'}}" data-id="{{item.id}}" data-index="{{index}}">选择</view>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>
+<!-- 插图 -->
+  <view class="illustration-view-dis" wx:if="{{goodsList==0}}">
+    <view class="illustration-border-dis">
+      <image class="illustration-style-dis" src="../../img/defaultImg/empty.png"></image>
+      <view class="illustration-text-dis">没有搜到这个宝贝，换个词试试吧～</view>
+    </view>
+  </view>
+
+<!--高度占位-->
+<view class="pl-view"></view>
+
+<!--确定按钮-->
+<view class="cofirm-body-view">
+  <view class="cofirm-btn" bindtap="cofirm">确定</view>
+</view>

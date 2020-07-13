@@ -1,0 +1,848 @@
+/**
+ * @fileoverview 开店页面
+ * @author liyujie
+ */
+
+// 引入全局app对象
+const app = getApp()
+// 引入WxValidate
+import WxValidate from '../../wxValidate/wxValidate.js'
+// 引入api
+import commonApi from '../../utils/config/Api/common.js'
+// 引入上传图片方法
+import upload from '../../utils/tools/uploadFile.js';
+let uploadFile = upload.uploadFile;
+// 引入表情解码与编码方法
+import tools from '../../utils/tools/util.js'
+let utf16toEntities = tools.utf16toEntities // emojy 转字符
+let uncodeUtf16 = tools.uncodeUtf16 //字符转emojy
+// 引入toast提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1
+
+Page({
+  data: {
+    topTips1: [
+      {
+        id: 1,
+        title: "商品添加至平台严选库，即刻拓宽上万商家渠道",
+        content: "将您的商品上传至平台严选库，上万个商家店铺帮您曝光营销，拓宽您的销售渠道，帮您增加曝光，增加流量。"
+      },
+      {
+        id: 2,
+        title: "大数据分析，实现精准推送",
+        content: "在友商店铺中，如购物车界面、产品详情页界面、故事界面、 付款界面等。按照消费者喜好，生态互助、精准推送您的商品，提高销售转化，增加流量。"
+      },
+      {
+        id: 3,
+        title: "讲述吸引眼球的故事，为店铺引流",
+        content: "用商品背后的故事内容，做场景化故事营销，增加流量。"
+      },
+    ],
+    topTips2: [
+      {
+        id: 1,
+        title: "会员源头分佣",
+        content: "引导顾客在您的店铺小程序消费，即刻绑定成为您的终身会员，您可以持续获得您会员在任何店铺消费的源头绑定分佣，轻松实现躺着挣钱。"
+      },
+      {
+        id: 2,
+        title: "销售商品分佣",
+        content: "商家间打通货源，互为分销，无需囤货，多多挣钱"
+      },
+    ],
+    // 经办人手机
+    contactsPhone: '',
+    // 经办人姓名
+    contactsName: '',
+    // 经办人身份证
+    contactsIdCard: '',
+    // 法人手机
+    legalPhone: '',
+    // 法人姓名
+    legalName: '',
+    // 法人身份证号
+    legalIdCard: '',
+    // 公司
+    // 公司名称
+    companyName: '',
+    companyRegion: [],
+    companyRegionCode: [],
+    // 公司头像
+    companyHeader: '',
+    // 经办人身份证有效期类型  1：有截止 2：长期
+    contactsIdCardType: 1,
+    // 经办人身份证到期时间  
+    contactsIdDate: '',
+    // 法人身份证类型
+    legalIdCardType: 1,
+    // 法人身份证到期时间
+    legalIdDate: '',
+    // 开户行 账户类型 1：企业账户 2：法人账户
+    accountType: 1,
+    // 是否开通线下店铺 1：是 2：否
+    whetherOpenOffline: 2,
+    openingBankRegion: [],
+    openingBankRegionCode: [],
+    // 营业执照类型
+    businessLicenseType: 1,
+    // 营业执照图片
+    businessLicensePic: '',
+    // 营业执照到期时间 
+    businessLicenseDate: '',
+    // 银行列表
+    bankList: [],
+    // 银行列表索引
+    bankListIndex: 0,
+    // 银行卡号
+    bankCardNum: '',
+    // 银行名称
+    bankName: '',
+    // 银行编码
+    bankCode: '',
+    // 上传图片类型 1:公司头像 2：营业执照照片
+    uploadType: 1,
+    // 是否同意协议
+    selected: true,
+    // 身份证正面
+    idCardFront: "",
+    // 身份证反面
+    idCardBehind: "",
+    // 店铺门牌照片
+    shopDoorImg: '',
+    // 店铺内部照片
+    shopInsideImg: '',
+    // 其他资质照片
+    otherImgList: [],
+    // 当前日期
+    nowDate: ''
+  },
+
+  onLoad: function (options) {
+    // 初始化校验函数
+    this.initValidate();
+    // 请求用户手机号
+    this.getUserPhone();
+    // 获取银行列表
+    this.getBankList();
+    // 获取当前时间
+    this.getNowTime();
+    // 重新开店获取详情
+    if (options.reApply == 1) {
+      this.getShopDetail();
+    }
+  },
+
+  onShow() {
+
+  },
+
+  getNowTime() {
+    let now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    let day = now.getDate() + 1;
+    this.setData({
+      nowDate: `${year}-${month}-${day}`
+    })
+  },
+
+  /**
+   * 校验信息提示
+   */
+  showModal(error) {
+    alertModal1(error.msg)
+  },
+
+  /**
+   * 校验规则函数
+   */
+  initValidate() {
+    const rules = {
+      companyName: {
+        required: true,
+        rangelength: [2, 50]
+      },
+      shopName: {
+        required: true,
+        rangelength: [2, 50]
+      },
+      companyAddressDetail: {
+        required: true,
+        rangelength: [3, 100]
+      },
+      contactsName: {
+        required: true,
+        rangelength: [2, 20]
+      },
+      contactsMobile: {
+        required: true,
+        tel: true
+      },
+      contactsIdCard: {
+        required: true,
+        numberB: true,
+        rangelength: [15, 18]
+      },
+      legalName: {
+        required: true,
+        rangelength: [2, 20]
+      },
+      legalMobile: {
+        required: true,
+        tel: true
+      },
+      legalIdCard: {
+        required: true,
+        numberB: true,
+        rangelength: [15, 18]
+      },
+      bankCardNum: {
+        required: true,
+        rangelength: [1, 30]
+      },
+      businessLicenseNum: {
+        required: true,
+        rangelength: [15, 18]
+      }
+    }
+    const messages = {
+      companyName: {
+        required: '请填写公司全称',
+        rangelength: "公司名称2-50个字符"
+      },
+      shopName: {
+        required: '请填写店铺名称',
+        rangelength: "店铺名称2-50个字符"
+      },
+      companyAddressDetail: {
+        required: '请填写公司详细地址',
+        rangelength: "公司详细地址3-100个字符"
+      },
+      contactsName: {
+        required: '请填写经办人姓名',
+        rangelength: "经办人姓名2-20个字符"
+      },
+      contactsMobile: {
+        required: '请填写经办人手机号',
+        tel: '请填写正确的手机号'
+      },
+      contactsIdCard: {
+        required: '请填写经办人身份证号',
+        idcard: '请填写正确的身份证号',
+        rangelength: '身份证长度15-18字符'
+      },
+      legalName: {
+        required: '请填写法人姓名',
+        rangelength: '法人姓名2-20字符'
+      },
+      legalMobile: {
+        required: '请填写法人手机号',
+        tel: '请填写正确的手机号'
+      },
+      legalIdCard: {
+        required: '请填写法人身份证号',
+        idcard: '请填写正确的身份证号',
+        rangelength: '身份证长度15-18字符'
+      },
+      bankCardNum: {
+        required: '请填写银行卡号',
+        rangelength: '银行卡号长度15-18字符'
+      },
+      businessLicenseNum: {
+        required: '请填写营业执照号',
+        rangelength: '营业执照号长度15或18位',
+      }
+    }
+    this.WxValidate = new WxValidate(rules, messages)
+  },
+
+  /**
+   * 表单提交
+   */
+  formSubmit(e) {
+    console.log('form发生了submit事件，携带数据为：', e.detail.value)
+    const params = e.detail.value
+    //校验表单
+
+    if (!this.WxValidate.checkForm(params)) {
+      wx.hideLoading()
+      const error = this.WxValidate.errorList[0]
+      this.showModal(error)
+      return false
+    }
+
+    // 组合数据
+    let businessLicenseDate = this.data.businessLicenseDate;
+    let contactsIdDate = this.data.contactsIdDate;
+    let legalIdDate = this.data.legalIdDate;
+    if (this.data.businessLicenseType === 2) {
+      this.data.businessLicenseDate = ''
+      businessLicenseDate = '3099-12-31'
+    }
+    if (this.data.contactsIdCardType === 2) {
+      this.data.contactsIdDate = ''
+      contactsIdDate = '3099-12-31'
+    }
+    if (this.data.legalIdCardType === 2) {
+      this.data.legalIdDate = ''
+      legalIdDate = '3099-12-31'
+    }
+    let openShopInfo = {
+      // 银行编码
+      assuringBank: this.data.bankCode,
+      // 银行名称
+      assuringBankName: this.data.bankName,
+      // 开户行城市代码
+      bankReceiverCity: this.data.openingBankRegionCode[1],
+      // 开户行城市名称
+      bankReceiverCityName: this.data.openingBankRegion[1],
+      // 开户行省代码
+      bankReceiverProvince: this.data.openingBankRegionCode[0],
+      // 开户行省
+      bankReceiverProvinceName: this.data.openingBankRegion[0],
+      // 营业执照到期时间
+      businessLicenseValidity: businessLicenseDate,
+      // 营业执照类型
+      businessLicenseValidityType: this.data.businessLicenseType,
+      // 公司城市code
+      companyReceiverCity: this.data.companyRegionCode[1],
+      // 公司城市
+      companyReceiverCityName: this.data.companyRegion[1],
+      // 公司详细地址
+      companyReceiverDetailAddress: utf16toEntities(params.companyAddressDetail),
+      // 公司省份code
+      companyReceiverProvince: this.data.companyRegionCode[0],
+      // 公司省
+      companyReceiverProvinceName: this.data.companyRegion[0],
+      // 公司区code
+      companyReceiverRegion: this.data.companyRegionCode[2],
+      // 公司区
+      companyReceiverRegionName: this.data.companyRegion[2],
+      // 经办人身份证到期时间
+      contactsIdValidity: contactsIdDate,
+      // 经办人身份证类型
+      contactsIdValidityType: this.data.contactsIdCardType,
+      // 经办人姓名
+      contactsName: utf16toEntities(params.contactsName),
+      // 经办人身份证号
+      contactsNumberId: params.contactsIdCard,
+      // 经办人手机号
+      contactsPhone: params.contactsMobile,
+      // 银行卡号
+      creditCardNumbers: params.bankCardNum,
+      // 法人身份证号
+      legalPersonIdNumber: params.legalIdCard,
+      // 法人身份证日期
+      legalPersonIdNumberIdentity: legalIdDate,
+      // 法人身份证类型
+      legalPersonIdNumberIdentityType: this.data.legalIdCardType,
+      // 法人姓名
+      legalPersonName: utf16toEntities(params.legalName),
+      // 法人电话
+      legalPersonPhone: params.legalMobile,
+      // 公司名
+      merchantName: utf16toEntities(params.companyName),
+      // 公司头像
+      merchantHeader: this.data.companyHeader,
+      // 门店名
+      shopName: utf16toEntities(params.shopName),
+      // 账户类型
+      type0fAssuringBank: this.data.accountType,
+      // 是否开通线下门店
+      whetherOpenOffline: this.data.whetherOpenOffline,
+      // 营业执照号
+      uniformSocialCreditCode: params.businessLicenseNum,
+      // 营业执照照片
+      qualificationPhoto: this.data.businessLicensePic,
+      // 身份证正面
+      legalPersonIdNumberPhotoOne: this.data.idCardFront,
+      // 身份证反面
+      legalPersonIdNumberPhotoTwo: this.data.idCardBehind,
+      // 门牌图片
+      shopDoorPic: this.data.shopDoorImg,
+      // 门店内照片
+      inShopPic: this.data.shopInsideImg,
+      // 其他资质照片
+      merchantQualificationList: this.data.otherImgList
+    }
+
+    this.submitShopInfo(openShopInfo)
+
+  },
+
+  /**
+   * 请求银行卡列表
+   */
+  getBankList() {
+    let _this = this
+    commonApi.getBankList({}).then(res => {
+      console.log(res.data)
+      if (res.data.status === "0000") {
+        _this.setData({
+          bankList: res.data.data,
+          // bankName: res.data.data[0].bankName,
+          // bankCode: res.data.data[0].code
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 提交开店信息
+   */
+  submitShopInfo(params) {
+    if (this.data.companyHeader === '') {
+      alertModal1("请上传公司LOGO")
+      return
+    }
+    if (params.businessLicenseValidity === '' || params.contactsIdValidity === '' || params.legalPersonIdNumberIdentity === '') {
+      alertModal1("请选择截止日期")
+      return
+    }
+    if (this.data.businessLicensePic === '') {
+      alertModal1("请上传营业执照照片")
+      return
+    }
+    if (this.data.companyRegion.length === 0) {
+      alertModal1("请选择公司所在地区")
+      return
+    }
+    if (this.data.openingBankRegion.length === 0) {
+      alertModal1("请选择开户行所在地区")
+      return
+    }
+    if (this.data.bankName === '') {
+      alertModal1("请选择开户行")
+      return
+    }
+    if (this.data.idCardFront === '') {
+      alertModal1("请上传身份证正面图片")
+      return
+    }
+    if (this.data.idCardBehind === '') {
+      alertModal1("请上传身份证反面图片")
+      return
+    }
+    if (this.data.shopDoorImg === '') {
+      alertModal1("请上传店铺门牌照片")
+      return
+    }
+    if (this.data.shopInsideImg === '') {
+      alertModal1("请上传店铺内部照片")
+      return
+    }
+    if (this.data.otherImgList.length == 0) {
+      alertModal1("请上传其他资质照片")
+      return
+    }
+    wx.showLoading({
+      title: '加载中',
+      mask: true
+    })
+    let _this = this;
+    console.log("开店信息", params)
+    commonApi.openShop(params).then(res => {
+      console.log('开店结果', res.data)
+      if (res.data.status === "0000") {
+        wx.hideLoading()
+        wx.redirectTo({
+          url: `../shopopen/shopopen?shopId=${res.data.data}&shopStatus=1`,
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+
+  },
+
+  /**
+   * 选择图片
+   */
+  uploadImg(e) {
+    let uploadType = e.currentTarget.dataset.type
+    this.data.uploadType = uploadType
+    let _this = this
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success(res) {
+        if (res.tempFiles[0].size > 2097152) {
+          alertModal1("您上传的图片需小于2MB");
+          alertModal1("您上传的图片需小于2MB");
+          return;
+        }
+        console.log('chooseImage success, temp path is', res.tempFilePaths[0])
+        _this.submitImg(20, res.tempFilePaths[0])
+      }
+    })
+  },
+
+  /**
+   * 上传头像
+   */
+  submitImg(type, tempFilePaths) {
+    var _this = this;
+    uploadFile(tempFilePaths, type).then(res => {
+      console.log('上传结果', res)
+      if (_this.data.uploadType === 1) {
+        _this.setData({
+          companyHeader: res
+        })
+      } else {
+        _this.setData({
+          businessLicensePic: res
+        })
+      }
+    })
+  },
+
+  /**
+   * 获取用户手机号
+   */
+  getUserPhone() {
+    let _this = this
+    commonApi.getUserPhone({}).then(res => {
+      if (res.data.status == "0000") {
+        console.log(res)
+        if (res.data) {
+          _this.setData({
+            contactsPhone: res.data.data
+          })
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 日期picker选择
+   */
+  bindDateChange(e) {
+    console.log('picker发送选择改变，携带值为', e.detail.value)
+    let type = e.currentTarget.dataset.type
+    switch (type) {
+      case 1: // 经办人身份证有效期
+        this.setData({
+          contactsIdDate: e.detail.value
+        })
+        break
+      case 2: // 法人身份证有效期
+        this.setData({
+          legalIdDate: e.detail.value
+        })
+        break
+      case 3: // 营业执照有效期
+        this.setData({
+          businessLicenseDate: e.detail.value
+        })
+        break
+    }
+
+  },
+
+  /**
+   * picker省市区选择
+   */
+  bindRegionChange(e) {
+    console.log('picker发送选择改变，携带值为', e.detail)
+    let type = e.currentTarget.dataset.type
+    switch (type) {
+      case 1: //公司地址
+        this.setData({
+          companyRegion: e.detail.value,
+          companyRegionCode: e.detail.code
+        })
+        break
+      case 2: // 开户银行地址
+        this.setData({
+          openingBankRegion: e.detail.value,
+          openingBankRegionCode: e.detail.code
+        })
+        break
+    }
+
+  },
+
+  /**
+   * 切换tab类型
+   */
+  changeTabType(e) {
+    let no = e.currentTarget.dataset.no
+    switch (no) {
+      case 1: // 经办人
+        this.setData({
+          contactsIdCardType: e.currentTarget.dataset.type
+        })
+        break
+      case 2: // 法人
+        this.setData({
+          legalIdCardType: e.currentTarget.dataset.type
+        })
+        break
+      case 3: // 账户类型
+        this.setData({
+          accountType: e.currentTarget.dataset.type
+        })
+        break
+      case 4:
+        this.setData({
+          businessLicenseType: e.currentTarget.dataset.type
+        })
+      case 5: //是否开通线下店铺
+        this.setData({
+          whetherOpenOffline: e.currentTarget.dataset.type
+        })
+        break
+    }
+  },
+
+  /**
+   * 复制经办人信息
+   */
+  copy() {
+    this.setData({
+      legalPhone: this.data.contactsPhone,
+      legalIdCardType: this.data.contactsIdCardType,
+      legalIdDate: this.data.contactsIdDate,
+      legalName: this.data.contactsName,
+      legalIdCard: this.data.contactsIdCard
+    })
+  },
+
+  /**
+   * 输入经办人姓名
+   */
+  inputName(e) {
+    this.data.contactsName = e.detail.value
+  },
+
+  /**
+   * 输入经办人idcard
+   */
+  inputIdCard(e) {
+    this.data.contactsIdCard = e.detail.value
+  },
+
+  /**
+   * 选择银行
+   */
+  bindPickerChange(e) {
+    console.log(e)
+    let index = e.detail.value
+    this.setData({
+      bankListIndex: index,
+      bankName: this.data.bankList[index].bankName,
+      bankCode: this.data.bankList[index].code
+    })
+  },
+
+  /**
+   * 点击同意协议
+   */
+  selected() {
+    let selected = this.data.selected;
+    selected = !selected;
+    this.setData({
+      selected: selected
+    })
+  },
+
+  agreeTo() {
+    this.setData({
+      selected: true
+    })
+  },
+
+  // 跳转协议页面
+  goAgreementPage() {
+    wx.navigateTo({
+      url: '../agreement/agreement?type=1',
+    })
+  },
+
+  /**
+   * 上传身份证正反面和门店门牌 内部等照片
+   */
+  uploadCommonImg(e) {
+    let that = this;
+    let type = e.currentTarget.dataset.type
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success(res) {
+        if (res.tempFiles[0].size > 2097152) {
+          alertModal1("您上传的图片需小于2MB");
+          alertModal1("您上传的图片需小于2MB");
+          return;
+        }
+        // tempFilePath可以作为img标签的src属性显示图片
+        let tempFilePaths = res.tempFilePaths
+        uploadFile(tempFilePaths[0], 20).then((res) => {
+          console.log("上传的图片路径书", res)
+          switch (type) {
+            case 1:
+              that.setData({
+                idCardFront: res
+              })
+              return
+            case 2:
+              that.setData({
+                idCardBehind: res
+              })
+              return
+            case 3:
+              that.setData({
+                shopDoorImg: res
+              })
+              return
+            case 4:
+              that.setData({
+                shopInsideImg: res
+              })
+              return
+          }
+        })
+      }
+    })
+  },
+
+  /**
+   * 上传其他资质照片
+   */
+  uploadOthersImgs() {
+    let _this = this
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success(res) {
+        if (res.tempFiles[0].size > 2097152) {
+          alertModal1("您上传的图片需小于2MB");
+          alertModal1("您上传的图片需小于2MB");
+          return;
+        }
+        let tempFilePaths = res.tempFilePaths
+        uploadFile(tempFilePaths[0], 20).then((res) => {
+          let otherImgList = _this.data.otherImgList
+          otherImgList.push({
+            qualificationPhoto: res
+          })
+          _this.setData({
+            otherImgList: otherImgList
+          })
+        })
+      }
+    })
+  },
+
+  /**
+   * 删除图片
+   */
+  close(e) {
+    let _this = this;
+    let picArr = this.data.otherImgList
+    let index = e.currentTarget.dataset.index
+
+    picArr.splice(index, 1)
+    this.setData({
+      otherImgList: picArr
+    })
+  },
+
+  /**
+   * 预览其他资质图片
+   */
+  previewImage: function (e) {
+    let previewImageList = []
+    this.data.otherImgList.map(item => {
+      previewImageList.push(item.qualificationPhoto)
+    })
+    var _this = this;
+    var current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: previewImageList
+    })
+  },
+
+  /**
+   * 重新开店获取开店详情
+   */
+  getShopDetail() {
+
+    let _this = this;
+    commonApi.getShopDetail({}).then(res => {
+      let data = res.data.data;
+
+      _this.setData({
+        // 经办人手机
+        contactsPhone: data.contactsPhone,
+        // 经办人姓名
+        contactsName: data.contactsName,
+        // 经办人身份证
+        contactsIdCard: data.contactsNumberId,
+        // 法人手机
+        legalPhone: data.legalPersonPhone,
+        // 法人姓名
+        legalName: data.legalPersonName,
+        // 法人身份证号
+        legalIdCard: data.legalPersonIdNumber,
+        // 公司名称
+        companyName: data.merchantName,
+        shopName: data.shopName,
+        // 公司详细地址
+        companyAddressDetail: data.companyReceiverDetailAddress,
+        companyRegion: [data.companyReceiverProvinceName, data.companyReceiverCityName, data.companyReceiverRegionName],
+        companyRegionCode: [data.companyReceiverProvince, data.companyReceiverCity, data.companyReceiverRegion],
+        // 公司头像
+        companyHeader: data.merchantHeader,
+        // 经办人身份证有效期类型  1：有截止 2：长期
+        contactsIdCardType: data.contactsIdValidityType,
+        // 经办人身份证到期时间  
+        contactsIdDate: data.contactsIdValidity,
+        // 法人身份证类型
+        legalIdCardType: data.legalPersonIdNumberIdentityType,
+        // 法人身份证到期时间
+        legalIdDate: data.legalPersonIdNumberIdentity,
+        // 开户行 账户类型 1：企业账户 2：法人账户
+        accountType: data.type0fAssuringBank,
+        openingBankRegion: [data.bankReceiverProvinceName, data.bankReceiverCityName],
+        openingBankRegionCode: [data.bankReceiverProvince, data.bankReceiverCity],
+
+        // 是否开通线下店铺
+        whetherOpenOffline: data.whetherOpenOffline,
+        // 营业执照号
+        businessLicenseNum: data.uniformSocialCreditCode,
+        // 营业执照类型
+        businessLicenseType: data.businessLicenseValidityType,
+        // 营业执照图片
+        businessLicensePic: data.qualificationPhoto,
+        // 营业执照到期时间 
+        businessLicenseDate: data.businessLicenseValidity,
+        // 银行卡号
+        bankCardNum: data.creditCardNumbers,
+        // 银行名称
+        bankName: data.assuringBankName,
+        // 银行编码
+        bankCode: data.assuringBank,
+        // 身份证正面
+        idCardFront: data.legalPersonIdNumberPhotoOne,
+        // 身份证反面
+        idCardBehind: data.legalPersonIdNumberPhotoTwo,
+        // 店铺门牌照片
+        shopDoorImg: data.shopDoorPic,
+        // 店铺内部照片
+        shopInsideImg: data.inShopPic,
+        // 其他资质照片
+        otherImgList: data.merchantQualificationList,
+      })
+    })
+  }
+})

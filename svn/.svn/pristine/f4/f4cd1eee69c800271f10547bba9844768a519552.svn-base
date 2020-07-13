@@ -1,0 +1,135 @@
+<!--小程序的首页&故事列表页-->
+
+<!--过滤器-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!-- 自定义导航样式 -->
+<!-- 自定义头部 -->
+<view class="header">
+	<!-- status-bar -->
+	<view class="status-bar" style="{{ statusBarStyle }}" />
+	<!-- navigation-bar -->
+	<view class="navigation-bar" style="{{ navigationBarStyle }}">
+		<!-- 返回按钮 -->
+		<view class="page-title">云乐汇壹厂</view>
+	</view>
+</view>
+
+<!-- 头部占位 -->
+<view class="bar">
+	<!-- status-bar -->
+	<view class="status-bar" style="{{ statusBarStyle }}" />
+	<!-- navigation-bar -->
+	<view class="navigation-bar" style="{{ navigationBarStyle }}" />
+	<view class="menu-bar" />
+</view>
+
+<!-- ======焦点图====== -->
+<view class="swiper-container" wx:if="{{swiper.bannerList.length!= 0}}">
+	<swiper class="swiper-box" indicator-dots="{{swiper.indicatorDots}}" circular="swiper.circular" autoplay="{{swiper.autoplay}}" interval="{{swiper.interval}}" duration="{{swiper.duration}}">
+		<block wx:for="{{swiper.bannerList}}" wx:key="id">
+			<swiper-item>
+				<image bindtap="jumpBannerDetail" mode="aspectFit" data-id="{{item.contentId}}" data-content="{{item.content}}" data-adLinkType="{{item.adLinkType}}" src="{{item.adPhoto}}" class="slide-image" />
+			</swiper-item>
+		</block>
+	</swiper>
+</view>
+
+<!-- ======分类====== -->
+<scroll-view scroll-x>
+	<view class="category-wrap" style='width:{{category_box_width}}rpx;'>
+		<view class="category-item" wx:for="{{categories}}" wx:key="id">
+			<view class="category-column {{activeCategoryId == item.id ? 'type-item-on' : ''}}" data-url="{{item.page}}" bindtap="tabClick" id="{{item.id}}">
+				<image class="img" src="{{item.icon}}"></image>
+				<view class="title">{{item.title}}</view>
+			</view>
+		</view>
+	</view>
+</scroll-view>
+
+<!-- <view class="tab-wrap">
+	<view class="tab-item">
+		<view class="btn" type="default" bindtap="{{!buttonClicked?'openShop':''}}">
+			<text class="title">{{tabList[0].name}}</text>
+			<image class="arrow" src="../../img/homeImg/arrow-tab.png" mode="aspectFill"></image>
+			<image class="logo" src="../../img/homeImg/tab06.png" mode="aspectFill"></image>
+		</view>
+	</view>
+	<view class="tab-item">
+		<view class="btn" type="default" bindtap="jumpPage">
+			<text class="title">{{tabList[1].name}}</text>
+			<image class="arrow" src="../../img/homeImg/arrow-tab.png" mode="aspectFill"></image>
+      <image class="logo" src="../../img/homeImg/tab05.png" mode="aspectFill"></image>
+		</view>
+
+	</view>
+</view> -->
+
+<!-------------精选------------->
+<view class='featured-view'>
+	<image class="text-img" src="../../img/homeImg/text.png"></image>
+	<!-- <image bindtap='changeMoudel' data-type='1' wx:if='{{moudelType == 1}}' class='featured-img' src='../../img/homeImg/block1.png'></image>
+  <image bindtap='changeMoudel' data-type='2' wx:if='{{moudelType == 2}}' class='featured-img' src='../../img/homeImg/block2.png'></image> -->
+</view>
+
+<!-------------非瀑布流------------->
+<view wx:if='{{moudelType == 1}}' bindtap='jumpToDetails' data-id='{{item.id}}' data-page="{{item.page}}" data-index="{{index}}" class='content-none' wx:for="{{commodityList}}" wx:key="id">
+	<image class='item-no-img-s' src='{{item.contentBanner}}'></image>
+	<view class='inform-view'>
+		<view class='title-no-s'>{{item.title}}</view>
+		<view class='avatar-fave'>
+			<image class="item-ava1" src="{{item.editorImg}}"></image>
+			<text class="name-title">{{item.editor}}</text>
+			<view class="heart_1" data-id='{{item.id}}' data-index="{{index}}" data-is="{{item.isThumbUp}}" catchtap='likeFave'>
+				<image wx:if="{{item.isThumbUp == 0}}" class="heart" src="../../img/homeImg/favorite.png"></image>
+				<image wx:elif="{{item.isThumbUp == 1}}" class="heart" src="../../img/homeImg/favorite1.png"></image>
+				<text>{{item.virtualThumbUpNumber}}</text>
+			</view>
+		</view>
+	</view>
+</view>
+
+<!-------------瀑布流------------->
+<view wx:if='{{moudelType == 2 && commodityList.length != 0}}' class="content">
+	<view class="left">
+		<block wx:for="{{commodityList}}" wx:key="id">
+			<template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==0}}"></template>
+		</block>
+	</view>
+	<view class="right">
+		<block wx:for="{{commodityList}}" wx:key="id">
+			<template is="item" data="{{item:item,index:index}}" wx:if="{{index%2==1}}"></template>
+		</block>
+	</view>
+</view>
+
+<!-------------单一故事模块------------->
+<template name="item">
+	<view class="item" bindtap='jumpToDetails' data-id='{{item.id}}' data-page="{{item.page}}">
+		<image class="item-img" src="{{item.contentBanner}}" mode="widthFix"></image>
+		<view class="item-title-box">
+			<view class="item-title">{{item.title}}</view>
+			<!-- <image class="arrow" src="../../image/arrow.png"></image>   -->
+		</view>
+		<view class="name">
+			<image class="item-ava" src="{{item.editorImg}}"></image>
+			<text class="name-title">{{item.editor}}</text>
+			<view class="heart_" data-id='{{item.id}}' data-index="{{index}}" data-is="{{item.isThumbUp}}" catchtap='likeFave'>
+				<image wx:if="{{item.isThumbUp == 0}}" class="heart" src="../../img/homeImg/favorite.png"></image>
+				<image wx:elif="{{item.isThumbUp == 1}}" class="heart" src="../../img/homeImg/favorite1.png"></image>
+				<text>{{item.virtualThumbUpNumber}}</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<!--暂无数据-->
+<view wx:if="{{commodityList.length == 0}}" class='owText'>暂无数据</view>
+
+<!--浮层添加故事入口-->
+<view class="add-story-view" bindtap="addStory">
+	<image class="add-story-img" src="../../img/homeImg/homepage_btn_write.png"></image>
+	<text>写故事</text>
+</view>
+<!-- 遮罩层 -->
+<view class="submit-mask" wx:if="{{subMask}}"></view>

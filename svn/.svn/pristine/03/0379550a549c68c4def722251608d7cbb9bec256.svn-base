@@ -1,0 +1,340 @@
+/**
+ * @fileoverview 订单详情页面
+ * @author liyujie
+ */
+import QRCode from '../../utils/weapp-qrcode'
+// 引入全局app
+const app = getApp()
+// 引入接口api
+import Api from '/../../utils/config/Api/order.js';
+import goodsApi from '/../../utils/config/Api/goods.js';
+// 引入toast提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let loading = alert.showLoading;
+import util from '../../utils/tools/util.js';
+//字符转 emojy
+let uncodeUtf16 = util.uncodeUtf16;
+
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    belongOwnFlag:true,
+    // 订单详情数据
+    orderDetail: null,
+    // 订单id
+    orderId: '',
+    // 物流弹窗显示状态
+    logisticsHidden: true,
+    // 取消订单原因列表
+    cancelReasonList: [],
+    // 取消订单原因名字
+    cancelReasonName: '',
+    // 取消订单原因code
+    cancelReasonCode: '',
+    //展示二维码
+    showQrcode:false,
+    //定时器
+    getOrder:function(){}
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad(options) {
+    let _this = this
+    console.log(options.orderId)
+    this.setData({
+      orderId: options.orderId
+    })
+    //每10秒刷新1次
+    let getOrder = setInterval(function () {
+      _this.getOrderDetail(options.orderId)   
+    },10000)
+  this.setData({
+    getOrder
+  })
+    // 订单详情
+    this.getOrderDetail(options.orderId)
+
+    // 取消原因列表
+    this.getCancelReasonList()
+  },
+
+  /**
+   * 请求 取消订单原因
+   */
+  getCancelReasonList() {
+    let _this = this
+    Api.getCancelReasonList({}).then(res => {
+      if (res.data.status === "0000") {
+        _this.setData({
+          cancelReasonList: res.data.data
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+  
+  //页面跳转 会员列表
+  toPsdManage(e) {
+    wx.navigateTo({
+      url: `../../pages/utilPage/utilPage`,
+    })
+  },
+
+  /**
+   * 继续支付
+   */
+  pay(e) {
+    var that = this;
+    let _parms = {
+      id: that.data.orderId
+    }
+    Api.restartPay(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        app.data.orderId = res.data.data.tranId
+        wx.requestPayment({
+          timeStamp: res.data.data.timeStamp,
+          nonceStr: res.data.data.nonceStr,
+          package: res.data.data.packAge,
+          signType: res.data.data.signType,
+          paySign: res.data.data.paySign,
+          success(res) {
+            console.log(res)
+            wx.navigateTo({
+              url: `../orderPaySuccess/orderPaySuccess?totalPayAmount=${e.currentTarget.dataset.price}`,
+            })
+          },
+          fail(res) {
+            console.log(res)
+            alertModal("支付失败")
+          }
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  /**
+   * 查询物流
+   */
+  logistics(e) {
+    let _this = this
+    loading();
+    console.log(e.target.dataset.id)
+    let params = {
+      orderId: e.target.dataset.id
+    }
+    Api.viewLogistics(params).then(res => {
+      console.log(res)
+      if (res.data.status === "0000") {
+        _this.setData({
+          logisticsHidden: false,
+          logisticsMessage: {
+            stepList: res.data.data
+          }
+        })
+      } else {
+        logisticsMessage: {
+          stepList: null
+        }
+        alertModal1(res.data.msg)
+      }
+    }).catch(err => {
+      logisticsMessage: {
+        stepList: null
+      }
+    })
+  },
+
+  /**
+   * 关闭物流弹层
+   */
+  cancelClick() {
+    this.setData({
+      logisticsHidden: true,
+      logisticsMessage: {
+        stepList: null
+      }
+    })
+  },
+
+  /**
+   * 跳转商品详情
+   */
+  goGoodsDetail(e) {
+    let goodsId = e.currentTarget.dataset.goods;
+    wx.navigateTo({
+      url: `../shopDetail/shopDetail?goodsId=${goodsId}`,
+    })
+  },
+
+  /**
+   * 确认收货
+   */
+  receiveGoods(e) {
+    let _this = this
+    wx.showModal({
+      content: '是否确认收货',
+      confirmText: '确认收货',
+      cancelText: '我再想想',
+      success(res) {
+        if (res.confirm) {
+          let data = {
+            confirmStatus: 1,
+            orderId: e.currentTarget.dataset.id
+          }
+          Api.confirmReceipt(data).then(res => {
+            console.log(res)
+            if (res.data.status === "0000") {
+              _this.getOrderDetail(e.currentTarget.dataset.id)
+              alertModal1("确认收货成功")
+            } else {
+              alertModal1(res.data.msg)
+            }
+          }).catch(err => {
+            alertModal("请求服务失败")
+          })
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+
+
+  /**
+   * 取消订单confirm
+   */
+  cancelMyOrder(e) {
+    let that = this;
+    wx.showModal({
+      title: '取消订单',
+      content: '您确定要取消订单吗？',
+      success: function (sm) {
+        if (sm.confirm) {
+          console.log('----ssss', e)
+          let orderId = e.target.dataset.id;
+          let orderStatus = e.target.dataset.status;
+          let cancelReasonCode = 7;
+          that.cancelOrder(orderId, cancelReasonCode, orderStatus);
+          // 用户点击了确定 可以调用删除方法了
+
+        } else if (sm.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+  
+  /**
+   * 订单详情
+   */
+  getOrderDetail(orderId) {
+    console.log('进入订单详情')
+
+    let _this = this
+    let params = {
+      orderId: orderId
+    }
+    Api.getOrderDetail(params).then(res => {
+      console.log("订单详情", res.data)
+      if (res.data.status === "0000") {
+      
+        let data = res.data.data;
+
+        if(data.orderResList[0].productId){
+          goodsApi.getGoodsTypeById({ goodsId: data.orderResList[0].productId }).then(res => {
+            if (!res.data.data) {
+              _this.setData({
+                belongOwnFlag: res.data.data,
+              })
+            }
+          })
+
+        }
+
+        data.receiverName = uncodeUtf16(data.receiverName);
+        data.receiverDetailAddress = uncodeUtf16(data.receiverDetailAddress);
+        _this.setData({
+          orderDetail: data
+        })
+        //二维码
+        new QRCode('myQrcode', {
+          text: data.verificationCode,
+          width: 128,
+          height: 128,
+          padding: 8, // 生成二维码四周自动留边宽度，不传入默认为0
+          correctLevel: QRCode.CorrectLevel.Q, // 二维码可辨识度
+          callback: (res) => {
+            console.log(res.path)
+
+            // 接下来就可以直接调用微信小程序的api保存到本地或者将这张二维码直接画在海报上面去，看各自需求
+          }
+        })
+        // setTimeout(_this.getOrderDetail, 10000)
+      }
+
+    })
+  },
+
+  /**
+   * 跳转申请售后
+   */
+  applyAfterSale(e) {
+    let orderId = e.target.dataset.id
+    wx.navigateTo({
+      url: `../applyAfterSale/applyAfterSale?orderId=${orderId}`,
+    })
+  },
+
+  /**
+   * 选择取消订单原因
+   */
+  bindPickerChange(e) {
+    console.log(e)
+    let orderId = e.target.dataset.id
+    let index = e.detail.value
+    let orderStatus = e.target.dataset.status
+    let cancelReasonCode = this.data.cancelReasonList[index].code
+    this.setData({
+      cancelReasonName: this.data.cancelReasonList[index].name,
+      cancelReasonCode: cancelReasonCode
+    })
+    this.cancelOrder(orderId, cancelReasonCode, orderStatus)
+  },
+
+  /**
+   * 取消订单
+   */
+  cancelOrder(orderId, cancelReasonCode, orderStatus) {
+    let _this = this
+    let data = {
+      orderId: orderId,
+      cancelReason: cancelReasonCode,
+      orderStatus: orderStatus
+    }
+    Api.cancelOrder(data).then(res => {
+      if (res.data.status === "0000") {
+        _this.getOrderDetail(orderId)
+        alertModal1("取消订单成功")
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch(err => {
+      alertModal1("请求服务失败")
+    })
+  },
+  onUnload(){
+    let _this = this
+    clearInterval(_this.data.getOrder)
+  }
+})

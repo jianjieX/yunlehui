@@ -1,0 +1,246 @@
+// 引入接口api
+import Api from '/../../utils/config/Api/activity.js';
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    img: 'https://ylhdev.oss-cn-beijing.aliyuncs.com/goodsSpecs/20191203184308327lA.png',
+    list: [
+      // {
+      //   listInner: [{
+      //       id: 4,
+      //       type: 1, // 1跳转列表 2跳转详情
+      //       url: '../../img/activityCategory/01.png',
+      //       name: '工商代办',
+      //       navigateTarget: '/pages/activityCategory/activityCategory',
+      //       typeId: 1
+      //     },
+      //     {
+      //       id: 5,
+      //       type: 1,
+      //       url: '../../img/activityCategory/02.png',
+      //       name: '法务咨询',
+      //       navigateTarget: '/pages/activityCategory/activityCategory',
+      //       typeId: 1
+      //     },
+      //     {
+      //       id: 6,
+      //       type: 2,
+      //       url: '../../img/activityCategory/03.png',
+      //       name: '知识产权',
+      //       navigateTarget: '/pages/activityCategory/activityCategory',
+      //       typeId: 1
+      //     },
+      //     {
+      //       id: 7,
+      //       type: 2,
+      //       url: '../../img/activityCategory/04.png',
+      //       name: '项目审报',
+      //       navigateTarget: '/pages/activityCategory/activityCategory',
+      //       typeId: 1
+      //     },
+      //     {
+      //       id: 8,
+      //       type: 2,
+      //       url: '../../img/activityCategory/05.png',
+      //       name: '投融资服务',
+      //       navigateTarget: '/pages/activityCategory/activityCategory',
+      //       typeId: 1   
+      //     },
+      //     {
+      //       id: 9,
+      //       type: 1,
+      //       url: '../../img/activityCategory/06.png',
+      //       name: '财务服务',
+      //       navigateTarget: '/pages/activityCategory/activityCategory',
+      //       typeId: 1
+      //     }
+      //   ]
+      // },
+      {
+        listInner: [{
+            id: 10,
+            type: 2,
+            url: '../../img/activityCategory/07.png',
+            name: '预约工位',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 11,
+            type: 2,
+            url: '../../img/activityCategory/08.png',
+            name: '预约会议室',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 12,
+            type: 2,
+            url: '../../img/activityCategory/09.png',
+            name: '访客预约',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          }
+        ]
+      },
+      {
+        listInner: [{
+            id: 10,
+            type: 2,
+            url: '../../img/activityCategory/10.png',
+            name: '內部日常',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 11,
+            type: 2,
+            url: '../../img/activityCategory/11.png',
+            name: '创业培训',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 15,
+            type: 2,
+            url: '../../img/activityCategory/12.png',
+            name: '创业咨询',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 16,
+            type: 2,
+            url: '../../img/activityCategory/13.png',
+            name: '创业大赛',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          }
+        ]
+      },
+      {
+        listInner: [{
+            id: 17,
+            type: 2,
+            url: '../../img/activityCategory/14.png',
+            name: '水费',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 18,
+            type: 2,
+            url: '../../img/activityCategory/15.png',
+            name: '电费 ',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 19,
+            type: 2,
+            url: '../../img/activityCategory/16.png',
+            name: '暖气费',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 20,
+            type: 2,
+            url: '../../img/activityCategory/17.png',
+            name: '房租',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 21,
+            type: 2,
+            url: '../../img/activityCategory/18.png',
+            name: '物业费',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 22,
+            type: 2,
+            url: '../../img/activityCategory/19.png',
+            name: '设备保修',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 23,
+            type: 2,
+            url: '../../img/activityCategory/20.png',
+            name: '绿植保养',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          },
+          {
+            id: 25,
+            type: 2,
+            url: '../../img/activityCategory/21.png',
+            name: '联系客服',
+            navigateTarget: '/pages/activityCategory/activityCategory',
+            typeId: 1
+          }
+        ]
+      }
+    ],
+  },
+  goDetail(e) {
+    if (e.currentTarget.dataset.id == 25) {
+      wx.makePhoneCall({
+        phoneNumber: '40007065665'
+      })
+      return;
+    }
+    if (e.currentTarget.dataset.type == 1) {
+      //belong 0属于活动 1属于服务
+      const belong = parseInt(e.currentTarget.dataset.belong)
+      wx.navigateTo({
+        url: `../activityHome/activityHome?id=${e.currentTarget.dataset.id}&&name=${e.currentTarget.dataset.name}&&typeId=${belong}`
+      });
+    }
+  
+
+    if (e.currentTarget.dataset.type == 2) {
+      let params = {
+        classifiId: e.currentTarget.dataset.id,
+        currentPage: 1,
+        enablePage: true,
+        pageSize: 10
+      }
+      Api.getServiceAndActivityList(params).then((res) => {
+        if (res.data.status === '0000') {
+          if (res.data.data.list.length != 0) {
+            let id = res.data.data.list[0].id;
+            wx.navigateTo({
+              url: `../serveDetail/serveDetail?id=${id}&&name=${e.currentTarget.dataset.name}&&type=${e.currentTarget.dataset.type}`
+            });
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '暂无此分类详情',
+            })
+            return;
+          }
+        } else {
+          wx.showToast({
+            icon: 'none',
+            title: res.data.msg,
+          })
+        }
+      }).catch((res) => {
+        wx.showToast({
+          icon: 'none',
+          title: '请求失败',
+        })
+      })
+
+
+    }
+
+  }
+});

@@ -1,0 +1,700 @@
+// pages/enjoyCard/enjoyCard.js
+import enjoyCardApi from '../../utils/config/Api/enjoyCard.js'
+import myInformApi from '../../utils/config/Api/myInform.js';
+import Api from '/../../utils/config/Api/order.js';
+let alert = require('../../utils/tools/alert.js');
+import WxParse from '../../wxParse/wxParse.js'
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let loading = alert.showLoading;
+let app = getApp()
+import util from '../../utils/tools/util.js';
+let uncodeUtf16 = util.uncodeUtf16 // emojy 转字符
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //乐享卡id
+    cardId: '',
+    authorityList: [{
+        title: "专享",
+        imgSrc: "https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216093453.png",
+        desc: "5000乐享金"
+      }, {
+        title: "持卡",
+        imgSrc: "https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216093212.png",
+        desc: "全域享受"
+      },
+      // {
+      //   title: "精准",
+      //   imgSrc: "https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191219105758.png",
+      //   desc: "获客方案"
+      // }, 
+      {
+        title: "精选",
+        imgSrc: "https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216093431.png",
+        desc: "每月福利"
+      },
+      //  {
+      //   title: "特权",
+      //   imgSrc: "https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216093339.png",
+      //   desc: "特训营服务"
+      // },
+       {
+        title: "尊享",
+        imgSrc: "https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191216093411.png",
+        desc: "客户服务"
+      }
+    ],
+    // 礼包商品
+    commodityList: [],
+    // 乐享商品
+    enjoyProList: [],
+    // 蒙层弹出窗
+    showMask: false,
+    // 权益弹窗
+    showAuthorMask: false,
+    //协议弹窗
+    showProtocolMak: false,
+    currentPage: 1,
+    totalPages: 1,
+    // 是否开卡
+    haveAuthority: false,
+    screenHeight: wx.getSystemInfoSync().screenHeight,
+    // 门店id
+    shopId:'',
+    // 分享人id
+    shareId:'',
+    // 开卡渠道
+    sourceBindingType:''
+  },
+  /**
+   * 展示特权
+   */
+  showAuthority(e) {
+    let _this = this
+    let type = e.currentTarget.dataset.type
+    this.setData({
+      index: type,
+      showMask: true,
+      showAuthorMask: true
+    })
+    let authorityHtml = this.data.authorityDesc[type]
+    console.log('--authorityHtml', authorityHtml)
+    WxParse.wxParse('description', 'html', authorityHtml, _this, 300);
+  },
+  /**
+   * 展示toast
+   */
+  showToast() {
+    wx.showToast({
+      mask: true,
+      icon: 'none',
+      title: '请选择开卡礼包直接开通',
+    })
+  },
+
+  /**
+   * 取消遮罩层
+   */
+  cancelMask() {
+    this.setData({
+      showMask: false,
+      showAuthorMask: false,
+      showProtocolMak: false
+
+    })
+  },
+  /**
+   * 展示协议
+   */
+  showProtocol() {
+    this.setData({
+      showMask: true,
+      showProtocolMak: true
+    })
+  },
+  /**
+   * 同意协议
+   */
+  agreeProtocol() {
+    let _this = this;
+    _this.cancelMask();
+    // app.userLogin().then((res)=>{
+    //   console.log('登录结果============',res)
+    //   console.log('app.data.decryptDataFlag && app.data.flag=',app.data.decryptDataFlag,app.data.flag)
+    //   if (app.data.decryptDataFlag && app.data.flag == 1) {
+    //     _this.getUserInfo()
+    //   }else{
+    //     wx.switchTab({
+    //       url: '../shopHome/shopHome'
+    //     })
+    //   }
+    //     //授权
+    //     app.accredit().then(
+    //       () => {
+    //         console.log('app.data.userInfo=',app.data.userInfo)
+    //         let {
+    //           avatarUrl,
+    //           nickName,
+    //         } = app.data.userInfo
+
+    //         _this.setData({
+    //           userAvatar: avatarUrl,
+    //           nickName
+    //         })
+    //       }
+    //     )
+    // })
+    //旧版本买商品开卡方法
+    // this.jumpToEnjoyProduct()
+    wx.showModal({
+      content: '您是否确认开通会员卡',
+      confirmText: '确认开通',
+      cancelText: '考虑一下',
+      cancelColor:'#999999',
+      confirmColor:'#FABE00',
+      success(result) {
+        if (result.confirm){
+          let params = {
+            shopId: _this.data.shopId,
+            shareId:_this.data.shareId,
+            sourceBindingType: _this.data.sourceBindingType
+          }
+          enjoyCardApi.openOrder(params).then(res => {
+            console.log('++++',res)
+            let parms = {
+              "id": res.data.data.tranId,
+            }
+            enjoyCardApi.queryPay(parms).then((resa) => {
+              if (resa.data.status == '0000') {
+                _this.onShow();
+              } else {
+                alertModal1(resa.data.msg)
+              }
+            }).catch((resa) => {
+              alertModal("请求服务失败")
+            })
+          })
+        }
+      },
+      fail(erroe) {
+        console.log(error)
+       }
+    })
+  },
+
+  /***
+   *  获取乐享卡id
+   */
+  getEnjoyCardId() {
+    let _this = this
+    enjoyCardApi.getEnjoyCardId().then(res => {
+      if (res.data.status == '0000') {
+        _this.setData({
+          cardId: res.data.data[0].id
+        })
+        let params = {
+          cardId: res.data.data[0].id
+        }
+        _this.findProductForId(params)
+      }
+
+    })
+
+  },
+
+  /***
+   *   根据乐享卡id获取商品列表
+   */
+  findProductForId(params) {
+    let _this = this
+    enjoyCardApi.findProductForId(params).then(res => {
+      console.log(res.data.data.content)
+      _this.setData({
+        commodityList: res.data.data.content
+      })
+    })
+  },
+  /***
+   * 取消订单
+   */
+  cancelOrder() {
+    wx.showModal({
+      title: '取消订单',
+      content: '你确定取消订单吗',
+      cancelText: "取消",
+      confirmText: "确定",
+      success(res) {
+        if (res.confirm) {
+          console.log('用户点击确定')
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+  /**
+   * 点击立即开卡
+   */
+  openCard() {
+
+    this.cancelMask()
+    if (this.data.haveAuthority) {
+      return
+    }
+    this.showProtocol()
+    // wx.pageScrollTo({
+    //   scrollTop: 0
+    // })
+    // wx.showModal({
+    //   content: '您还有待支付乐享卡订单，是否继续支付？',
+    //   cancelColor: 'rgba(153,153,153,1)',
+    //   confirmColor: 'rgba(250,190,0,1)',
+    //   success(res) {
+    //     if (res.confirm) {
+    //       wx.showToast({
+    //         mask: true,
+    //         icon: 'none',
+    //         title: '请选择开卡礼包直接开通',
+    //       })
+    //     } else if (res.cancel) {
+    //       _this.cancelOrder()
+    //     }
+    //   }
+    // })
+  },
+  /**
+   * 获取商户id
+   */
+  getShopId(option) {
+    
+    console.log('获取商户id', option);
+    let q = decodeURIComponent(option.q);
+    console.log('q------',q)
+    let activeCardShopId = q.substring(q.lastIndexOf("/") + 1);
+    console.log(activeCardShopId, '-------------商家二维码进入shopid-----------');
+    app.data.activeCardShopId = activeCardShopId;
+    app.data.sourceBindingType = 'MERCHANT_SHOP';
+
+    console.log('app中寸的activeCardShopId值:', app.data.activeCardShopId);
+    console.log('app中寸的sourceBindingType值:', app.data.sourceBindingType);
+
+    this.setData({
+      shopId: activeCardShopId,
+      shareId: '',
+      sourceBindingType: 'MERCHANT_SHOP'
+    })
+  },
+  /***
+   * 跳转到使用记录
+   */
+  jumpEnjoyCardRecord() {
+    wx.navigateTo({
+      url: '../enjoyCardRecord/enjoyCardRecord',
+
+    })
+  },
+  /**
+   * 去领取
+   */
+  jumpToEnjoyProduct(e) {
+    let _this = this
+    let goodsId
+    let enjoymentPrice
+    let id = this.data.cardId
+    let selectedPrice
+
+    if (e) {
+
+      goodsId = e.currentTarget.dataset.goodsid
+      enjoymentPrice = e.currentTarget.dataset.enjoymentprice
+      selectedPrice =e.currentTarget.dataset.selectedprice
+    } else {
+      goodsId = this.data.commodityList[0].goodsId
+      enjoymentPrice = this.data.commodityList[0].salePrice
+      selectedPrice = this.data.commodityList[0].selectedPrice
+    }
+
+
+
+    enjoyCardApi.getExistOrder().then(res => {
+      if (res.data.status == '0000') {
+        _this.setData({
+          payAmount: res.data.data.payAmount
+        })
+        let id = res.data.data.id
+        let _params = {
+          id
+        }
+
+        console.log('有待支付订单')
+        // _this.getOrdrDetail(_params) 
+        wx.showModal({
+          title:'提示',
+          content: '您还有待支付乐享卡订单，是否继续支付？',
+          success(res) {
+            if (res.confirm) {
+
+              _this.getOrdrDetail(_params)
+
+            } else if (res.cancel) {
+
+            }
+          }
+        })
+      } else {
+        wx.navigateTo({
+          url: `../../pages/enjoyCardDetail/enjoyCardDetail?goodsId=${goodsId}&enjoyCardId=${id}&enjoymentPrice=${enjoymentPrice}&selectedPrice=${selectedPrice}`
+        })
+        console.log('没有待支付订单')
+      }
+    })
+
+
+  },
+  /**
+   * 跳转到商品详情
+   */
+  jumpToproduct(e) {
+
+    let goodsId = e.currentTarget.dataset.goodsid
+
+    wx.navigateTo({
+      url: `../../pages/shopDetail/shopDetail?goodsId=${goodsId}`
+    })
+  },
+
+  /***
+   * 获取下单信息
+   */
+  getOrdrDetail(_params) {
+    let _this = this
+    Api.restartPay(_params).then((res) => {
+      if (res.data.status == '0000') {
+        console.log(res)
+        app.data.orderId = res.data.data.tranId
+        wx.requestPayment({
+          timeStamp: res.data.data.timeStamp,
+          nonceStr: res.data.data.nonceStr,
+          package: res.data.data.packAge,
+          signType: res.data.data.signType,
+          paySign: res.data.data.paySign,
+          success(res) {
+
+            _this.setData({
+              showMask: false
+            })
+            wx.navigateTo({
+              url: `../orderPaySuccess/orderPaySuccess?totalPayAmount=${_this.data.payAmount}`,
+            })
+          },
+          fail(res) {
+            console.log(res)
+            _this.setData({
+              showMask: false
+            })
+            alertModal("支付失败")
+          }
+        })
+      } else {
+        _this.setData({
+          showMask: false
+        })
+        alertModal1(res.data.msg)
+      }
+    }).catch((err) => {
+      _this.setData({
+        showMask: false
+      })
+      alertModal("请求服务失败")
+    })
+  },
+
+  /**
+   * 已开卡获取乐享卡信息
+   */
+  getEnjoyCardDetail() {
+    let _this = this
+    enjoyCardApi.getEnjoyCardDetail().then(res => {
+      if (res.data.status == '0000') {
+        _this.setData({
+          cardId: res.data.data.id,
+          interestsNo: res.data.data.interestsNo,
+          validity: res.data.data.validity,
+          remainingSum: res.data.data.remainingSum,
+          useSum: res.data.data.useSum,
+
+        })
+        let params = {
+          cardId: res.data.data.id
+        }
+        _this.findProductForId(params)
+      }
+
+
+    })
+  },
+
+  /**
+   * 获取乐享商品列表
+   */
+  findEnjoyProductList(params, add) {
+    let _this = this
+
+    enjoyCardApi.findEnjoyProductList(params).then(res => {
+      if (res.data.status == '0000') {
+        let data = res.data.data
+        if (add) {
+          _this.setData({
+            enjoyProList: [..._this.data.enjoyProList, ...data.content],
+            totalPages: data.totalPages
+          })
+        } else {
+          _this.setData({
+            enjoyProList: data.content,
+            totalPages: data.totalPages
+          })
+        }
+      } else {
+        _this.setData({
+          enjoyProList: []
+        })
+      }
+    })
+  },
+  /**
+   * 判断是否有特权
+   */
+  haveAuthority() {
+    let _this = this
+    enjoyCardApi.checkUserAuthority().then(res => {
+      if (res.data.status == '0000') {
+
+        //判断是否开卡
+        if (res.data.data) {
+          this.getEnjoyCardDetail()
+        } else {
+          this.getEnjoyCardId()
+        }
+
+        _this.setData({
+          haveAuthority: res.data.data
+        })
+      }
+
+    })
+  },
+  // 请求个人信息
+  getUserInfo() {
+    let _this = this;
+    myInformApi.originatorDetail().then(res => {
+      console.log(res)
+      if (res.data.status === "0000") {
+        if (res.data.data.nickName === null) {
+          return
+        }
+        let {
+          nickName,
+          signature,
+          avatarUrl,
+          gender,
+          userPhone
+        } = res.data.data
+
+        //用户昵称转码
+        if (nickName != null && nickName != undefined) {
+          nickName = uncodeUtf16(nickName)
+        }
+        //用户签名转码
+        if (signature != null && signature != undefined) {
+          signature = uncodeUtf16(signature)
+        }
+
+        let userInfo = {
+          nickName,
+          signature,
+          avatarUrl,
+          gender,
+          userPhone
+        }
+
+        app.data.userInfo = userInfo
+      }
+    })
+
+  },
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function(options) {
+    let _this = this
+
+    console.log('123')
+console.log(options)
+
+    if (options.shareId) {
+      _this.setData({
+        shopId: wx.getStorageSync('shopId')
+      })
+      //正常用户分享进入
+      console.log('用户分享', '-----------------', options)
+      app.data.shareId = options.shareId
+      app.data.sourceBindingType = 'MEMBER';
+
+      _this.setData({
+        shopId: wx.getStorageSync('shopId'),
+        shareId: options.shareId,
+        sourceBindingType: 'MEMBER'
+      })
+    } else if (options.q) {
+      // 二维码进入
+      _this.getShopId(options)
+    }else{
+      _this.setData({
+        shopId: wx.getStorageSync('shopId'),
+        shareId: '',
+        sourceBindingType: 'MERCHANT_SHOP'
+      })
+    }
+
+
+  },
+  /***
+   * 权益的富文本
+   */
+  riceText() {
+    let equityOne = `<p style="font-family:PingFangSC-Regular,PingFang SC;"><p style='width:504rpx; margin:0 auto; font-size:32rpx; line-height:48rpx;color:rgba(51,51,51,1);font-family:PingFangSC-Regular,PingFang SC;'>开卡即得5000乐享金<br>消费时，1乐享金抵扣1元人民币<br>乐享金可用来自动冲抵商品原价与特权价之间的差额<br>乐享金仅限在云乐汇平台和乐享会员店平台使用，不得转让，不得提现</p>`
+
+
+
+    let equityTwo = `<p style="font-family:PingFangSC-Regular,PingFang SC;"><p style='width:504rpx; margin:0 auto; font-size:32rpx; line-height:48rpx;color:rgba(51,51,51,1);font-family:PingFangSC-Regular;'>乐享权益会员不仅可在【好物】专<br>区享受特价优惠，更可在【精选商<br>户】中享受所有联盟商家提供的个<br>性化专属会员权益服务，一卡在<br>手，全域享受！</p><img src="https://ylhdev.oss-cn-beijing.aliyuncs.com/other/20191219104521.png" class="desc-image2"></img ></p>`
+
+
+
+    let equityThree = `<p style='width:504rpx; margin:0 auto; font-size:32rpx; line-height:48rpx;color:rgba(51,51,51,1);font-family:PingFangSC-Regular;'>乐享权益会员可以享受联盟商家每<br>月推出的免费、特价、打折券、抽<br>奖、霸王餐、吃喝玩乐大礼包等精<br>选福利产品，具体详情可在【精选<br>商户】店铺中查看</p><img src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200207175627uf.png" class="desc-image4"></img ></p>`
+
+
+    let equityFour = `<p style='width:504rpx; margin:0 auto; font-size:32rpx; line-height:48rpx;color:rgba(51,51,51,1);font-family:PingFangSC-Regular;'>正品保障 商品保质保量<br>支持一件代发48小时内发货<br>承诺损坏品支持退换货<br>全程售后服务 客服及时响应<br></p><p style='width:504rpx; margin:0 auto; font-size:32rpx; line-height:48rpx;color:rgba(51,51,51,1);font-family:PingFangSC-Regular;'>24小时内解决平台争议客诉</p><p><br></p>`
+
+    this.setData({
+      authorityDesc: [equityOne, equityTwo, equityThree, equityFour]
+    })
+
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function() {
+
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function() {
+ 
+    let _this = this
+    app.userLogin().then(
+      (res) => {
+        console.log('登录结果============',res)
+        console.log('app.data.decryptDataFlag && app.data.flag=',app.data.decryptDataFlag,app.data.flag)
+        if (app.data.decryptDataFlag && app.data.flag == 1) {
+          _this.getUserInfo()
+        }
+        _this.haveAuthority()
+        let _parms = {
+          currentPage: this.data.currentPage,
+          enablePage: true
+        }
+        //乐享商品列表
+        let add = false;
+        _this.findEnjoyProductList(_parms, add)
+        _this.riceText()
+
+        //授权
+        app.accredit().then(
+          () => {
+            console.log('app.data.userInfo=',app.data.userInfo)
+            let {
+              avatarUrl,
+              nickName,
+            } = app.data.userInfo
+
+            _this.setData({
+              userAvatar: avatarUrl,
+              nickName
+            })
+          }
+        )
+
+      }
+    )
+
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function() {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function() {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function() {
+
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+    if (this.data.currentPage > this.data.totalPages) {
+      wx.showToast({
+        title: '没有更多列表',
+        icon: 'none'
+      })
+      return
+    }
+    this.setData({
+      currentPage: this.data.currentPage + 1
+    })
+    let add = true;
+    let _parms = {
+      currentPage: this.data.currentPage + 1,
+      enablePage: true
+    }
+    this.findEnjoyProductList(_parms, add)
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function() {
+    let _this = this;
+
+    let _parms = {
+      storyId: this.data.id,
+    }
+
+    return {
+      // title: that.data.data.title,
+      // imageUrl: that.data.data.storyImg,
+      path: `/pages/enjoyCard/enjoyCard?shareId=${app.data.userId}`
+    }
+  }
+})

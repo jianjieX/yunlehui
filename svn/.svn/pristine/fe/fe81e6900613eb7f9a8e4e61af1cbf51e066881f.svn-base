@@ -1,0 +1,298 @@
+/**
+ * 疫情活动页面
+ * 
+ * @date 2020/02/06
+ * @author liuhongbin
+ */
+
+const app = getApp();
+import commonApi from '/../../utils/config/Api/common.js';
+// 引入toast相关方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+// 引入解码表情方法
+let utils = require('../../utils/tools/util.js')
+let uncodeUtf16 = utils.uncodeUtf16;
+import util from '../../utils/tools/util.js';
+
+Page({
+
+  data: {
+    // 预置弹幕
+    dm: [{
+        id: 0,
+        word: '祈福',
+        content: '向一线的勇士致敬！心与你们同在！'
+      },
+      {
+        id: 1,
+        word: '态度',
+        content: '不信谣不传谣 ，我为中国加油！'
+      },
+      {
+        id: 2,
+        word: '平安',
+        content: '一切安好！大家也都要好好的！'
+      },
+      {
+        id: 3,
+        word: '参与',
+        content: '身体健康，宅在家里也是做贡献！'
+      },
+    ],
+    // banner背景
+    banner: 'https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200205164920Va.png',
+    // 默认头像
+    defaultAvatar: '/img/others/ac-logo.png',
+    // 基础数据
+    baseData: [],
+    dmData: [],
+    //模态框的状态  true-隐藏  false-显示
+    hideModal: true,
+    animationData: {},
+    // 开店弹窗状态  true-隐藏
+    hideDialog: true,
+    // 商品列表
+    goodsList: []
+  },
+
+  onLoad() {
+
+    app.userLogin().then(() => {
+      // 弹幕数据
+      this.getDMBaseData();
+      // 商品列表
+      this.getGoodsList();
+      // 统计进入页面次数
+      this.activityClick();
+    })
+  },
+
+
+  /**
+   * 获取弹幕基础数据
+   */
+  getDMBaseData() {
+    commonApi.getActivityDMlist({}).then(res => {
+      if (res.data.status === '0000') {
+        let baseData = res.data.data;
+
+        for (let i = 0; i < baseData.length; i++) {
+
+          if (baseData[i].memberName.slice(0, 1) === '&') {
+            baseData[i].memberName = '**';
+          } else {
+            baseData[i].memberName = `${baseData[i].memberName.slice(0, 1)}**`;
+          }
+        }
+        this.setData({
+          baseData: [...this.data.baseData, ...baseData]
+        })
+      }
+    })
+
+  },
+
+
+
+  /**
+   * 显示弹窗
+   */
+  showModal() {
+
+    let that = this;
+    that.setData({
+      hideModal: false
+    })
+    let animation = wx.createAnimation({
+      duration: 600, //动画的持续时间 默认400ms   数值越大，动画越慢   数值越小，动画越快
+      timingFunction: 'ease', //动画的效果 默认值是linear
+    })
+    this.animation = animation;
+    setTimeout(function() {
+      that.fadeIn(); //调用显示动画
+    }, 200)
+  },
+
+  /**
+   * 隐藏弹窗
+   */
+  hideModal() {
+
+    let that = this;
+    let animation = wx.createAnimation({
+      duration: 400, //动画的持续时间 默认400ms   数值越大，动画越慢   数值越小，动画越快
+      timingFunction: 'ease', //动画的效果 默认值是linear
+    })
+    this.animation = animation
+    that.fadeDown(); //调用隐藏动画   
+    setTimeout(function() {
+      that.setData({
+        hideModal: true
+      })
+    }, 320) //先执行下滑动画，再隐藏模块
+
+  },
+
+  /**
+   * 动画集
+   */
+  fadeIn() {
+
+    this.animation.translateY(0).step();
+    this.setData({
+      animationData: this.animation.export() //动画实例的export方法导出动画数据传递给组件的animation属性
+    })
+  },
+
+  fadeDown() {
+
+    this.animation.translateY(300).step();
+    this.setData({
+      animationData: this.animation.export(),
+    })
+  },
+
+
+  /**
+   * 点击祈福
+   */
+  sendDM(e) {
+    let message = e.currentTarget.dataset.value;
+
+    let params = {
+      message
+    }
+    commonApi.sendDM(params).then(res => {
+      if (res.data.status === '0000') {
+
+        alertModal1('祈福成功');
+        this.data.baseData = [];
+        this.getDMBaseData();
+        this.hideModal();
+      } else {
+        alertModal1(res.data.msg);
+      }
+    })
+
+  },
+
+  /**
+   * 获取商品列表
+   */
+  getGoodsList() {
+    let _this = this;
+    commonApi.getActiveGoodsList({}).then(res => {
+      if (res.data.status === '0000') {
+
+        let goodsList = res.data.data;
+
+        _this.setData({
+          goodsList
+        })
+
+      }
+    })
+  },
+  /**
+   * 跳转商品详情
+   */
+  goGoodsDetail(e) {
+
+    let goodsId = e.currentTarget.dataset.id;
+
+    this.activityClick(1);
+    wx.navigateTo({
+      url: `../shopDetail/shopDetail?goodsId=${goodsId}&sarsMark=1`,
+    })
+  },
+
+  /**
+   * 分享好友
+   */
+  onShareAppMessage() {
+    let shopId = wx.getStorageSync('shopId');
+    return {
+      title: '防控有我 全民祈福',
+      imageUrl: "https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200206134614Sd.png",
+      path: `pages/activity/activity?shopId=${shopId}`,
+    }
+  },
+  /**
+ * 统计次数
+ */
+  activityClick(type = 0) {
+
+    let params = {
+      type
+    }
+    commonApi.activityClick(params).then(res => {
+      if (res.data.status === '0000') {
+        console.log('统计次数调用成功')
+      }
+    })
+  },
+
+  /**
+   * 动画结束处理弹幕分页
+   */
+  handleAnimationEnd() {
+
+    console.log('动画结束');
+    this.getDMBaseData();
+  },
+
+  /**
+   * 显示开店弹窗
+   */
+  showDialog() {
+
+    this.setData({
+      hideDialog: false
+    })
+  },
+
+  /**
+   * 隐藏开店弹窗
+   */
+  hideDialog() {
+
+    this.setData({
+      hideDialog: true
+    })
+  },
+  //开店（1判断是否授权 2判断是否开店 3开店）
+  openShop() {
+    let that = this;
+    // 防止多次触发
+    util.buttonClicked(this);
+
+    //临时注释
+    // wx.navigateTo({
+    //   url: '../../pages/shopOpenTemp/shopOpenTemp',
+    // })
+    app.accredit().then((res) => {
+      //判断是否开店
+      that.jumpOpenShop()
+    })
+  },
+
+  //开店
+  jumpOpenShop() {
+    // 判断是否开过店
+    commonApi.clickOpenShop({}).then(res => {
+      console.log('是否开过店？', res)
+      if (res.data.status === "0002") {
+        wx.navigateTo({
+          url: `../shopopen/shopopen?shopId=${res.data.data.merchantShopId}&shopStatus=${res.data.data.auditStatus}&rejectReason=${res.data.data.rejectReason}`,
+        })
+      }
+      else {
+        wx.navigateTo({
+          url: '../shopApplication/shopApplication'
+        })
+      }
+    })
+  }
+})

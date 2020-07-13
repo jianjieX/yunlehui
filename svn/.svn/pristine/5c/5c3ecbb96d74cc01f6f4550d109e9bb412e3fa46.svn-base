@@ -1,0 +1,91 @@
+<wxs module="location" src="../../filter/location.wxs"></wxs>
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!--商户详情-->
+<view class="merchant-line"></view>
+<view class="detail">
+	<image src="{{shopDoorPic}}" class="logo"></image>
+	<block wx:if='{{shopDoorPic&&shopDoorPic.length}}'>
+		<swiper
+        indicator-dots="true" autoplay="truetrue" circular="true"
+        interval="5000" duration="500" style="height:376rpx">
+        <block wx:for="{{shopDoorPic}}" wx:key="index">
+          <swiper-item wx:if='{{item}}'>
+						<image class="logo" src="{{item}}" mode='scaleToFill'></image>
+          </swiper-item>
+        </block>
+      </swiper>
+	</block>
+	<view class="name">
+		<view class="left">
+			{{shopName}}
+		</view>
+		<view class="right">
+			<button open-type="share" class="share">
+				<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200117133119Eu.png"></image>
+			</button>
+		</view>
+	</view>
+	<view class="title">
+		<import src="../../wxParse/wxParse.wxml" />
+		<template is="wxParse" data="{{wxParseData:article.nodes}}" />
+	</view>
+	<view class="line"></view>
+	<view class="time">
+		<text class="left">营业时间</text>
+		<text class="right">{{week? week:'周一至周日'}} {{beginTime? beginTime:'8:00'}} - {{endTime? endTime:'23:00'}}</text>
+	</view>
+	<view class="line"></view>
+	<view class="address">
+		<view class="left">
+			<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200117134359tB.png" class="logo"></image>
+		</view>
+		<view class="medium" bindtap="openMap">
+			<view class="title">{{shopAddress}}</view>
+			<view class="distance" data-latitude='{{dimension}}' data-longitude='{{longitude}}' data-distance="{{location.getDistance(latitudeUser,longitudeUser,dimension,longitude)}}" >距您当前距离<text wx:if="{{distance}}">{{distance}}</text>
+      <text wx:else>{{location.getDistance(latitudeUser,longitudeUser,latitude,longitude)}}</text>
+      </view>
+		</view>
+		<view class="right" catchtap="openPhone">
+			<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200117134336wn.png" class="logo" wx:if="{{phone}}"></image>
+		</view>
+	</view>
+</view>
+
+
+<!--优惠专区-->
+<view wx:if="{{merchantList.length == 0}}" class="empty">{{merchantList}}</view>
+
+<!--空白处-->
+<view wx:if="{{merchantList.length != 0}}">
+	<view class="blank"></view>
+	<view class="coupon">
+		<view class="left">
+			惠
+		</view>
+		<view class="right">优惠专区</view>
+	</view>
+	<block wx:for="{{merchantList}}" wx:key="*this">
+		<view class="list" bindtap='jumpDetail' id='{{item.goodsId}}'>
+			<view class="list-top">
+				<view class="left">
+					<image class="logo" src="{{item.goodsPicUrl}}" id="{{item.merchantId}}"></image>
+				</view>
+				<view class="medium">
+					<text class="name">{{item.goodsName}}</text>
+					<view class="couponEmpty"></view>
+					<view class="week">{{week}}</view>
+					<view class="couponEmpty"></view>
+					<view class="medium-money">
+						<text class="enjoyment-price"><text style="font-size:20rpx;">￥</text>{{numFr.getNum(item.enjoymentPrice)}}<text style="margin-left:4rpx;">特权价</text></text>
+						<text class="enjoyment-saveMoney">售价￥{{numFr.getNum(item.selectedPrice)}}</text>
+					</view>
+				</view>
+				<view class="right">
+					<view class="sale">
+						已售{{item.totalSale}}
+					</view>
+				</view>
+			</view>
+		</view>
+	</block>
+</view>

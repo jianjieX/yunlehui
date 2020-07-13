@@ -1,0 +1,88 @@
+/**
+ * 开店
+ * 
+ * @author liyujie
+ * @date 2019-12-3
+ */
+
+let app = getApp();
+import base from "../../utils/base.js"
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 所开门店id
+    openShopId: '',
+    // 店铺状态（0：成功，1：审核中，2：失败）
+    shopStatus: 1,
+    // 全机型适配距顶
+    fixedTop: app.data.fixedTop + 16,
+    // 全机型适配顶部高度
+    topHeight: app.data.fixedTop - 20,
+  },
+
+  onLoad(options) {
+
+    console.log('开店的店铺id', options.openShopId)
+    console.log('开店的店铺状态', options.shopStatus)
+
+    this.setData({
+      shopStatus: options.shopStatus,
+      openShopId: options.openShopId,
+      rejectReason: options.rejectReason
+    })
+  },
+
+
+  /**
+   * 管理店铺
+   */
+  decorationShop() {
+
+    let _this = this;
+    wx.navigateToMiniProgram({
+      appId: 'wx8d499275d8fc3c71',
+      extraData: {
+        shopId: _this.data.openShopId
+      },
+      envVersion: base.envVersion,
+      success(res) {
+        console.log('打开结果', res)
+      }
+    })
+  },
+
+  /**
+   * 重新申请
+   */
+  reApply() {
+
+    wx.redirectTo({
+      url: '../chooseShopType/chooseShopType?reApply=1',
+    })
+  },
+
+  /**
+   * 拨打客服电话
+   */
+  makePhoneCall() {
+
+    wx.makePhoneCall({
+      phoneNumber: '4007065665' //仅为示例，并非真实的电话号码
+    })
+  },
+
+  /**
+   * 自定义返回
+   */
+  goBack() {
+
+    wx.switchTab({
+      url: '../shopMy/shopMy',
+    })
+  }
+
+})

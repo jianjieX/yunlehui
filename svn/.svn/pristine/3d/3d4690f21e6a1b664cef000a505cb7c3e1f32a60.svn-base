@@ -1,0 +1,39 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+
+     //查询全部精选商户
+     getCategory(data) {
+        let result = {};
+        result.method = "POST";
+        result.url = '/cmini/selected/selectedMerchantTabs' ;
+        return result
+    },
+
+    //查询全部精选商户
+    getMerchant(data) {
+        let result = {};
+        result.method = "POST";
+        result.url = '/cmini/selected/merchant' ;
+        return result
+    },
+
+    // 获取商户详情页
+    getMerchantDtail(data) {
+        let result = {};
+        result.method = "POST";
+        result.url = '/cmini/selected/selectedMerchantDetail';
+        return result
+    },
+
+    // 优惠专区商户
+    getConpon(data) {
+        let result = {};
+        result.method = "POST";
+        result.url = '/cmini/goods/preferGoodsListForOpenCar';
+        return result
+    }
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

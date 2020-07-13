@@ -1,0 +1,39 @@
+<wxs module="handleTime" src="../../filter/time.wxs"></wxs>
+<wxs module="activity" src="../../filter/activity.wxs"></wxs>
+<!-- 自定义tabbar -->
+<!-- ======内容区====== -->
+<view class="content-wrap">
+  <view class="list">
+    <block wx:for="{{list}}" wx:key="">
+      <view class="item-wrap">
+        <view class="img-wrap" data-id="{{item.id}}" data-type="{{item.typeId}}"   bindtap="jumpToDetail">
+          <image lazy-load="true" mode="scaleToFill" src="{{item.mainImage}}"></image>
+          <view class="title" wx:if="{{item.startTime !=null || item.endTime !=null }}"><text>活动时间{{item.startTime}}至{{item.endTime}}</text></view>
+          <view class="status">{{activity.formatStatus(item)}}</view>
+        </view>
+        <view class="des-wrap">
+          <text>{{item.title}}</text>
+        </view>
+        <view class="bottom">
+          <image class="avatar" wx:if="{{item.publisherPortrait}}" src="{{item.publisherPortrait}}"></image>
+          <image class="avatar" wx:else src="../../img/activity/default.png"></image>
+          <text class="name left" wx-if="{{item.publisher !=null}}" >{{item.publisher}}</text>
+          <image class="icon ml20" src="../../img/activity/eye.png"></image>
+          <text class="name">{{activity.pageViewNUm(item.pageView) || ''}}</text>
+        </view>
+        <view class="line"></view>
+      </view>
+    </block>
+  </view>
+</view>
+
+<!--没有消息-->
+<block wx:if="{{list.length == 0}}">
+  <view class="illustration-view">
+    <view class="illustration-border">
+      <image class="illustration-style" src="../../img/activity/error.png"></image>
+      <view class="illustration-text" wx:if="{{typeId == 0}}" >活动正在准备中，敬请期待！</view>
+      <view class="illustration-text" wx:if="{{typeId == 1}}" >服务正在准备中，敬请期待！</view>
+    </view>
+  </view>
+</block>

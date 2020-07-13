@@ -1,0 +1,30 @@
+<!-- 地址列表页面 -->
+
+<view class='address-list'>
+  <!-- 选择select -->
+  <view class='address-item' wx:for="{{addressList}}" wx:key="{{item.id}}" data-item='{{item}}' bindtap='selectAddress'>
+    <view class='checked' wx:if="{{item.selected}}">
+      <icon wx:if="{{item.selected}}" type="success" color="#FDE500" data-index='{{index}}' size='18' class="radio_chek" bindtap="selectList"/>
+      <icon wx:else type="circle"  class="radio_chek" data-index='{{index}}' size='18' bindtap="selectList"/>
+    </view>
+    <!-- 地址信息 -->
+    <view class='info'>
+      <view class='name'>{{item.receiver}}</view>
+      <view class='phone'>{{item.mobile}}</view>
+      <span wx:if="{{item.isDefault === 1}}" class="isDefault">默认</span>
+      <view class='address'>
+        {{item.provinceName}}{{item.cityName}}{{item.areaName}} {{item.address}}
+      </view>
+    </view>
+    <!-- 编辑 -->
+    <view class='edit' data-id='{{item.id}}' catchtap='editAddress'>
+      <image src='../../img/edit.png'></image>
+    </view>
+  </view>
+
+  <!-- 添加新地址按钮 -->
+  <view class='newAddress' bindtap='newAddress'>
+    添加新地址
+  </view>
+</view>
+

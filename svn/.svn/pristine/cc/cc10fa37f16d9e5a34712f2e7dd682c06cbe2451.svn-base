@@ -1,0 +1,72 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<view class='order-wapper'>
+  <view wx:if="{{scanCode}}" class='take-meal'>
+    <view class='code'>
+      <text class='title'>取餐号</text>
+      <view class="no">{{orderDetail.note.takeMealsNo}}</view>
+    </view>
+  </view>
+  <view class='content'>
+    <view class='shopcard'>
+      <view class='iconfont .icon-dianpu shop'></view>
+      <view class='shop-name'>云端马语</view>
+    </view>
+    <view class='goods'>
+      <view wx:for="{{orderDetail.orderResList}}" wx:key="index" class='detail'>
+        <view class='foods'>
+          <image class='image' src='{{item.productPic}}'></image>
+          <view class='name'>
+            <text class='title'>{{item.productName}}</text>
+            <text class="spec">{{item.specs}}</text>
+            <text class='number'>x{{item.productQuantity}}份</text>
+          </view>
+        </view>
+         <view class='price'>
+          <text>￥{{numFr.getNum(item.saleAmount - item.enjoyTotalDiscountAmount)}}</text>
+          <text wx:if="{{item.enjoyTotalDiscountAmount}}" class="{{item.enjoyTotalDiscountAmount?'yprice':''}}">￥{{numFr.getNum(item.saleAmount)}}</text>
+        </view>
+      </view>
+    </view>
+    <view class='sum'>
+      <text class='title'>小计</text>
+      <text class='total'>￥{{numFr.getNum(orderDetail.payAmount)}}</text>
+    </view>
+  </view>
+  <view class='edit'>
+    <view class='mode'>
+      <text class='title'>就餐方式</text>
+      <view class="modes">{{orderDetail.note.mode=="1"?'堂食':'外带'}}</view>
+    </view>
+    <view class='number'>
+      <text class='title'>用餐人数</text>
+
+      <view class="persons">{{orderDetail.note.num}}</view>
+    </view>
+    <view class='desc'>
+      <text class='title'>备注</text>
+      <view class="detail">{{orderDetail.note.desc}}</view>
+    </view>
+  </view>
+
+  <view class='order-desc'>
+    <view class='time'>
+      <text class='title'>下单时间</text>
+
+      <view class="date">{{orderDetail.orderTime}}</view>
+    </view>
+    <view class='time'>
+      <text class='title'>下单编号</text>
+
+      <view class="date">{{orderDetail.orderId}}</view>
+    </view>
+
+  </view>
+</view> 
+<view class='settlement'>
+  <view class='btns'>
+    <button class='cancel-btn btn'  wx:if="{{ orderDetail.orderStatus === 3 && timeState && !orderDetail.enjoyTotalDiscountAmount}}" catchtap='applyAfterSale'>申请售后</button>
+    <button class='cancel-btn btn' wx:if="{{orderDetail.orderStatus === 0}}" catchtap='cancelHandle'>取消订单</button>
+    <button catchtap='pay' wx:if="{{orderDetail.orderStatus === 0}}"  disabled='{{disabled}}' class='pay-btn btn'>继续支付</button>
+    <text wx:if="{{ orderDetail.orderStatus === 6 }}" class='text'>已取消</text>
+  </view>
+</view>

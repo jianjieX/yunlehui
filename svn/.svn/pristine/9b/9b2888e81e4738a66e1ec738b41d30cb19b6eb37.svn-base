@@ -1,0 +1,55 @@
+var baseUrl = require("../../utils/base.js");
+import exceptionHandling from './exceptionHandling.js'
+
+/**
+ * 封装wx.request
+ */
+function sendRrquest(url, method, data, header) {
+
+  let promise = new Promise(function (resolve, reject) {
+    wx.showNavigationBarLoading() //在标题栏中显示加载
+    wx.request({
+      url: url,
+      data: data,
+      method: method,
+      header: header,
+      success: resolve,
+      fail: reject,
+      complete: function (res) {
+        if (res.data != undefined){
+          if (res.data.status === "B5000" || res.data.status === "5000") {
+            // token过期处理
+            exceptionHandling.tokenTimeout(res)
+          }
+          if (res.data.status === "9999") {
+            // 服务器异常处理
+            exceptionHandling.serverErr(res)
+          }
+        }
+        wx.hideLoading();
+        wx.hideNavigationBarLoading(); //完成停止加载
+        wx.stopPullDownRefresh(); //停止下拉刷新
+      }
+    })
+  });
+  return promise;
+};
+
+/**
+ * 添加请求头
+ */
+function MyHttp(ALL_API) {
+  let _build_url = baseUrl.base;
+  let resource = {};
+  for (let actionName in ALL_API) {
+    let _config = ALL_API[actionName];
+    resource[actionName] = (pdata) => {
+      return sendRrquest(_build_url + _config(pdata).url, _config(pdata).method, pdata, {
+        'content-type': 'application/json', "Authorization": "Bearer " + wx.getStorageSync("token")
+      });
+    }
+  }
+  return resource;
+}
+
+export default MyHttp;

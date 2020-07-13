@@ -1,0 +1,151 @@
+/**
+ * @fileoverview 添加地址页面
+ * @author liyujie
+ */
+
+// 引入接口api
+import Api from '../../utils/config/Api/address.js'
+// 引入toast等提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+
+import tools from '../../utils/tools/util.js'
+// emojy 转字符
+let utf16toEntities = tools.utf16toEntities;
+// 字符转emojy
+let uncodeUtf16 = tools.uncodeUtf16;
+
+Page({
+  data: {
+    // 地址picker
+    region: ['北京市', '北京市', '东城区'],
+    regionCode: ["110000", "110100", "110101"],
+    // 收货人姓名
+    name: '',
+    // 收货人电话
+    phone: '',
+    // 收货人详细地址
+    address: '',
+    // 是否默认
+    isDefault: true
+  },
+
+  /**
+   * 地址选择picker
+   */
+  bindRegionChange(e) {
+    console.log(e)
+    this.setData({
+      region: e.detail.value,
+      regionCode: e.detail.code
+    })
+  },
+
+  /**
+   * 输入姓名电话地址等信息
+   */
+  handleName(e) {
+    this.setData({
+      name: e.detail.value.trim()
+    })
+  },
+  handlePhone(e) {
+    this.setData({
+      phone: e.detail.value
+    })
+  },
+  handleAddress(e) {
+    this.setData({
+      address: e.detail.value.trim()
+    })
+  },
+
+  /**
+   * 是否默认
+   */
+  switchChange(e) {
+    this.setData({
+      isDefault: e.detail.value
+    })
+  },
+
+  /**
+   * 新增地址
+   */
+  submit(e) {
+    if (this.data.name === '') {
+      alertModal1("收货人不能为空")
+      return;
+    }
+    if (this.data.phone === '') {
+      alertModal1("联系电话不能为空")
+      return;
+    }
+    if (!/^1[3456789]\d{9}$/.test(this.data.phone)) {
+      alertModal1("请输入正确的手机号")
+      return;
+    }
+    if (this.data.address === '') {
+      alertModal1("地址信息不能为空")
+      return;
+    }
+    let _this = this;
+    wx.showLoading({
+      title: '加载中',
+      mask: true
+    })
+    let params = {
+      address: utf16toEntities(this.data.address),
+      province: this.data.regionCode[0],
+      city: this.data.regionCode[1],
+      area: this.data.regionCode[2],
+      provinceName: this.data.region[0],
+      cityName: this.data.region[1],
+      areaName: this.data.region[2],
+      isDefault: this.data.isDefault ? '1' : '0',
+      mobile: this.data.phone,
+      receiver: utf16toEntities(this.data.name)
+    }
+    console.log(params)
+    if (this.data.isDefault) {
+      Api.validateDefaultAddress({}).then(res => {
+        if (res.data.status === "0000") {
+          Api.addAddress(params).then(result => {
+            console.log(result)
+            if (result.data.status === "0000") {
+              wx.showToast({
+                title: '新增地址成功',
+                icon: 'success',
+                duration: 2000
+              })
+              wx.navigateBack({
+                delta: 1
+              })
+            } else {
+              alertModal1(result.data.msg)
+            }
+          })
+        } else {
+          alertModal1(res.data.msg)
+        }
+      })
+    } else {
+      Api.addAddress(params).then(res => {
+        console.log(res)
+        if (res.data.status === "0000") {
+          wx.showToast({
+            title: '新增地址成功',
+            icon: 'success',
+            duration: 2000
+          })
+          wx.navigateBack({
+            delta: 1
+          })
+        } else {
+          alertModal1(res.data.msg)
+        }
+      })
+    }
+  }
+})

@@ -1,0 +1,119 @@
+/**
+ * 消息中心
+ * 
+ * @author huoyujia
+ * @date 2019-09-10
+ */
+
+let app = getApp()
+let baseUrl = require("../../utils/base.js");
+import Api from '/../../utils/config/Api/customerService.js';
+import util from '../../utils/tools/util.js';
+// emojy 转字符
+let uncodeUtf16 = util.uncodeUtf16;
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let sl = alert.showLoading;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //消息列表
+    messageList: [],
+    //当前页
+    currentPage: 1,
+    //每页多少条
+    pageSize: 10,
+    //总页数
+    totalPages: 0,
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function (options) {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+    let that = this;
+    sl();
+    let _parms = {
+      currentPage: 1,
+      pageSize: that.data.pageSize,
+      enablePage: true
+    }
+    Api.cminiLoadlist(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        let list = res.data.data.content;
+        for(let i = 0; i < list.length; i++){
+          list[i].message = uncodeUtf16(list[i].message);
+        }
+        that.setData({
+          messageList: list,
+          currentPage: that.data.currentPage + 1,
+          totalPages: res.data.data.totalPages
+        })
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  //获得更多
+  getMore() {
+    let that = this;
+    if (that.data.currentPage > that.data.totalPages) {
+      alertModal1("没有更多内容了")
+      return
+    }
+    sl();
+    let _parms = {
+      currentPage: that.data.currentPage,
+      pageSize: that.data.pageSize,
+      enablePage: true
+    }
+    Api.cminiLoadlist(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        let list = res.data.data.content;
+        for (let i = 0; i < list.length; i++) {
+          list[i].message = uncodeUtf16(list[i].message);
+        }
+        that.data.messageList = list.concat(that.data.messageList);
+        that.setData({
+          messageList: that.data.messageList,
+          currentPage: that.data.currentPage + 1,
+          totalPages: res.data.data.totalPages
+        })
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+  /** 
+   * 页面上拉触底事件的处理函数 
+   */
+  onReachBottom: function () {
+    this.getMore();
+  },
+
+  //去聊天
+  toChat(e){
+    let that = this;
+    let id = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: '../../pages/customerService/customerService?goodsId=' + id + '&reqType=2',
+    })
+  }
+})

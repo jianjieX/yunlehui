@@ -1,0 +1,13 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = git@codehub.devcloud.huaweicloud.com:jhpt00001/saas_factory_mini.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "1.3.0"]
+	remote = origin
+	merge = refs/heads/1.3.0

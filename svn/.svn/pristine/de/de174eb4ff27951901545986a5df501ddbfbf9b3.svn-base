@@ -1,0 +1,308 @@
+/**
+ * @fileoverview 申请售后页面
+ * @author liyujie
+ */
+
+const app = getApp()
+
+// 引入上传图片方法
+import upload from '../../utils/tools/uploadFile.js';
+let uploadFile = upload.uploadFile;
+// 上传图片接口路径
+let uploadUrl = require('../../utils/base.js')
+// 引入接口api
+import Api from '/../../utils/config/Api/order.js';
+// 引入toast提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1
+// 引入表情转码方法
+import tools from '../../utils/tools/util.js'
+let utf16toEntities = tools.utf16toEntities // emojy 转字符
+let uncodeUtf16 = tools.uncodeUtf16 //字符转emojy
+import util from '../../utils/tools/util.js';
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 申请售后图片list
+    returnPicList: [],
+    uploadIndex: 0,
+    // 申请售后原因列表
+    cancelReasonList: [],
+    // 申请售后原因
+    cancelReasonName: '',
+    // 申请售后原因code
+    cancelReasonCode: '',
+    // 申请详细原因
+    returnInfo: '',
+    // 联系人姓名
+    returnUserName: "",
+    // 联系人手机
+    returnUserPhone: "",
+    // 订单详情
+    orderDetail: null,
+    // textarea输入的字符数
+    inputCount: 0
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad(options) {
+    this.getOrderDetail(options.orderId)
+  },
+
+
+  /**
+   * 选择图片
+   */
+  uploadImg(e) {
+    let _this = this
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success(res) {
+        _this.setData({
+          tempFilePaths: res.tempFilePaths
+        })
+        _this.submitImg(0, 20, _this.data.tempFilePaths)
+      }
+    })
+  },
+
+  /**
+   * 上传图片
+   */
+  submitImg(index, type, tempFilePaths) {
+    let _this = this;
+    console.log("index================" + index, tempFilePaths)
+    let returnPicList = this.data.returnPicList
+
+    wx.showLoading({
+      title: `正在上传${index + 1}/${tempFilePaths.length}`,
+    })
+    uploadFile(tempFilePaths[index], type).then(res => {
+      returnPicList.push({
+        returnPicUrl: res
+      })
+
+      index++;
+      _this.setData({
+        returnPicList: returnPicList
+      })
+
+      if (tempFilePaths.length === index) {
+        _this.setData({
+          tempFilePaths: []
+        })
+        wx.hideLoading()
+        return
+      }
+      _this.submitImg(index, 20, _this.data.tempFilePaths)
+    })
+  },
+
+  /**
+   * 删除图片
+   */
+  close(e) {
+    let _this = this;
+    let picArr = this.data.returnPicList
+    let index = e.currentTarget.dataset.index
+
+    picArr.splice(index, 1)
+    this.setData({
+      returnPicList: picArr
+    })
+  },
+
+  /**
+   * 预览售后凭证图片
+   */
+  previewImage(e) {
+    let previewImageList = []
+    this.data.returnPicList.map(item => {
+      previewImageList.push(item.returnPicUrl)
+    })
+    var _this = this;
+    var current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: previewImageList
+    })
+  },
+
+  /**
+   * 请求 取消订单原因列表
+   */
+  getCancelReasonList() {
+    let _this = this;
+    let orderDetail = _this.data.orderDetail;
+    if (orderDetail.isMealsOrder) {
+      let obj = [{
+          code: 1,
+          name: '商家缺货/打烊，联系我取消'
+        }, {
+          code: 2,
+          name: '忘记使用红包'
+        },
+        {
+          code: 3,
+          name: '忘点主食'
+        }
+      ];
+      _this.setData({
+        cancelReasonList: obj
+      })
+    } else {
+      Api.returnReasonList({}).then(res => {
+        if (res.data.status === "0000") {
+          _this.setData({
+            cancelReasonList: res.data.data
+          })
+        } else {
+          alertModal1(res.data.msg)
+        }
+      })
+    }
+  },
+
+  /**
+   * 选择取消订单原因
+   */
+  bindPickerChange(e) {
+    console.log(e)
+    let orderId = e.target.dataset.id
+    let index = e.detail.value
+    let cancelReasonCode = this.data.cancelReasonList[index].code
+    this.setData({
+      cancelReasonName: this.data.cancelReasonList[index].name,
+      cancelReasonCode: cancelReasonCode
+    })
+  },
+
+  /**
+   * input textarea 输入
+   */
+  userInput(e) {
+    let _this = this
+    let inputType = e.target.dataset.type
+    let value = utf16toEntities(e.detail.value)
+    switch (inputType) {
+      case 1:
+        _this.setData({
+          returnUserName: value
+        })
+        return
+      case 2:
+        _this.setData({
+          returnUserPhone: value
+        })
+        return
+      case 3:
+        if (value.length == 300) {
+          alertModal1("输入字数达到上限")
+        }
+        _this.setData({
+          returnInfo: value,
+          inputCount: value.length
+        })
+        return
+    }
+  },
+
+  /**
+   * 获取订单详情
+   */
+  getOrderDetail(orderId) {
+    let _this = this
+    let params = {
+      orderId: orderId
+    }
+    Api.getOrderDetail(params).then(res => {
+      console.log("订单详情", res.data)
+      if (res.data.status === "0000") {
+        _this.setData({
+          orderDetail: res.data.data
+        })
+        _this.getCancelReasonList()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+
+  },
+
+  /**
+   * 提交申请
+   */
+  submit() {
+    util.buttonClicked(this);
+    if (this.data.cancelReasonCode === '') {
+      alertModal1("请选择退款原因")
+      return
+    }
+    if (this.data.returnInfo === '') {
+      alertModal1("请填写退款原因")
+      return
+    }
+    if (this.data.returnPicList.length === 0) {
+      alertModal1("请上传售后凭证")
+      return
+    }
+    if (this.data.returnUserName === '') {
+      alertModal1("请填写联系人")
+      return
+    }
+    let nameReg = /^[a-zA-Z\u4e00-\u9fa5]+$/
+    if (!nameReg.test(this.data.returnUserName)) {
+      alertModal1("请输入真实姓名")
+      return
+    }
+    if (this.data.returnUserPhone === '') {
+      alertModal1("请填写联系电话")
+      return
+    }
+    let phoneReg = /^1[3456789]\d{9}$/;
+    if (!phoneReg.test(this.data.returnUserPhone)) {
+      alertModal1("请填写正确的手机号")
+      return
+    }
+
+    wx.showLoading({
+      title: '提交中',
+      mask: true
+    })
+    let data = this.data.orderDetail
+    let params = {
+      dealType: 1,
+      orderId: data.orderId,
+      returnAmount: data.payAmount,
+      returnGoodsList: data.orderResList,
+      returnInfo: this.data.returnInfo,
+      returnPicList: this.data.returnPicList,
+      returnReason: this.data.cancelReasonCode,
+      returnUserName: this.data.returnUserName,
+      returnUserPhone: this.data.returnUserPhone
+    }
+
+    Api.applyAfterSale(params).then(res => {
+      console.log("申请售后结果", res.data)
+      if (res.data.status === "0000") {
+        wx.hideLoading()
+        console.log("申请售后结果", res.data)
+        wx.redirectTo({
+          url: '../shopOrderList/shopOrderList?currentTab=8',
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch(err => {
+      alertModal1("请求失败")
+    })
+  }
+})

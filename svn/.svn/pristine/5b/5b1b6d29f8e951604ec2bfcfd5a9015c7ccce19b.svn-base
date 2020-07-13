@@ -1,0 +1,244 @@
+/**
+ * @fileoverview 售后详情页面
+ * @author liuzhuang
+ */
+
+const app = getApp();
+// 引入接口api
+import Api from '/../../utils/config/Api/order.js';
+// 引入toast loading
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let loading = alert.showLoading;
+// 引入表情转码方法
+import tools from '../../utils/tools/util.js'
+let utf16toEntities = tools.utf16toEntities // emojy 转字符
+let uncodeUtf16 = tools.uncodeUtf16 //字符转emojy
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    afterDisplaySta: true,
+    orderDisplaySta: true,
+    // 售后id
+    returnId: '',
+    // 物流弹层显示状态
+    logisticsHidden: true,
+    // 用户填写物流单号
+    expressNo: '',
+    // 物流公司
+    logisticsCompany: '',
+    // 预览图片list
+    imglist: [],
+    // 定时器
+    timeId: null
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad: function (options) {
+    this.data.returnId = options.returnId
+    loading()
+    // 请求详情
+    this.getOrderDetail();
+  },
+
+  /**
+   * 获取订单详情
+   */
+  getOrderDetail() {
+    var that = this;
+    clearTimeout(that.data.timeId)
+    let params = {
+      orderReturnId: that.data.returnId
+    }
+    Api.afterSaleDetail(params).then(res => {
+      console.log("售后详情", res.data)
+      if (res.data.status === "0000") {
+        let list = []
+        res.data.data.orderReturnPicResList.map(item => {
+          list.push(item.goodsUrl)
+        })
+        let data = res.data.data;
+        data.returnInfo = uncodeUtf16(data.returnInfo);
+        data.returnUserName = uncodeUtf16(data.returnUserName);
+        data.note = uncodeUtf16(JSON.parse(data.note).desc);
+        switch (data.returnReason) {
+          case 1:
+            data.returnReasonName = '商家缺货/打烊，联系我取消';
+            break;
+          case 2:
+            data.returnReasonName = '忘记使用红包';
+            break;
+          case 3:
+            data.returnReasonName = '忘点主食';
+            break;
+        } 
+        data.systemLogList.map(item => {
+          item.operUser = uncodeUtf16(item.operUser)
+        })
+
+        that.setData({
+          orderDetail: data,
+          imglist: list
+        })
+        wx.hideLoading()
+        // 隐藏导航栏加载框
+        wx.hideNavigationBarLoading();
+        // 停止下拉动作
+        wx.stopPullDownRefresh();
+        if (res.data.data.returnStatus == 1) {
+          that.calcTime(res.data.data.returnSubmitTime)
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 计算剩余时间
+   */
+  calcTime(time) {
+    if (!time) {
+      return
+    }
+    var timestamp = Date.parse(new Date());
+    var totime = time / 1000 + 7200;
+    console.log('截止时间', totime)
+    console.log('当前时间', timestamp)
+    //当前时间戳
+    timestamp = timestamp / 1000;
+    var surplus = totime - timestamp;
+    if (surplus >= 0) {
+      this.setData({
+        time: surplus
+      })
+      this.setTimeCount()
+    }
+  },
+
+  /**
+   * 倒计时
+   */
+  setTimeCount() {
+    let time = this.data.time
+    time--;
+    if (time <= 0) {
+      time = 0;
+      return
+    }
+    this.setData({
+      time: time
+    })
+    this.data.timeId = setTimeout(this.setTimeCount, 1000);
+  },
+
+  /**
+   * 撤销申请
+   */
+  cancelAfterSale() {
+    let _this = this
+    wx.showModal({
+      title: '撤销售后申请',
+      content: '撤销售后申请，售后订单将关闭。之后您将无法发起平台申诉！',
+      success(res) {
+        if (res.confirm) {
+          let params = {
+            orderReturnId: _this.data.returnId,
+            returnStatus: 8
+          }
+          Api.cancelAfterSale(params).then(res => {
+            if (res.data.status === "0000") {
+              alertModal1("取消售后成功")
+              _this.getOrderDetail()
+            } else {
+              alertModal1(res.data.msg)
+            }
+          })
+        } else if (res.cancel) {
+          console.log('用户点击取消')
+        }
+      }
+    })
+  },
+
+  /**
+     * 图片预览
+     */
+  previewImage(e) {
+    var that = this;
+    var current = e.currentTarget.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.imglist
+    })
+  },
+
+  /**
+   * 离开时清除setTimeout
+   */
+  onUnload() {
+    clearTimeout(this.data.timeId)
+  },
+
+  //切换隐藏售后详情
+  changeAfterDis() {
+    this.setData({
+      afterDisplaySta: !this.data.afterDisplaySta
+    })
+  },
+
+  //切换隐藏订单信息
+  changeOrderDis() {
+    this.setData({
+      orderDisplaySta: !this.data.orderDisplaySta
+    })
+  },
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function () {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function () {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function () {
+
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function () {
+
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function () {
+
+  }
+})

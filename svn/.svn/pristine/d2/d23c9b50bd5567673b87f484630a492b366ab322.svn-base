@@ -1,0 +1,39 @@
+<!-------------标头------------->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view class="arrow-view">
+        <view class="arrow" bindtap='goHome' /></view>
+      <view>确认授权</view>
+    </view>
+  </view>
+</view>
+
+<view class='container'>
+  <view class='logo'>
+    <image wx:if="{{shopHeader=== null || shopHeader === ''}}" style="width:140rpx;height:140rpx;" src="../../img/LOGO.png"></image>
+    <image wx:else style="width:140rpx;height:140rpx;" src="{{shopHeader}}"></image>
+  </view>
+  <view class='title' wx:if="{{shopName=== null || shopName === ''}}">云乐汇自营店</view>
+  <view class='title' wx:else>{{shopName}}</view>
+  <view class='tips'>
+    <view wx:if="{{buttonType == 1}}">请同意云乐汇授权</view>
+    <view wx:elif="{{buttonType == 2}}">请绑定手机号</view>
+    <view>以便本店为您提供更好的服务</view>
+  </view>
+  <button wx:if="{{buttonType == 1}}" class="{{selected ? 'btn' : 'btn-false'}}" open-type="{{selected ? 'getUserInfo' : ''}}" lang="zh_CN" bindgetuserinfo="{{selected ? 'onGotUserInfo' : ''}}">
+    <text>确认授权</text>
+  </button>
+  <button wx:elif="{{buttonType == 2}}" class='btn' bindgetphonenumber='getPhoneNumber' open-type='getPhoneNumber'>
+    <text>获取手机号</text>
+  </button>
+  <view class="agreement" wx:if="{{buttonType == 1}}">
+    <!-- <icon wx:if="{{selected}}" type="success" color="#FDE500" size='14' class="radio_chek" bindtap="selected" />
+    <icon wx:else type="circle" color="#D0D0D0" class="radio_chek" size='14' bindtap="selected" /> -->
+    <text bindtap="goAgreementPage" class="bottom-text">确认授权表示您已同意《云乐汇服务及隐私政策》</text>
+  </view>
+</view>

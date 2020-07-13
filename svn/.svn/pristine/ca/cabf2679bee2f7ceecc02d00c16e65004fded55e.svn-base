@@ -1,0 +1,61 @@
+// pages/activityBanner/activityBanner.js
+
+const app = getApp();
+import commonApi from '/../../utils/config/Api/common.js';
+import util from '../../utils/tools/util.js';
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  onLoad(options) {
+
+  },
+
+  /**
+   * 开店
+   */
+  // TODO:商户入驻上线后 改跳转页面
+  //开店（1判断是否授权 2判断是否开店 3开店）
+  openShop() {
+    let that = this;
+    // 防止多次触发
+    util.buttonClicked(this);
+
+    //临时注释
+    // wx.navigateTo({
+    //   url: '../../pages/shopOpenTemp/shopOpenTemp',
+    // })
+    app.accredit().then((res) => {
+      //判断是否开店
+      that.jumpOpenShop()
+    })
+  },
+
+  //开店
+  jumpOpenShop() {
+    // 判断是否开过店
+    commonApi.clickOpenShop({}).then(res => {
+      console.log('是否开过店？', res)
+      if (res.data.status === "0002") {
+        wx.navigateTo({
+          url: `../shopopen/shopopen?shopId=${res.data.data.merchantShopId}&shopStatus=${res.data.data.auditStatus}&rejectReason=${res.data.data.rejectReason}`,
+        })
+      }
+      else {
+        wx.navigateTo({
+          url: '../shopApplication/shopApplication'
+        })
+      }
+    })
+  }
+
+})

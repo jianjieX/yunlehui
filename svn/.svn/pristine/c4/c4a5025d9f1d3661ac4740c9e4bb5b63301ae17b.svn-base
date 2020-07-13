@@ -1,0 +1,77 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  /**
+   * 搜索服务详细
+   */
+  searchServeDetail(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/atv/getDetailForC`;
+    return result
+  },
+  /**
+   * 查询服务预约信息
+   */
+  getServeSubscribePhone(data) {
+    let result = {};
+    result.method = "GET";
+    result.url = `/atv/findPhone`;
+    return result
+  },
+
+
+  /**
+   * 搜索服务和活动列表  
+   */
+  getServiceAndActivityList(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/atv/getServiceClassifi`;
+    return result
+  },
+
+  /**
+   * 我的页面---我的服务
+   */
+  getService(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/atv/getServiceForC`;
+    return result
+  },
+
+  /**
+   * 提交服务预约
+   */
+  submitServeSubscribe(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/atv/enrol/add`;
+    return result
+  },
+  /**
+   * 我的页面---我的活动
+   */
+  getActivity(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = `/atv/findActivityForFront`;
+    return result
+  },
+  /***
+   * 我的页面---服务及活动详情
+   */
+  getDetailFor(id) {
+    let result = {};
+    result.method = "GET";
+    result.url = `/atv/enrolDetail/${id}`;
+    return result
+
+  }
+}
+
+
+const Api = new MyHttp(ALL_API);
+
+export default Api;

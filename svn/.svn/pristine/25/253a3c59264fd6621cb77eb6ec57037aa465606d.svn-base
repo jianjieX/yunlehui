@@ -1,0 +1,444 @@
+/**
+ * 服务详情页面
+ */
+// 引入全局app对象
+const app = getApp();
+// 引入wxParse
+import WxParse from '../../wxParse/wxParse.js'
+// 引入WxValidate
+import WxValidate from '../../wxValidate/wxValidate.js'
+// 引入分享朋友圈 canvas相关
+import Poster from '../../components/miniprogram_dist/poster/poster';
+// 引入接口api
+import Api from '/../../utils/config/Api/activity.js';
+// 引入toast相关方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+// 引入解码表情方法
+let utils = require('../../utils/tools/util.js')
+let uncodeUtf16 = utils.uncodeUtf16
+
+Page({
+  data: {
+    // id
+    options: '',
+    list: [],
+    // 头部自适应样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    //导航条名字
+    navigateName: '',
+    //导航条名字
+    navigateTarget: '',
+    // 使用data数据对象设置样式名
+    minusStatus: 'disabled',
+    // 画布配置,分享
+    posterConfig: {},
+    // 分享的图片
+    shareImage: '',
+    localImg: '',
+    //弹出动画
+    animationPlus: {},
+    showModalStatus: false,
+    showSpecModalStatus: false,
+    isGoTopShow: false,
+    // tab切换
+    currentTab: 1,
+    // 是否分享进入
+    shareType: 0,
+    // 页面遮罩层
+    pageMask: false,
+    // 地图名称
+    mapName: '北京',
+    //地图经度纬度
+    latitude: 39.9075,
+    longitude: 116.39723,
+    // 活动电话
+    phone: '',
+    //活动报名信息
+    signParams: {
+      memberName: '',
+      mobile: '',
+      memberRemark: ''
+    },
+    // 主图
+    mainImage: '',
+    // 头像
+    publisherPortrait: '',
+    // 姓名
+    publisher: '',
+    // 地址
+    address: '',
+    // 电话
+    contactNumber: '',
+    // 操作
+    joinModeName: '',
+    // 是否可编辑
+    joinModeVaild: '',
+    //防止连续触发
+    buttonClicked: false,
+  },
+
+  onLoad(options) {
+    this.init(options);
+    this.dealStyle();
+    this.initValidate() //验证规则函数
+  },
+
+  init(options) {
+    let that = this;
+    that.setData({
+      options
+    })
+    wx.showLoading({
+      title: '加载中',
+    })
+
+    this.searchData()
+  },
+  // 头部适配  初始化数据
+  dealStyle() {
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+    })
+  },
+  onShow() {
+    this.setData({
+      pageMask: false
+    })
+  },
+
+  /**
+   * 验证函数
+   */
+  initValidate() {
+    const rules = {
+      mobile: {
+        required: true,
+        tel: true
+      },
+      memberRemark: {
+        required: false,
+        maxlength: 50
+      }
+    }
+    const messages = {
+      mobile: {
+        required: '请填写手机号',
+        tel: '请填写正确的手机号'
+      },
+      memberRemark: {
+        required: '请填写备注',
+        maxlength: '最多只能输入50个字符'
+      }
+    }
+    this.WxValidate = new WxValidate(rules, messages)
+  },
+
+  /**
+   * 查询服务详细
+   */
+  searchData() {
+    let that = this
+    let params = {
+      id: this.data.options.id
+    }
+    Api.searchServeDetail(params).then((res) => {
+      if (res.data.status === '0000') {
+        if (res.data.data) {
+          let data = res.data.data;
+          that.setData({
+            mainImage: data.mainImage,
+            publisherPortrait: data.publisherPortrait,
+            address: data.address,
+            publisher: data.publisher,
+            contactNumber: data.contactNumber,
+            latitude: data.lat,
+            longitude: data.lng,
+            content: data.content,
+            title: data.title,
+            joinModeName: data.joinModeName,
+            joinModeStatus: data.joinModeStatus,
+            joinModeVaild: data.joinModeVaild
+          })
+        }
+        let content = uncodeUtf16(that.data.content);
+        // wxParse解析html富文本
+        WxParse.wxParse('article', 'html', content, that, 5);
+      }
+    }).catch((res) => {
+      alertModal(res)
+    })
+  },
+
+  /**
+   * 打开地图
+   */
+  openMap() {
+    const name = this.data.address;
+    const latitude = Number(this.data.latitude);
+    const longitude = Number(this.data.longitude);
+    wx.openLocation({
+      name: name,
+      latitude: latitude,
+      longitude: longitude,
+      scale: 18
+    })
+  },
+  /**
+   * 打开电话
+   */
+  openPhone() {
+    let phoneNumber = this.data.contactNumber;
+    wx.makePhoneCall({
+      phoneNumber: phoneNumber,
+      success: function() {
+        console.log("拨打电话成功！")
+      },
+      fail: function() {
+        console.log("拨打电话失败！")
+      }
+    })
+  },
+
+  /**
+   * 查询服务预约信息-手机
+   */
+  getServeSubscribePhone() {
+
+    let that = this
+    Api.getServeSubscribePhone().then((res) => {
+      if (res.data.status === '0000') {
+        let mobile = res.data.data
+        that.setData({
+          ['signParams.mobile']: mobile
+        })
+        this.showModal()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+
+  },
+
+  /**
+   * 表单提交
+   */
+  formSubmit(e) {
+
+    let params = e.detail.value
+    let that = this
+    params.activityId = this.data.options.id
+
+    //校验表单
+    if (!this.WxValidate.checkForm(params)) {
+      const error = this.WxValidate.errorList[0]
+      alertModal1(error.msg)
+      return false
+    }
+
+    Api.submitServeSubscribe(params).then((res) => {
+      if (res.data.status === '0000') {
+        alertModal1('提交成功')
+        that.hideDialog()
+        that.searchData()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+
+  },
+
+  /**
+   * 返回按钮
+   */
+  handleRt() {
+
+    if (this.data.shareType == 1) {
+      wx.switchTab({
+        url: '../shopHome/shopHome',
+      })
+    } else {
+      wx.navigateBack({
+        delta: 1
+      })
+    }
+  },
+
+  /**
+   * 返回首页
+   */
+  goHome() {
+
+    wx.switchTab({
+      url: '../shopHome/shopHome'
+    })
+  },
+
+  /**
+   * 分享
+   */
+  share() {
+
+    let _this = this
+    // 检查授权和绑定手机状态
+    let type = app.accredit().then((res) => {
+      if (type) {
+        _this.showModal()
+      }
+    });
+  },
+
+  // 规格图片
+  previewSpecPic(e) {
+
+    let that = this;
+    let current = e.target.dataset.src;
+    wx.previewImage({
+      current: current,
+      urls: that.data.specPicList
+    })
+  },
+
+  /**
+   * 打开关闭
+   */
+  showDialog() {
+    utils.buttonClicked(this);
+    this.accredit()
+  },
+
+  /**
+   * 双授权检测
+   */
+  accredit() {
+
+    if (app.data.decryptDataFlag) {
+      if (app.data.flag === 0) {
+        wx.showModal({
+          title: '提示',
+          content: '绑定手机号后查看',
+          success(res) {
+            if (res.confirm) {
+              wx.navigateTo({
+                url: '../confirmation/confirmation',
+              })
+            } else if (res.cancel) {
+              wx.switchTab({
+                url: '../shopHome/shopHome',
+              })
+            }
+          }
+        })
+      } else {
+        this.searchServeSubscribeInfo()
+      }
+    } else {
+      wx.navigateTo({
+        url: '../confirmation/confirmation?type=1',
+      })
+    }
+
+  },
+
+  /**
+   * 获取提交昵称
+   */
+  searchServeSubscribeInfo() {
+
+    let that = this
+    this.setData({
+      ['signParams.memberName']: app.data.userInfo.nickName
+    })
+    this.getServeSubscribePhone()
+
+  },
+
+  /**
+   * 隐藏dialog
+   */
+  hideDialog: function() {
+    this.hideModal()
+  },
+
+  /**
+   * 规格弹窗动画
+   */
+  showModal() {
+
+    // 显示遮罩层
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(450).step()
+    this.setData({
+      animationData: animation.export(),
+      showSpecModalStatus: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        animationData: animation.export()
+      })
+    }.bind(this), 200)
+  },
+
+  /**
+   * 隐藏
+   */
+  hideModal() {
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(450).step()
+    this.setData({
+      animationData: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        animationData: animation.export(),
+        showSpecModalStatus: false
+      })
+    }.bind(this), 200)
+  },
+
+
+  /**
+   * tab切换
+   */
+  changeTab(e) {
+
+    let currentTab = e.currentTarget.dataset.current
+    this.setData({
+      currentTab
+    })
+  },
+
+  /**
+   * 富文本超链接
+   */
+  wxParseTagATap(e) {
+
+    let href = e.currentTarget.dataset.src;
+    console.log(href);
+    wx.navigateTo({
+      url: `../webviewPage/webviewPage?url=${href}`
+    })
+  }
+})

@@ -1,0 +1,33 @@
+/* pages/activityBanner/activityBanner.wxss */
+
+.container {
+  position: relative;
+}
+
+image {
+  display: block;
+}
+
+.img1 {
+  width: 750rpx;
+  height: 1882rpx;
+}
+
+.img2 {
+  width: 750rpx;
+  height: 1352rpx;
+}
+
+.img3 {
+  width: 750rpx;
+  height: 2220rpx;
+}
+
+.open-img {
+  width: 284rpx;
+  height: 70rpx;
+  position: absolute;
+  bottom: 64rpx;
+  left: 50%;
+  transform: translateX(-50%);
+}

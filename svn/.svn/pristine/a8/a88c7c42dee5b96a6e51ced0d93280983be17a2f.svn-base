@@ -1,0 +1,26 @@
+<!--设置我的信息页面-->
+<!--我的信息-->
+<view class="my-inform-view my-inform-margin-top">
+  <view class="my-avatar">
+    <view>头像</view>
+    <image bindtap="{{featuresType ? 'chooseAvatar' : ''}}" class="avatar-view" src="{{avatarUrl}}"></image>
+  </view>
+  <view class="line-view"></view>
+  <view class="my-inform-item">
+    <view>昵称</view>
+    <input class="inform-input" bindinput="{{featuresType ? 'changeName' : ''}}" maxlength="16" value="{{nickName}}" placeholder="请输入"></input>
+  </view>
+  <view class="line-view"></view>
+  <view class="my-inform-item">
+    <view>性别</view>
+    <picker bindchange="{{featuresType ? 'bindGenderChange' : ''}}" value="{{index}}" range="{{genderPicker}}" class="inform-picker">{{gender}}</picker>
+  </view>
+  <view class="line-view"></view>
+  <view class="my-inform-item-none">
+    <view style="line-height:100rpx;">个人签名</view>
+    <input class="inform-input" bindinput="{{featuresType ? 'changeSignature' : ''}}" bindfocus="clearValue" value="{{signature}}" placeholder="请输入"></input>
+  </view>
+</view>
+
+<!--保存-->
+<view class="save-cofirm" bindtap="modifyUser">保存</view>

@@ -1,0 +1,37 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  updatePayPwd(data) { // 修改支付密码
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/user/updatePayPwd';
+    return result
+  },
+  getPhoneCode(data) { // 获取短信验证码
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/user/getPhoneCode?mobile=' + data.mobile;
+    return result
+  },
+  checkUser(data) { // 手机验证码验证身份
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/user/checkUser';
+    return result
+  },
+  checkOldPwd(data) { // 校验旧密码
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/user/checkOldPwd';
+    return result
+  },
+  resetPaymentPwd(data) { // 重置密码
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/user/resetPaymentPwd';
+    return result
+  }
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

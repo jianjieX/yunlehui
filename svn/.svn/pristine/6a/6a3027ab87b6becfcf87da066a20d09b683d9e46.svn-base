@@ -1,0 +1,159 @@
+<!-- 疫情活动页面 -->
+
+<!-- 格式化金钱 -->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<!-- 弹幕 -->
+<view class='displayGroup'>
+
+	<!-- top -->
+	<view class='dmGroup top' style="animation: dmAnimation2 {{3.5*baseData.length}}s linear infinite; ">
+		<view class='dmItem' wx:for="{{ baseData }}" wx:if="{{ index % 3 === 0 }}" wx:key="id">
+			<view class='dm'>
+				<view class='avatarBox'>
+					<image src='{{item.memberAvatar || defaultAvatar}}' class='avatar' mode='aspectFit'></image>
+				</view>
+				<view class='content'>
+					<view>{{ item.memberName }}</view>
+					<view>{{ item.message }}</view>
+				</view>
+			</view>
+		</view>
+	</view>
+
+	<!-- mid -->
+	<view class='dmGroup mid' style="animation: dmAnimation2 {{3*baseData.length}}s linear 1s infinite; ">
+		<view class='dmItem' wx:for="{{ baseData }}" wx:if="{{ index % 3 === 1 }}" wx:key="id">
+			<view class='dm'>
+				<view class='avatarBox'>
+					<image src='{{item.memberAvatar || defaultAvatar}}' class='avatar' mode='aspectFit'></image>
+				</view>
+				<view class='content'>
+					<view>{{ item.memberName }}</view>
+					<view>{{ item.message }}</view>
+				</view>
+			</view>
+		</view>
+	</view>
+
+	<!-- btm -->
+	<view class='dmGroup btm' style="animation: dmAnimation2 {{4.5*baseData.length}}s linear infinite; ">
+		<view class='dmItem' wx:for="{{ baseData }}" wx:if="{{ index % 3 === 2 }}" wx:key="id">
+			<view class='dm'>
+				<view class='avatarBox'>
+					<image src='{{item.memberAvatar || defaultAvatar}}' class='avatar' mode='aspectFit'></image>
+				</view>
+				<view class='content'>
+					<view>{{ item.memberName }}</view>
+					<view>{{ item.message }}</view>
+				</view>
+			</view>
+		</view>
+	</view>
+
+	<view class='focus'>
+		<image src='{{ banner }}' class='img'></image>
+	</view>
+	<view class='shadowOverlay'></view>
+
+	<!-- 祈福按钮 -->
+	<view class="q-btn" bindtap="showModal" hidden="{{!hideModal}}">共抗疫情 中国加油</view>
+</view>
+
+
+<!-- 商品列表 -->
+<view class="g-title">疫情防护专场</view>
+<view class="goods-list">
+	<view class="goods-item" wx:for="{{goodsList}}" wx:key="goodsId" data-id="{{item.goodsId}}" bindtap="goGoodsDetail">
+		<view class="goods-img">
+			<image src="{{item.goodsPicUrl}}"></image>
+		</view>
+		<view class="goods-name">{{item.goodsName}}</view>
+		<view class="goods-price">
+			<view class="price-l">￥{{numFr.getNum(item.goodsPrice)}}</view>
+			<view class="price-r" wx:if="{{item.marketPrice}}">￥{{numFr.getNum(item.marketPrice)}}</view>
+		</view>
+	</view>
+</view>
+
+<!-- 弹窗 -->
+<view class="modals modals-bottom-dialog" hidden="{{hideModal}}">
+	<view class="bottom-dialog-body bottom-pos" animation="{{animationData}}">
+		<view class="modal-title">感谢所有留守、致敬所有坚守
+			<image class="close-icon" src="/img/others/close.png" bindtap="hideModal"></image>
+		</view>
+		<view class="modal-content">
+			<view class="dm-item" wx:for="{{dm}}" wx:key="id" bindtap="sendDM" data-value="{{item.content}}">
+				<view class="dm-item-box">
+					<image class="icon-bg" src="/img/others/icon-bg.png"></image>
+					<view>{{item.word}}</view>
+				</view>
+				<view class="dm-item-content">{{item.content}}</view>
+			</view>
+		</view>
+	</view>
+</view>
+
+<!-- 底部按钮 -->
+<view class="btn-group">
+	<button class="open-shop" bindtap="showDialog">
+		<view class="btn-title">我要开店</view>
+		<view class="btn-content">把祈福分享给我的客户</view>
+	</button>
+	<button class="share-btn" open-type="share">
+		<view class="btn-title">立即分享</view>
+		<view class="btn-content">把祈福分享给我的朋友</view>
+	</button>
+</view>
+
+<!-- 开店弹窗 -->
+<view class="dialog-view" catchtouchmove="false" hidden="{{hideDialog}}">
+	<view class="dialog">
+		<image class="close-icon" src="/img/others/close.png" bindtap="hideDialog"></image>
+		<image src="https://ylhmuying.oss-cn-beijing.aliyuncs.com/other/20200210130205rn.png" class="dialog-bg"></image>
+		<view class="dialog-btn" bindtap="openShop">
+			<image class="dialog-btn-img" src="/img/others/openshop.png"></image>
+			<view class="dialog-btn-text">我要开店</view>
+		</view>
+
+		<scroll-view scroll-y class="dialog-content">
+			<view class="d-item">
+				<view class="d-item-title">
+					<image src="/img/others/icon1.png" class="icon1"></image>
+					免费做公益
+				</view>
+				<view class="d-item-content">
+					云乐汇“防疫专区”所有商品售价均低于市场价。其中所有差价，均由云乐汇承担。商家只须分享给自己的用户即可完成公益助力!
+				</view>
+			</view>
+
+			<view class="d-item">
+				<view class="d-item-title">
+					<image src="/img/others/icon2.png" class="icon2"></image>
+					云乐汇微信小程序免费开店
+				</view>
+				<view class="d-item-content">
+					免费拥有，专属线上店铺；操作便捷，即可分享卖货；会员营销，享受源头分佣；平台福利，商家福利不间断。
+				</view>
+			</view>
+
+			<view class="d-item">
+				<view class="d-item-title">店铺上线“正品低价防护用具”模块</view>
+				<view class="d-item-content">
+					正品低价防护用具于 2.10 日上线。所有用户均可用低于市场价购买的正品防护用具。 “正品低价防护用具”模块适用于云乐汇所有店铺。
+				</view>
+			</view>
+
+			<view class="d-item">
+				<view class="d-item-title">
+					<view class="title-icon"></view>
+					云乐汇简介
+					<view class="title-icon"></view>
+				</view>
+				<view class="d-item-content">
+					云乐汇隶属于美克集团，是继美克家居、美克化工外的第三大板块(产 业互联网)，为企业/商家提供会员营销平台，帮助其增流量、多挣钱， 最终实现让合作方效益倍增。
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</view>

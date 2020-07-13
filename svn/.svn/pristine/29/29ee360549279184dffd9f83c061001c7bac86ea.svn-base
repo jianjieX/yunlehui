@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.imp.jd.user.distribution.channel.dao.JdUserDisbutChannelDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.imp.jd.user.distribution.channel.entity.JdUserDisbutChannelEntity" id="jdUserDisbutChannelMap">
+        <result property="id" column="id"/>
+        <result property="jdId" column="jd_id"/>
+        <result property="platformId" column="platform_id"/>
+        <result property="jcbNickname" column="jcb_nickname"/>
+        <result property="userIdentity" column="user_identity"/>
+        <result property="userIdentityview" column="user_identityview"/>
+        <result property="userPididentity" column="user_pididentity"/>
+        <result property="userPididentityView" column="user_pididentity_view"/>
+        <result property="grandpaUserJcbNickname" column="grandpa_user_jcb_nickname"/>
+        <result property="grandpaUserIdentity" column="grandpa_user_identity"/>
+        <result property="grandpaUserIdentityView" column="grandpa_user_identity_view"/>
+        <result property="generalBuyerCount" column="general_buyer_count"/>
+        <result property="extendCount" column="extend_count"/>
+        <result property="purchaseOrderCount" column="purchase_order_count"/>
+        <result property="saleOrderCount" column="sale_order_count"/>
+        <result property="saleTotalMoney" column="sale_total_money"/>
+        <result property="jcbMobile" column="jcb_mobile"/>
+        <result property="created" column="created"/>
+        <result property="upgradeTime" column="upgrade_time"/>
+        <result property="authSwitch" column="auth_switch"/>
+        <result property="userChangeUpper" column="user_change_upper"/>
+        <result property="incomeTotalAmount" column="income_total_amount"/>
+        <result property="userPid" column="user_pid"/>
+        <result property="growTotalValue" column="grow_total_value"/>
+        <result property="puserJcbNickname" column="puser_jcb_nickname"/>
+        <result property="modified" column="modified"/>
+        <result property="openId" column="open_id"/>
+        <result property="yn" column="yn"/>
+        <result property="unionid" column="unionid"/>
+        <result property="source" column="source"/>
+        <result property="sex" column="sex"/>
+        <result property="header" column="header"/>
+        <result property="miniOpenId" column="mini_open_id"/>
+        <result property="city" column="city"/>
+        <result property="province" column="province"/>
+        <result property="country" column="country"/>
+        <result property="wxNickname" column="wx_nickname"/>
+        <result property="jcbHeader" column="jcb_header"/>
+        <result property="userType" column="user_type"/>
+        <result property="userPidNickname" column="user_pid_nickname"/>
+        <result property="userIdHierarchy" column="user_id_hierarchy"/>
+        <result property="jcbNicknameHierarchy" column="jcb_nickname_hierarchy"/>
+        <result property="grandpaUserId" column="grandpa_user_id"/>
+        <result property="bindTime" column="bind_time"/>
+        <result property="starValue" column="star_value"/>
+        <result property="objectVersionNumber" column="OBJECT_VERSION_NUMBER"/>
+        <result property="creationDate" column="CREATION_DATE"/>
+        <result property="createdBy" column="CREATED_BY"/>
+        <result property="lastUpdatedBy" column="LAST_UPDATED_BY"/>
+        <result property="lastUpdateDate" column="LAST_UPDATE_DATE"/>
+        <result property="lastUpdateLogin" column="LAST_UPDATE_LOGIN"/>
+        <result property="attributeCategory" column="ATTRIBUTE_CATEGORY"/>
+        <result property="attribute1" column="ATTRIBUTE1"/>
+        <result property="attribute2" column="ATTRIBUTE2"/>
+        <result property="attribute3" column="ATTRIBUTE3"/>
+        <result property="attribute4" column="ATTRIBUTE4"/>
+        <result property="attribute5" column="ATTRIBUTE5"/>
+        <result property="attribute6" column="ATTRIBUTE6"/>
+        <result property="attribute7" column="ATTRIBUTE7"/>
+        <result property="attribute8" column="ATTRIBUTE8"/>
+        <result property="attribute9" column="ATTRIBUTE9"/>
+        <result property="attribute10" column="ATTRIBUTE10"/>
+        <result property="attribute11" column="ATTRIBUTE11"/>
+        <result property="attribute12" column="ATTRIBUTE12"/>
+        <result property="attribute13" column="ATTRIBUTE13"/>
+        <result property="attribute14" column="ATTRIBUTE14"/>
+        <result property="attribute15" column="ATTRIBUTE15"/>
+    </resultMap>
+
+
+</mapper>

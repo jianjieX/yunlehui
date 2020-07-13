@@ -1,0 +1,7 @@
+<!--小猪绑定成功页-->
+<view class="success-view">
+  <icon type="success" size="93" color="#FABE00"></icon>
+  <view class="success-text2">信息提交成功</view>
+  <view class="success-text1">我们将以短信的方式告知您，请按照短信的指示完成电签!</view>
+  <view class="success-button" bindtap="resend">重新发送</view>
+</view>

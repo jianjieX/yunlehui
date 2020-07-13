@@ -1,0 +1,65 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="income" src="../../filter/income.wxs"></wxs>
+<!-- 导航栏 -->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view bindtap='backPage' class='arrow-view'>
+        <view class='arrow'></view>
+      </view>
+      <view class="label">已结算</view>
+    </view>
+  </view>
+</view>
+<view style="height:{{fixedTop}}px;"></view>
+
+<block>
+  <view>
+    <view class='mywealth'>
+      <view class='wealth-item'>
+        <view class='mid'>已结算金额</view>
+        <view class='total-price'>{{numFr.getNum(balance)}}元</view>
+        <text class="withdraw-button-view" bindtap='cashOut'>提现</text>
+      </view>
+    </view>
+  </view>
+  <view class='list'>
+    <scroll-view scroll-x class='nav'>
+      <view class="{{currentTab === 0?'focus':'scroll-item'}}" data-current='{{0}}' bindtap='handleTab'>全部</view>
+      <view class="{{currentTab === '22-36'?'focus':'scroll-item'}}" data-current="{{'22-36'}}" bindtap='handleTab'>内容创作</view>
+      <view class="{{currentTab === '23-37'?'focus':'scroll-item'}}" data-current="{{'23-37'}}" bindtap='handleTab'>创客招商</view>
+      <!-- <view class="{{currentTab === '43'?'focus':'scroll-item'}}" data-current="{{'43'}}" bindtap='handleTab'>乐享权益分佣</view> -->
+      
+    </scroll-view>
+    <view class="line" wx:if='{{currentTab === 0}}'></view>
+    <view class="line1" wx:if="{{currentTab === '22-36'}}"></view>
+    <view class="line2" wx:if="{{currentTab === '23-37'}}"></view>
+     <!-- <view class="line3" wx:if="{{currentTab === '43'}}"></view> -->
+    <view wx:if="{{hasInform}}">
+      <view class='content' wx:for="{{dataList}}" wx:key="item">
+        <view class='content-item'>
+          <view class="item">
+            <view>
+              <view class="item-id">{{income.trxType(item.trxType)}}</view>
+              <view class="item-time">{{numFr.dateFormat(item.updateTime)}}</view>
+            </view>
+            <view class="price">
+              <text class="add-icon" wx:if="{{item.fundDirection=='ADD'}}">+￥{{numFr.getNum(item.amount)}}</text>
+              <text class="sub-icon" wx:else>-￥{{numFr.getNum(item.amount)}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:else>
+      <view class="no-content-view">
+        <image class="no-content-image" src="../../img/withdraw/earnings _withdrawal_ settlement_null.png" mode="widthFix"></image>
+        <view class="no-content-text">当前暂无已结算~</view>
+      </view>
+    </view>
+  </view>
+</block>

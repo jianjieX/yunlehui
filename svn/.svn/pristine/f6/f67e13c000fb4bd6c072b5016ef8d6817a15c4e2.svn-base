@@ -1,0 +1,653 @@
+/**
+ * 主页，故事列表
+ *
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+let app = getApp();
+//请求地址
+let baseUrl = require("../../utils/base.js");
+//故事API
+import Api from '/../../utils/config/Api/story.js';
+import commonApi from '/../../utils/config/Api/common.js';
+import myInformApi from '../../utils/config/Api/myInform.js';
+import util from '../../utils/tools/util.js';
+// emojy 转字符
+let uncodeUtf16 = util.uncodeUtf16;
+//alert提示
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+//加loading
+let sl = alert.showLoading;
+let sl2 = alert.showLogin;
+let loading = alert.loading;
+
+Page({
+  data: {
+    //官方的全机型适配样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    // 门店id
+    shopId: 1,
+    //适配轮播顶部
+    fixedTop: getApp().data.fixedTop + 38,
+    //商品列表
+    commodityList: null,
+    //模块type
+    moudelType: '2',
+    //当前页
+    currentPage: 1,
+    //每页多少条
+    pageSize: 10,
+    //总页数
+    totalPage: null,
+    //遮罩层子
+    subMask: false,
+    //防止连续触发
+    buttonClicked: false,
+    swiper: {
+      swiperCurrent: 0,
+      indicatorDots: true,
+      autoplay: true,
+      interval: 3000,
+      duration: 800,
+      circular: true,
+      indicatorCo: '#ffdfdc',
+      swiperActiveColor: '#ff948a',
+      bannerList: [],
+    },
+    categories: [{
+      id: 1,
+      title: '正当红',
+      icon: './../../img/homeImg/tab01.png',
+      page: '../activityHome/activityHome?id=1&&name=正当红&&typeId=0'
+    }, {
+      id: 2,
+      title: '吃货帮',
+      icon: './../../img/homeImg/tab03.png',
+      page: '../shopFood/shopFood'
+    }, {
+      id: 5,
+      title: '精选商户',
+      icon: './../../img/homeImg/tab08.png',
+      page: '../shopMerchant/shopMerchant'
+    }, {
+      id: 3,
+      title: '梦工厂',
+      icon: './../../img/homeImg/tab07.png',
+      page: '../shopOpen/shopOpen'
+    }, {
+      id: 4,
+      title: '大管家',
+      icon: './../../img/homeImg/tab04.png',
+      page: '../activityCategory/activityCategory'
+    }],
+    tabList: [{
+      name: "梦工厂",
+      page: '../page/xx'
+    }, {
+      name: "精选商户",
+      page: '../page/xx'
+    }]
+  },
+
+  onLoad() {
+    let that = this;
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      shopId: wx.getStorageSync('shopId')
+    })
+    that.login();
+  },
+
+  onShow() {
+    let that = this;
+    //获取首页banner
+    that.getIndexBanner();
+    //重新获取点赞后的故事数据
+    if (wx.getStorageSync('page') && wx.getStorageSync('page') !== 'undefined') {
+      this.detailLike(wx.getStorageSync('page'));
+      wx.removeStorageSync('page');
+    }
+    that.setData({
+      subMask: false
+    })
+  },
+
+  //登录
+  login() {
+    let that = this
+    sl2("登录中")
+    app.userLogin().then((res) => {
+      // 故事列表
+      that.getAllStory();
+
+      //获取个人信息
+      if (app.data.decryptDataFlag && app.data.flag == 1) {
+        that.getUserInfo()
+      }
+    }).catch((err) => {
+      console.log('errrrrrrrr',err);
+      wx.hideLoading()
+      wx.showModal({
+        title: '提示',
+        content: '连接服务器失败，请重新登录',
+        showCancel: false,
+        success(res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            that.login();
+          }
+        }
+      })
+    })
+  },
+
+  // 请求个人信息
+  getUserInfo() {
+    let _this = this;
+    myInformApi.originatorDetail().then(res => {
+      if (res.data.status === "0000") {
+        if (res.data.data.nickName === null) {
+          return
+        }
+        let {
+          nickName,
+          signature,
+          avatarUrl,
+          gender,
+          userPhone
+        } = res.data.data
+
+        //用户昵称转码
+        if (nickName != null && nickName != undefined) {
+          nickName = uncodeUtf16(nickName)
+        }
+        //用户签名转码
+        if (signature != null && signature != undefined) {
+          signature = uncodeUtf16(signature)
+        }
+
+        let userInfo = {
+          nickName,
+          signature,
+          avatarUrl,
+          gender,
+          userPhone
+        }
+
+        app.data.userInfo = userInfo
+      }
+    })
+
+  },
+  //获取首页banner
+  getIndexBanner() {
+    let that = this;
+    commonApi.getIndexBanner().then((res) => {
+      that.setData({
+        ['swiper.bannerList']: res.data.data
+      }, function() {})
+    })
+  },
+  jumpBannerDetail(e) {
+    let that = this;
+    let type = e.currentTarget.dataset.adlinktype
+    let id = e.currentTarget.dataset.id;
+    //链接内容
+    let content = e.currentTarget.dataset.content;
+    switch (type) {
+      //1.自定义链接
+      case 1:
+        wx.navigateTo({
+          url: '../../pages/webviewPage/webviewPage?url=' + content,
+        })
+        break;
+      case 2:
+        //2.链接到商品
+        wx.navigateTo({
+          url: `../../pages/shopDetail/shopDetail?goodsId=${id}`,
+        })
+        break;
+      case 3:
+        //3.链接到故事
+        wx.navigateTo({
+          url: '../../pages/storyDetails/storyDetails?id=' + id + '&type=1&page=' + 1,
+        })
+        break;
+      case 4:
+        //4.链接到服务
+        wx.navigateTo({
+          url: `../../pages/serveDetail/serveDetail?id=${id}`,
+        })
+        break;
+      case 5:
+        //5.链接到活动
+        wx.navigateTo({
+          url: `../../pages/activityDetail/activityDetail?id=${id}`,
+        })
+        break;
+      case 6:
+        //6.链接到小程序页面
+        wx.navigateTo({
+          url: `../../${content}`,
+        })
+        break;
+    }
+
+  },
+  //获取全部故事列表
+  getAllStory() {
+    let that = this;
+    that.data.currentPage = 1
+    sl("加载中")
+
+    let _parms = {
+      currentPage: that.data.currentPage,
+      enablePage: true,
+      pageSize: that.data.pageSize,
+      shopId: wx.getStorageSync("shopId")
+    }
+    Api.story(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        //有查询结果情况
+        if (res.data.data != null) {
+          let list = res.data.data.content;
+          for (let i = 0; i < list.length; i++) {
+            //没有作者头像给默认值
+            if (list[i].editorImg == null || list[i].editorImg == "") {
+              list[i].editorImg = "../../img/LOGO.png";
+            }
+            //作者名转码
+            list[i].editor = uncodeUtf16(list[i].editor);
+            list[i].page = that.data.currentPage;
+            //故事标题转码
+            list[i].title = uncodeUtf16(list[i].title);
+          }
+          that.data.totalPages = res.data.data.totalPages;
+          that.data.currentPage = that.data.currentPage + 1
+          that.setData({
+            commodityList: list,
+          })
+        }
+        //无查询结果情况
+        else {
+          that.setData({
+            commodityList: [],
+          })
+          alertModal("无查询结果")
+        }
+      } else {
+        console.log(res)
+      }
+    }).catch((res) => {
+      alertModal("请求服务失败")
+    })
+  },
+
+
+  //渲染详情页点赞回显
+  detailLike(page) {
+    let that = this;
+    console.log('-----------------', page)
+    page = parseInt(page);
+    let _parms = {
+      currentPage: page,
+      enablePage: true,
+      pageSize: that.data.pageSize,
+      shopId: wx.getStorageSync("shopId")
+    }
+    Api.story(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        if (res.data.data != null) {
+          let list = res.data.data.content;
+          for (let i = 0; i < list.length; i++) {
+            //没有作者头像赋默认值
+            if (list[i].editorImg == null || list[i].editorImg == "") {
+              list[i].editorImg = "../../img/LOGO.png"
+            }
+            //作者和故事标题转码
+            list[i].editor = uncodeUtf16(list[i].editor);
+            list[i].title = uncodeUtf16(list[i].title);
+            list[i].page = page;
+            let temp = "commodityList[" + (page * 10 - (10 - i)) + "]";
+            that.setData({
+              [temp]: list[i]
+            })
+          }
+          that.data.totalPages = res.data.data.totalPages;
+        } else {
+          alertModal1("无查询结果")
+        }
+      } else {
+        alertModal(res.data.message)
+      }
+    }).catch((res) => {
+      alertModal1("请求服务失败")
+    })
+  },
+
+  //点赞
+  likeFave(e) {
+    let that = this;
+    let id = e.currentTarget.dataset.id;
+    let index = e.currentTarget.dataset.index;
+    let is = e.currentTarget.dataset.is;
+    //操作之前验证登录
+    app.accredit().then((res) => {
+      let _parms = {
+        storyId: id,
+      }
+      //is: 0操作点赞，1操作取消点赞
+      if (is == 0) {
+        Api.thumbUpForC(_parms).then((res) => {
+          if (res.data.status == "0000") {
+            alertModal1("点赞成功")
+            let req = "commodityList[" + index + "].isThumbUp";
+            let rep = "commodityList[" + index + "].virtualThumbUpNumber";
+            that.setData({
+              [req]: 1,
+              [rep]: res.data.data.thunmbUpCount
+            })
+          }
+        }).catch((res) => {
+          alertModal("请求服务失败")
+        })
+      } else if (is == 1) {
+        Api.deleteThumbUpForC(_parms).then((res) => {
+          if (res.data.status == "0000") {
+            alertModal1("取消点赞成功")
+            let req = "commodityList[" + index + "].isThumbUp";
+            let rep = "commodityList[" + index + "].virtualThumbUpNumber";
+            that.setData({
+              [req]: 0,
+              [rep]: res.data.data.thunmbUpCount
+            })
+          }
+        }).catch((res) => {
+          alertModal("请求服务失败")
+        })
+      }
+
+    });
+  },
+
+
+  //跳转强推广告
+  jumpBanner(e) {
+    let that = this;
+    let type = e.currentTarget.dataset.type;
+    //强推广告类型1跳webview广告页，2跳商品
+    if (type == 1) {
+      wx.navigateTo({
+        url: '../../pages/webviewPage/webviewPage?url=' + e.currentTarget.dataset.adrs,
+      })
+    } else if (type == 2) {
+      wx.navigateTo({
+        url: '../../pages/shopDetail/shopDetail?goodsId=' + e.currentTarget.dataset.goodsid,
+      })
+    }
+  },
+
+  //获取更多
+  getMore() {
+    let that = this;
+    let currentPage = that.data.currentPage;
+    let totalPages = that.data.totalPages;
+    if (currentPage > totalPages) {
+      alertModal1("没有更多内容了")
+      return;
+    }
+    let _parms = {
+      currentPage: currentPage,
+      enablePage: true,
+      pageSize: that.data.pageSize,
+      shopId: wx.getStorageSync("shopId")
+    }
+    Api.story(_parms).then((res) => {
+      if (res.data.status == '0000') {
+        //如果有查询结果
+        if (res.data.data != null) {
+          let list = res.data.data.content;
+          for (let i = 0; i < list.length; i++) {
+            //作者头像没有赋默认值
+            if (list[i].editorImg == null || list[i].editorImg == "") {
+              list[i].editorImg = "../../img/LOGO.png";
+            }
+            //作者名转码
+            list[i].editor = uncodeUtf16(list[i].editor);
+            list[i].page = that.data.currentPage;
+            //故事标题转码
+            list[i].title = uncodeUtf16(list[i].title);
+          }
+          that.data.totalPages = res.data.data.totalPages;
+          that.data.currentPage = that.data.currentPage + 1;
+          //拼接之前数据
+          list = that.data.commodityList.concat(list);
+          that.setData({
+            commodityList: list
+          })
+        } else {
+          alertModal1("无查询结果")
+        }
+      } else {
+        alertModal(res.data.message)
+      }
+    }).catch((res) => {
+      alertModal1("请求服务失败")
+    })
+  },
+
+  //更改列表模组显示方式(瀑布流还是竖版)
+  changeMoudel(e) {
+    let that = this;
+    let type = e.currentTarget.dataset.type;
+    if (type == '1') {
+      that.setData({
+        moudelType: '2'
+      })
+    } else if (type == '2') {
+      that.setData({
+        moudelType: '1'
+      })
+    }
+  },
+
+  //跳转到故事详情
+  jumpToDetails(e) {
+    let id = e.currentTarget.dataset.id;
+    let index = e.currentTarget.dataset.index;
+    let page = e.currentTarget.dataset.page;
+    wx.navigateTo({
+      url: '../../pages/storyDetails/storyDetails?id=' + id + '&type=1&page=' + page,
+    })
+  },
+
+
+  //开店（1判断是否授权 2判断是否开店 3开店）
+  openShop() {
+    let that = this;
+    // 防止多次触发
+    util.buttonClicked(this);
+    //临时注释
+    // wx.navigateTo({
+    //   url: '../../pages/shopOpenTemp/shopOpenTemp',
+    // })
+    app.accredit().then((res) => {
+      //判断是否开店
+      console.log('----res', res)
+      that.jumpOpenShop()
+    })
+  },
+
+
+  //开店
+  jumpOpenShop() {
+    // 判断是否开过店
+    commonApi.clickOpenShop({}).then(res => {
+      console.log('是否开过店？', res.data.data.auditStatus)
+      console.log('是否开过店res', res.data.data.exclusiveCode);
+      //     auditStatus :-1没店  0 审核通过 1待审核 2 驳回
+      if (res.data.data.auditStatus !== -1) {
+        wx.navigateTo({
+          url: `../shopopen/shopopen?shopId=${res.data.data.merchantShopId}&shopStatus=${res.data.data.auditStatus}&rejectReason=${res.data.data.rejectReason}&exclusiveCode=${res.data.data.exclusiveCode}`,
+        })
+      } else {
+        wx.navigateTo({
+          url: `../shopApplication/shopApplication`
+        })
+      }
+    })
+  },
+
+  //跳转到大管家
+  jumpPage() {
+    let that = this;
+    that.getUserLocation();
+  },
+
+  //添加编写新故事
+  addStory() {
+    let that = this;
+    that.setData({
+      subMask: true
+    })
+    //验证登录
+    app.accredit().then((res) => {
+      wx.navigateTo({
+        url: '../../pages/storyWriter/storyWriter',
+      })
+    })
+  },
+  //首页分类切换
+  tabClick: function(e) {
+    if (e.currentTarget.dataset.url == '../shopOpen/shopOpen') {
+      this.openShop();
+    } else if (e.currentTarget.dataset.url == '../shopFood/shopFood') {
+      app.accredit().then((res) => {
+        wx.navigateTo({
+          url: e.currentTarget.dataset.url
+        })
+      });
+    } else if (e.currentTarget.dataset.url == '../shopMerchant/shopMerchant') {
+      this.getUserLocation();
+    } else if (e.currentTarget.dataset.url == '../shopApplication/shopApplication') {
+      app.accredit().then((res) => {
+        wx.navigateTo({
+          url: e.currentTarget.dataset.url
+        })
+      });
+    } else {
+      wx.navigateTo({
+        url: e.currentTarget.dataset.url
+      })
+    }
+  },
+
+  /**
+   * 判断用户是否拒绝地理位置信息授权，拒绝的话重新请求授权
+   */
+
+  getUserLocation: function() {
+    let that = this;
+    wx.getSetting({
+      success: (res) => {
+        console.log(JSON.stringify(res))
+        // res.authSetting['scope.userLocation'] == undefined    表示 初始化进入该页面
+        // res.authSetting['scope.userLocation'] == false    表示 非初始化进入该页面,且未授权
+        // res.authSetting['scope.userLocation'] == true    表示 地理位置授权
+        if (res.authSetting['scope.userLocation'] != undefined && res.authSetting['scope.userLocation'] != true) {
+          wx.showModal({
+            title: '请求授权当前位置',
+            content: '需要获取您的地理位置，请确认授权',
+            success: function(res) {
+              if (res.cancel) {
+                wx.showToast({
+                  title: '拒绝授权',
+                  icon: 'none',
+                  duration: 1000
+                })
+              } else if (res.confirm) {
+                wx.openSetting({
+                  success: function(dataAu) {
+                    if (dataAu.authSetting["scope.userLocation"] == true) {
+                      wx.showToast({
+                        title: '授权成功',
+                        icon: 'success',
+                        duration: 1000
+                      })
+                      //再次授权，调用wx.getLocation的API
+                      that.getLocation();
+                    } else {
+                      wx.showToast({
+                        title: '授权失败',
+                        icon: 'none',
+                        duration: 1000
+                      })
+                    }
+                  }
+                })
+              }
+            }
+          })
+        } else if (res.authSetting['scope.userLocation'] == undefined) {
+          //调用wx.getLocation的API
+          that.getLocation();
+        } else {
+          //调用wx.getLocation的API
+          that.getLocation();
+        }
+      }
+    })
+  },
+
+  /**
+   *  获取定位当前位置的经纬度
+   * */
+  getLocation: function() {
+
+    wx.getLocation({
+      type: 'wgs84',
+      success: function(res) {
+
+        var latitude = res.latitude
+        var longitude = res.longitude
+
+        wx.navigateTo({
+          url: '../shopMerchant/shopMerchant?latitude=' + latitude + '&longitude=' + longitude
+        })
+      },
+      fail: function(res) {
+        console.log('fail' + JSON.stringify(res))
+      }
+    })
+  },
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function() {
+    this.getMore();
+  },
+
+  // 下拉刷新
+  onPullDownRefresh: function() {
+    // 显示顶部刷新图标
+    wx.showNavigationBarLoading();
+    let that = this;
+    that.getAllStory();
+    that.getIndexBanner();
+  },
+
+
+  //页面分享
+  onShareAppMessage: function() {
+    return app.onShare();
+  }
+})

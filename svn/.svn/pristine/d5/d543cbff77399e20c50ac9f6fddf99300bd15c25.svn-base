@@ -1,0 +1,7 @@
+0000000000000000000000000000000000000000 a238858aa8dc49d1e9dad6adf5491eff5f398e6d shijianjie <jianjie_x@163.com> 1587626422 +0800	clone: from git@codehub.devcloud.huaweicloud.com:jhpt00001/saas_factory_mini.git
+a238858aa8dc49d1e9dad6adf5491eff5f398e6d c5ef0297d4cf8d130f39738eedcec2dd74997a50 shijianjie <jianjie_x@163.com> 1587973742 +0800	commit: 商品分享海报及精选商户门头照轮播
+c5ef0297d4cf8d130f39738eedcec2dd74997a50 564628b47c55525d21272af77027d12b0ec760f7 shijianjie <jianjie_x@163.com> 1588239424 +0800	commit: 1.3.1分享海报
+564628b47c55525d21272af77027d12b0ec760f7 79c6e19baf1b7199e7a2fb105d60cc4b511fe514 shijianjie <jianjie_x@163.com> 1588239694 +0800	commit: '商品海报和精选商户门头照'
+79c6e19baf1b7199e7a2fb105d60cc4b511fe514 788bab5d5b01a0ec09d88c556631798aeca529a1 shijianjie <jianjie_x@163.com> 1588242241 +0800	commit (merge): '1.3.1精选商户和商品详情海报'
+788bab5d5b01a0ec09d88c556631798aeca529a1 094eea0b71340d45440a7b1e79754e88a823bd35 shijianjie <jianjie_x@163.com> 1588926937 +0800	commit: 1.3.1海报商品优化和补丁修改
+094eea0b71340d45440a7b1e79754e88a823bd35 14c075c5e249b34670c3ce279a1b1add590b5cdd shijianjie <jianjie_x@163.com> 1588927138 +0800	commit: '海报优化'

@@ -1,0 +1,51 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<wxs module="income" src="../../filter/income.wxs"></wxs>
+<wxs module="time" src="../../filter/time.wxs"></wxs>
+
+<!-- 导航栏 -->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view bindtap='backPage' class='arrow-view'>
+        <view class='arrow'></view>
+      </view>
+      <view class="label">提现记录</view>
+    </view>
+  </view>
+</view>
+<view style="height:{{fixedTop}}px;"></view>
+<!-- 页面 -->
+<block>
+  <view class='list'>
+    <scroll-view scroll-x class='nav'>
+      <view class="{{currentTab === 0?'focus':'scroll-item'}}" data-current='{{0}}' bindtap='handleTab'>提现中</view>
+      <view class="{{currentTab === 1?'focus':'scroll-item'}}" data-current='{{1}}' bindtap='handleTab'>已提现</view>
+    </scroll-view>
+    <view class="line" wx:if='{{currentTab === 0}}'></view>
+    <view class="line1" wx:if="{{currentTab === 1}}"></view>
+    <!-- 有提现记录 -->
+    <view wx:if="{{hasInform}}">
+      <view class='content' wx:for="{{dataList}}" wx:key="item">
+        <view class='content-item'>
+          <view class="item">
+            <view>
+              <view class="item-time">{{item.createTime}}</view>
+              <view class="item-fee">手续费￥{{numFr.getNum(item.handingFee)}}</view>
+            </view>
+            <view class="price">￥{{numFr.getNum(item.arrivalPrice)}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:else>
+      <view class="no-content-view">
+        <image class="no-content-image" src="../../img/withdraw/earnings _withdrawal_ settlement_null.png"></image>
+        <view class="no-content-text">当前暂无提现记录~</view>
+      </view>
+    </view>
+  </view>
+</block>

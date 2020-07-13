@@ -1,0 +1,53 @@
+<!-- 我的客服 -->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 客服头部 供应商信息 -->
+<!-- <view class="shop-info">
+  <view class="shop-header">
+    <image class="shop-header-img" src="{{merchantImg}}" />
+  </view>
+  <view class="shop-name">{{merchantName}}</view>
+  <view class="shop-tag">{{sourceType == 1 ? '供应商' : '商户'}}</view>
+</view> -->
+
+<!-- 客服头部 商品详情 -->
+<view class="product-details-view">
+  <view class="product-img-view">
+    <image class="product-img-style" src="{{goodsPicUrl}}"></image>
+  </view>
+  <view class="product-inform-view">
+    <view class="product-title-style">{{goodsName}}</view>
+    <view class="product-price-view">
+      <view class="product-price-style">￥{{numFr.getNum(selectedPrice)}}</view>
+      <view class="to-pay-view" bindtap="toPay">去购买</view>
+    </view>
+  </view>
+</view>
+
+<view style="height:224rpx;"></view>
+
+<!-- 消息记录列表 -->
+<scroll-view scroll-y class="message-container"  catchtap="closeInput" bindscrolltoupper='getMore' style="height:{{scrollTop}}px" scroll-into-view="{{bottom}}">
+  <view>
+    <!-- 消息 -->
+    <view class="message-item" wx:for="{{messageList}}" wx:key="{{item}}">
+      <view class="message-time {{item.sender == 1 ? 'time-fr' : 'time-fl'}}">{{numFr.dateFormat(item.time)}}</view>
+      <view class="{{item.type == 1 ? 'arrows' : ''}} {{item.sender == 1 ? 'fr' : 'fl'}}" />
+      <!-- 头像 -->
+      <image class="avatar {{item.sender == 1 ? 'fr' : 'fl'}}" src="{{item.sender == 1 ? item.userImg : item.supplierImg}}" />
+      <!-- 文本消息 -->
+      <view wx:if="{{item.type == 1}}" class="text-message {{item.sender == 1 ? 'fr' : 'fl'}}">
+        <text>{{item.message}}</text>
+      </view>
+      <view wx:elif="{{item.type == 2}}" class="img-message {{item.sender == 1 ? 'fr' : 'fl'}}">
+        <image src="{{item.message}}" mode="widthFix"></image>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{inputObj.extraObj.chatInputShowExtra}}" style="height: 234rpx;"></view>
+  <view id="bottom"></view>
+</scroll-view>
+
+<view style="height:100rpx;"></view>
+<!-- 底部输入组件 -->
+<import src="../../components/chat-input/chat-input.wxml" />
+<template is="chat-input" data="{{inputObj:inputObj,inputContent:inputContent,showVoicePart:true}}" />

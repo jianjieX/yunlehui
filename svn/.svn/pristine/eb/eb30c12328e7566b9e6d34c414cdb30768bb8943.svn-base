@@ -1,0 +1,67 @@
+<!-- 导航栏 -->
+<view class="header">
+  <!-- status-bar -->
+  <view class="status-bar" style="{{ statusBarStyle }}" />
+  <!-- navigation-bar -->
+  <view class="navigation-bar" style="{{ navigationBarStyle }}">
+    <!-- title -->
+    <view class="navigation" style="{{ navigationStyle }}">
+      <view bindtap='backPage' class='arrow-view'>
+        <view class='arrow'></view>
+      </view>
+      <view class="label">添加银行卡</view>
+    </view>
+  </view>
+</view>
+<view style="height:{{fixedTop}}px;"></view>
+
+<view class='addBankCard'>
+  <form catchsubmit="formSubmit">
+    <view class="form-item">
+      <view class='title'>持卡人姓名</view>
+      <input class="weui-input" name="name" placeholder="请输入" />
+    </view>
+    <view class="form-item">
+      <view class='title'>身份证号码</view>
+      <input class="weui-input" name="IdCard" placeholder="请输入身份证号" />
+    </view>
+    <view class="form-item">
+      <view class='title'>银行名称</view>
+      <picker class="bank-picker" bindchange="bindPickerChange" value="{{index}}" range="{{bankList}}" range-key="bankName">
+        <view class="bank-name">{{bankName}}</view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <view class='title'>银行卡号</view>
+      <input class="weui-input" type='number' name="bankCardNum" placeholder="请输入银行卡号" />
+    </view>
+    <view class="form-item">
+      <view class='title'>银行预留手机号</view>
+      <input class="weui-input" type='number' name="mobile" placeholder="请输入银行预留手机号" />
+    </view>
+    <view class="tip">注:绑定的银行卡银行预留手机号，必须是您当前注册的手机号</view>
+    <view class="btn-area">
+      <button class='btn' formType="submit">下一步</button>
+    </view>
+  </form>
+</view>
+
+<view wx:if='{{showPayPwdInput}}'>
+  <view class='bg_layer'></view>
+  <view class='input_main'>
+    <view class='input_title'>
+      <view class='input_back' catchtap='hidePayLayer'>
+        <text></text>
+      </view>
+      <text>设置支付密码</text>
+    </view>
+    <view class='input_tip'></view>
+    <view class='input_row' catchtap='getFocus'>
+      <view class='pwd_item' wx:for='{{6}}' wx:key='item' wx:for-index='i'>
+        <text wx:if='{{pwdVal.length>i}}'></text>
+      </view>
+    </view>
+    <!-- <view class='forget_pwd' catchtap='submitSure'>确定</view> -->
+    <input class='input_control' password type='number' focus='{{payFocus}}' bindinput='inputPwd' maxlength='6' />
+  </view>
+</view>

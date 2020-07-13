@@ -1,0 +1,27 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  /**
+   * 获取公益详情
+   */
+  getWelfareDetail(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/index/getCminiPublicWelfareDetail';
+    return result
+  },
+
+  /**
+   * 公益详情点赞
+   */
+  welfareLike(data) {
+    let result = {};
+    result.method = "POST";
+    result.url = 'cmini/index/welfare';
+    return result
+  },
+}
+
+const Api = new MyHttp(ALL_API);
+
+export default Api;

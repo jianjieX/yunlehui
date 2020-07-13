@@ -1,0 +1,213 @@
+/* 导航栏样式 */
+
+.header {
+  width: 750rpx;
+  background: white;
+  font-size: 32rpx;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 999;
+}
+
+.header .navigation {
+  padding-top: 12rpx;
+  padding-left: 30rpx;
+  display: flex;
+}
+
+.arrow-view {
+  width: 5%;
+  height: 100%;
+  left: 0;
+  z-index: 999;
+  position: relative;
+}
+
+.label {
+  margin-left: 16rpx;
+  color: #333;
+  font-size: 36rpx;
+  font-family: PingFangSC-Medium;
+}
+
+.arrow {
+  width: 22rpx;
+  height: 22rpx;
+  border-bottom: 2px solid black;
+  border-left: 2px solid black;
+  position: absolute;
+  transform: rotate(45deg);
+  top: 18rpx;
+  left: 2rpx;
+}
+
+
+/* 支付密码css start */
+
+.forget_pwd {
+  float: right;
+  margin: 30rpx;
+  width: 200rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: #f4bb2e;
+}
+
+.input_row {
+  /* margin-top: 300rpx; */
+  width: 690rpx;
+  margin: 0 auto;
+  height: 98rpx;
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1rpx solid #e2e2e2;
+  border-radius: 20rpx;
+}
+
+.input_row .pwd_item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-right: 1rpx solid #e2e2e2;
+  position: relative;
+}
+
+.pwd_item:nth-last-of-type(1) {
+  border-right: 0;
+}
+
+.pwd_item text {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 30rpx;
+  background-color: #555;
+}
+
+.bg_layer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+}
+
+.input_main {
+  position: fixed;
+  left: 0;
+  bottom: 500rpx;
+  width: 100%;
+  height: 394rpx;
+  background-color: #fff;
+  z-index: 9999;
+}
+
+.input_title {
+  width: 100%;
+  height: 90rpx;
+  line-height: 90rpx;
+  text-align: center;
+  font-size: 32rpx;
+  border-bottom: 1rpx solid #e2e2e2;
+}
+
+.input_back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 80rpx;
+  height: 90rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input_back text {
+  width: 20rpx;
+  height: 20rpx;
+  background-color: white;
+  border: 1rpx solid #aaa;
+  border-width: 5rpx 0 0 5rpx;
+  transform: rotate(-45deg);
+}
+
+.input_tip {
+  margin: 60rpx;
+  text-align: center;
+  font-size: 24px;
+  color: #f4bb2e;
+}
+
+.bank-picker {
+  width: 450rpx;
+  height: 96rpx;
+}
+
+.bank-name {
+  line-height: 96rpx;
+  font-size: 30rpx;
+}
+
+.addBankCard {
+  width: 750rpx;
+  height: 630rpx;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  height: 96rpx;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.title {
+  width: 260rpx;
+  margin-left: 24rpx;
+  color: #333333;
+  font-size: 32rpx;
+}
+
+.weui-input{
+    font-size: 30rpx;
+}
+
+.btn {
+  width: 654rpx;
+  margin-top: 48rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #FABE00;
+  color: #333333;
+}
+
+.changeTelNum{
+  color: #666666;
+  font-size: 24rpx;
+  margin: 72rpx 0 0 288rpx;
+}
+
+.tip{
+  color: #FF5850;
+  font-size: 20rpx;
+  padding: 24rpx 0 0 24rpx;
+}
+
+.btn::after {
+  border: 0;
+}
+
+/* 文本输入框位置: 设置到左边隐藏 */
+
+.input_control {
+  position: relative;
+  left: -300rpx;
+  bottom: 0;
+  width: 100rpx;
+  height: 100rpx;
+}

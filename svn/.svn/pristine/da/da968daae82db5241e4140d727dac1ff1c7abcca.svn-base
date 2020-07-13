@@ -1,0 +1,141 @@
+var numFr = {
+  getTotalNum: function (productPrice, enjoyTotalDiscountAmount){
+    if (enjoyTotalDiscountAmount){
+      return productPrice + enjoyTotalDiscountAmount
+    }
+    else{
+      return productPrice
+    }
+  },
+  getNum: function (x) {
+    var f = parseFloat(x);
+    if (isNaN(f)) {
+      return;
+    }
+    var f = Math.round(x * 100) / 100;
+    var s = f.toString();
+    var rs = s.indexOf('.');
+    if (rs < 0) {
+      rs = s.length;
+      s += '.';
+    }
+    while (s.length <= rs + 2) {
+      s += '0';
+    }
+    if(s > 10000){
+      f = (s * 100 / 10000)/100;
+      s = f.toFixed(2).toString();
+      rs = s.indexOf('.');
+      s += '万'
+    }
+    return s;
+  },
+  toFix: function (value) {
+    if (isNaN(value)) {
+      return;
+    }
+    return parseFloat(value)
+  },
+  subEnd: function (x) {
+    return x.slice(-4);
+  },
+  dateFormat: function (timestamp, format) {
+    if (timestamp == "" || timestamp == null) {
+      return
+    }
+    var regYear = getRegExp("(y+)", "i");
+    if (!format) {
+      format = "yyyy-MM-dd hh:mm:ss";
+    }
+    timestamp = parseInt(timestamp);
+    var realDate = getDate(timestamp);
+    function timeFormat(num) {
+      return num < 10 ? '0' + num : num;
+    }
+    var date = [
+      ["M+", timeFormat(realDate.getMonth() + 1)],
+      ["d+", timeFormat(realDate.getDate())],
+      ["h+", timeFormat(realDate.getHours())],
+      ["m+", timeFormat(realDate.getMinutes())],
+      ["s+", timeFormat(realDate.getSeconds())],
+      ["q+", Math.floor((realDate.getMonth() + 3) / 3)],
+      ["S+", realDate.getMilliseconds()],
+    ];
+    var reg1 = regYear.exec(format);
+    // console.log(reg1[0]);
+    if (reg1) {
+
+      format = format.replace(reg1[1], (realDate.getFullYear() + '').substring(4 - reg1[1].length));
+    }
+    for (var i = 0; i < date.length; i++) {
+      var k = date[i][0];
+      var v = date[i][1];
+
+      var reg2 = getRegExp("(" + k + ")").exec(format);
+      if (reg2) {
+        format = format.replace(reg2[1], reg2[1].length == 1
+          ? v : ("00" + v).substring(("" + v).length));
+      }
+    }
+    return format;
+  },
+  /**
+   * 计算订单列表数量
+   */
+  getList: function (list) {
+    var result = 0
+    for(var i=0; i<list.length; i++) {
+      result += list[i].productQuantity
+    }
+    return result
+  },
+  /**
+   * 订单列表是否可售后
+   */
+  canReturn: function (list) {
+    if(!list) {
+      return
+    }
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].memberGoodsFlag === 1) {
+        return false
+      } else {
+        return true
+      }
+    }
+  },
+
+  /**
+   * 获取金额中的整数
+   */
+  trunc: function (num){
+
+   return num >= 0 ? Math.floor(num) : Math.ceil(num);
+  },
+  /**
+   * 获取金额中的小数
+   */
+  fract:function(num){
+    var str = num - (num >= 0 ? Math.floor(num) : Math.ceil(num));
+    str = numFr.getNum(str).slice(1, str.length);
+    return str;
+  },
+  format:function(num){
+    var numOld = num;
+    var numNew = numOld.slice(0, 4) + " " + numOld.slice(4, 8)+" "+ numOld.slice(8);
+    return numNew
+  } 
+}
+
+module.exports = {
+  getNum: numFr.getNum,
+  toFix: numFr.toFix,
+  subEnd: numFr.subEnd,
+  dateFormat: numFr.dateFormat,
+  calcNum: numFr.getList,
+  canReturn: numFr.canReturn,
+  getTotalNum: numFr.getTotalNum,
+  trunc: numFr.trunc,
+  fract: numFr.fract,
+  format: numFr.format
+}

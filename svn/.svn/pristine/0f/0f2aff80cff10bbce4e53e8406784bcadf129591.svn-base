@@ -1,0 +1,97 @@
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<view class="{{isCheck?'is_checked':'normal'}}">
+  <!-- 导航栏 -->
+  <view class="header">
+    <!-- status-bar -->
+    <view class="status-bar" style="{{ statusBarStyle }}" />
+    <!-- navigation-bar -->
+    <view class="navigation-bar" style="{{ navigationBarStyle }}">
+      <!-- title -->
+      <view class="navigation" style="{{ navigationStyle }}">
+        <view bindtap='backPage' class='arrow-view'>
+          <view class='arrow'></view>
+        </view>
+        <view class="label">提现</view>
+      </view>
+    </view>
+  </view>
+  <view style="height:{{fixedTop}}px;"></view>
+
+  <view class="can-withdraw-view">
+    <view class="can-withdraw-text">
+      <view class="can-withdraw-money">￥{{numFr.getNum(placeholder)}}</view>
+      <text>可提现金额</text>
+    </view>
+
+    <view class="tip-text">提现金额</view>
+    <view class='input'>
+      <view class='icon'>￥</view>
+      <input placeholder-class="place-holder" placeholder="{{ruleInfo.merchantWithdrawalPriceTimeMin}}元<提现额<{{ruleInfo.userWithdrawalPriceTimeMax}}元" bindinput='handleInput' type="digit" value='{{cashOutNumber}}'></input>
+      <view class='all' catchtap='setAllPush'>全部提现</view>
+    </view>
+    <view class="line-view"></view>
+    <view class="cardInfo">
+      <view>
+        <text class="tip">到账银行</text>
+        <text class="bankName">{{bankName}}</text>
+      </view>
+      <view>
+        <text class="tip">持卡人姓名</text>
+        <text class="cardHolder">{{cardHolder}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提现规则 -->
+  <view class="withdraw-rule">
+    <text>提现规则:</text>
+    <view class="rules">
+      <text decode="true">1、每笔限额：{{ruleInfo.merchantWithdrawalPriceTimeMin}}元&lt;提现额&lt;{{ ruleInfo.userWithdrawalPriceTimeMax }}元 ；</text>
+      <text>2、提现手续费：提现金额* {{ ruleInfo.catPayerFee }} %；（支付通道收取）</text>
+      <text>3、每次提现次数：不限制；</text>
+      <text>4、提现审核日期：每月9日、19日；</text>
+      <text>5、提现到账时间：正常情况T+1的工作日</text>
+    </view>
+  </view>
+
+  <!--  确认提现按钮 -->
+  <view class="btn-null" wx:if="{{cashOutNumber==''}}">
+    <text>确认提现</text>
+  </view>
+  <view class="btn" wx:else bindtap='showModal'>
+    <text>确认提现</text>
+  </view>
+
+  <!-- 密码框 -->
+  <view wx:if='{{showPayPwdInput}}'>
+    <view class='bg_layer'></view>
+    <view class='input_main'>
+      <view class='input_title'>
+        <view class='input_back' catchtap='hidePayLayer'>
+          <text></text>
+        </view>
+        <text>输入支付密码</text>
+      </view>
+      <view class="input_num">￥{{numFr.getNum(cashOutNumber)}}</view>
+      <view class='input_row' catchtap='getFocus'>
+        <view class='pwd_item' wx:for='{{6}}' wx:key='item' wx:for-index='i'>
+          <text wx:if='{{pwdVal.length>i}}'></text>
+        </view>
+      </view>
+      <view class='forget_pwd' catchtap='hidePayLayer'>忘记密码？</view>
+      <input class='input_control' password type='number' focus='{{payFocus}}' bindinput='inputPwd' maxlength='6' />
+    </view>
+  </view>
+
+</view>
+
+<!-- 提现成功 -->
+<view class="success-view" wx:if="{{showConfirmModal}}">
+  <icon type="success" size="93" color="#09BB07"></icon>
+  <view class="success-text">
+    <view class="success-text1">佣金</view>
+    <view class="success-text2">提现成功，每月9日，19日审核，T+1工作日到账</view>
+  </view>
+  <view class="success-text3">请注意查收！</view>
+  <view class="success-button" bindtap="complete">完成</view>
+</view>

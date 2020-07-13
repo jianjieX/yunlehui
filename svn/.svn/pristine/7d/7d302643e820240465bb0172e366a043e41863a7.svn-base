@@ -1,0 +1,6 @@
+<!-- tab选项卡 -->
+<view class='nav'>
+  <block wx:for="{{dataSource}}" wx:key="item.value">
+    <view class="{{item.value == focuseItem?'focus':''}}" data-current='{{item.value }}' bindtap='handleTab' data-value="{{item.value}}">{{item.name}} </view>
+  </block>
+</view>

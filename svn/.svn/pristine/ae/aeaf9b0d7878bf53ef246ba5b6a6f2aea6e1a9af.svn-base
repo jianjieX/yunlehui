@@ -1,0 +1,73 @@
+/**
+ *平台客服
+ * 
+ * @author huoyujia
+ * @date 2019-09-09
+ */
+
+let app = getApp()
+let baseUrl = require("../../utils/base.js");
+import commonApi from '../../utils/config/Api/common.js';
+import util from '../../utils/tools/util.js';
+let uncodeUtf16 = util.uncodeUtf16 // emojy 转字符
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let sl = alert.showLoading;
+
+Page({
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    //模块type
+    moudelType: 0,
+    //店铺客服电话
+    shopTel: "",
+    //有没有店铺电话type
+    hasShopTel: false,
+  },
+
+  onLoad: function(options) {
+    this.showServicePhone()
+  },
+
+  //修改密码
+  toPassword(e) {
+    let type = e.currentTarget.dataset.type;
+    wx.navigateTo({
+      url: '../../pages/payPassword/payPassword?type=' + type,
+    })
+  },
+
+  //拨打电话
+  callPhone(e) {
+    let phoneNumber = e.currentTarget.dataset.phone;
+    wx.makePhoneCall({
+      phoneNumber: phoneNumber,
+      success: function() {
+        console.log("拨打电话成功！")
+      },
+      fail: function() {
+        console.log("拨打电话失败！")
+      }
+    })
+    this.setData
+  },
+
+  //请求门店客服电话
+  showServicePhone() {
+    let _this = this
+    let params = {
+      shopId: wx.getStorageSync("shopId")
+    }
+    commonApi.showServicePhone().then(res => {
+      console.log(res)
+      if (res.data.status=="0000") {
+        _this.setData({
+          shopTel: res.data.data.servicePhone
+        })
+      }
+
+    })
+  },
+})

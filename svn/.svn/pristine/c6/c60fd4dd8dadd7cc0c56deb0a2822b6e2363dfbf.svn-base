@@ -1,0 +1,211 @@
+/**
+ * 会员等级
+ * 
+ * @author huoyujia
+ * @date 2019-08-27
+ */
+
+let baseUrl = require('../../utils/base.js')
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+let promptModal = alert.promptModal;
+let sl = alert.showLoading;
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    progress: 0,
+    progressStyle: '',
+    swipeList: [
+      { level: 'V0', title: '卖赚（平均4%）', desc: '商品金额的0.2%-8%' },
+      { level: 'V1', title: '买省（平均10%）', desc: '商品金额的0.5%-20%' },
+      { level: 'V1', title: '卖赚（平均15%）', desc: '商品金额的0.8%-32%' },
+      { level: 'V2', title: '买省（平均12%）', desc: '商品金额的0.6%-24%' },
+      { level: 'V2', title: '卖赚（平均20%）', desc: '商品金额的1%-40%' },
+    ],
+    memberLevelEquityList: [{
+        id: 1,
+        levelName: "V0",
+        growths: "0~10",
+        equity: ["卖赚（平均4%）"]
+      },
+      {
+        id: 2,
+        levelName: "V1",
+        growths: "10~50",
+        equity: ["买省（平均10%）","卖赚（平均15%）"]
+      },
+      {
+        id: 3,
+        levelName: "V2",
+        growths: "50以上",
+        equity: ["买省（平均12%）","卖赚（平均20%）"]
+      },
+    ],
+    getGrowthsList: [
+      { description: '自购或分销订单金额，每满50元', value: '1' },
+      { description: '实体店主或店长注册并审核通过', value: '50' },
+    ],
+    goodsList: [], //礼包列表
+    giftcurrentPage: 1, //礼包列表当前页
+    giftPageSize: 10, //礼包列表每页多少条
+    giftTotalPages: null, //礼包总页数
+  },
+
+  onLoad: function(options) {
+
+  },
+
+  onShow() {
+    this.data.giftcurrentPage = 1;
+    this.getMemberLevelData()
+    this.getVipGif()
+  },
+
+  //获得会员等级数据
+  getMemberLevelData() {
+    let _this = this
+    sl("加载中")
+    wx.request({
+      url: `${baseUrl.URL}member/searchMemberInfoAndLevel`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + wx.getStorageSync("token")
+      },
+      success(res) {
+        console.log(res)
+        if (res.data.data != null) {
+          if (res.data.data.status === "0000") {
+            // 成长值
+            let memberGrowth = res.data.data.data.memberGrowth
+            let memberAllGrowth = res.data.data.data.memberAllGrowth
+            let percent = (memberGrowth / memberAllGrowth) * 100;
+            let left = 450 * (memberGrowth / memberAllGrowth)
+            let progressStyle = `left:${left}rpx;top:21rpx;`
+            console.log(progressStyle)
+            _this.setData({
+              data: res.data.data.data,
+              progress: percent,
+              progressStyle: progressStyle
+            })
+          }
+          wx.hideLoading();
+        } else {
+          wx.hideLoading();
+          alertModal(res.data.msg)
+        }
+      },
+      fail: function (res){
+        wx.hideLoading();
+        alertModal(res.errMsg)
+      }
+    })
+  },
+
+  //获取会员专享礼包列表
+  getVipGif(){
+    let that = this
+    sl("加载中")
+    wx.request({
+      url: `${baseUrl.URL}goods/memberGoodsList`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + wx.getStorageSync("token")
+      },
+      data:{
+        "currentPage": that.data.giftcurrentPage,
+        "enablePage": true,
+        "pageSize": that.data.giftPageSize
+      },
+      success(res) {
+        if (res.data.data != null) {
+          that.data.giftcurrentPage++;
+          that.data.giftTotalPages = res.data.data.totalPages;
+          that.setData({
+            goodsList: res.data.data.content
+          })
+        } else {
+          alertModal(res.data.msg)
+        }
+      },
+      fail: function (res) {
+        wx.hideLoading();
+        alertModal(res.errMsg)
+      }
+    })
+  },
+
+  //获取更多会员礼包
+  getMoreGif(){
+    let that = this
+    var currentPage = that.data.giftcurrentPage;
+    var totalPages = that.data.giftTotalPages;
+    if (currentPage > totalPages) {
+      alertModal1("没有更多礼包了")
+      return;
+    }
+    sl("加载中")
+    wx.request({
+      url: `${baseUrl.URL}goods/memberGoodsList`,
+      method: "POST",
+      header: {
+        "Authorization": "Bearer " + wx.getStorageSync("token")
+      },
+      data: {
+        "currentPage": that.data.giftcurrentPage,
+        "enablePage": true,
+        "pageSize": that.data.giftPageSize
+      },
+      success(res) {
+        if (res.data.data != null) {
+          var list = res.data.data.content
+          that.data.totalPages = res.data.data.totalPages;
+          that.data.currentPage = that.data.currentPage + 1
+          list = that.data.goodsList.concat(list);
+          that.setData({
+            goodsList: list
+          })
+          that.data.giftcurrentPage++;
+        } else {
+          alertModal(res.data.msg)
+        }
+      },
+      complete: function () {
+        wx.hideLoading();
+      }
+    })
+  },
+
+  // 立即购买
+  buyNow(e) {
+    console.log(e.currentTarget.dataset.id)
+    let goodsId = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: `../shopDetail/shopDetail?goodsId=${goodsId}`,
+    })
+  },
+
+  /** 
+     * 页面上拉触底事件的处理函数 
+     */
+  onReachBottom: function () {
+    this.getMoreGif();
+  },
+
+  //回到顶部
+  goTop: function (e) {  // 一键回到顶部
+    if (wx.pageScrollTo) {
+      wx.pageScrollTo({
+        scrollTop: 0
+      })
+    } else {
+      wx.showModal({
+        title: '提示',
+        content: '当前微信版本过低，无法使用该功能，请升级到最新微信版本后重试。'
+      })
+    }
+  },
+})

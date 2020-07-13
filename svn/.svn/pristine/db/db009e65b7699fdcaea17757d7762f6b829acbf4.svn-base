@@ -1,0 +1,119 @@
+<!--pages/memberLevel/memberLevel.wxml-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+
+<view class='header'>
+  <image class='bg' mode="widthFix" src='../../img/centerImg/memberLevel/header-bg.png'></image>
+  <view class='level'>
+    <image mode='widthFix' src='../../img/centerImg/memberLevel/star.png'></image>
+    <view class='level-num'>{{data.memberLevelName}}</view>
+    <view class='tip'>击败全国{{numFr.toFix(data.beyond)}}%用户</view>
+  </view>
+  <view class='level-bar'>
+    <progress percent="{{progress}}" color='#fdd045' backgroundColor="#524c45" stroke-width="5" border-radius="8" bindactiveend="handleProgress" />
+    <view class='level-item v_0'>
+      <image mode='widthFix' src='/img/memberLevel/mark_b.png'></image>
+      <view class='level-item-num'>V0</view>
+    </view>
+    <view class='level-item v_1'>
+      <image wx:if="{{data.memberLevelName === 'V1' || data.memberLevelName === 'V2'}}" mode='widthFix' src='/img/memberLevel/mark_b.png'></image>
+      <image wx:else mode='widthFix' src='/img/memberLevel/mark_bt.png'></image>
+      <view class='level-item-num'>V1</view>
+    </view>
+    <view class='level-item v_2'>
+      <image wx:if="{{data.memberLevelName === 'V2'}}" mode='widthFix' src='/img/memberLevel/mark_b.png'></image>
+      <image wx:else mode='widthFix' src='/img/memberLevel/mark_bt.png'></image>
+      <view class='level-item-num'>V2</view>
+    </view>
+    <view class='growth' style='{{progressStyle}}'>
+      <image mode='widthFix' src='/img/memberLevel/mark_s.png'></image>
+      <view class='growthNum'>{{data.memberGrowth}}</view>
+    </view>
+  </view>
+</view>
+
+<view class='content'>
+  <view class='title'>
+    <image mode='widthFix' src='../../img/centerImg/memberLevel/title_1.png'></image>
+  </view>
+  <!-- 可能会变得会员权益 -->
+  <!-- <view class="member-level">
+    <view class="member-level-v0">
+      <image class="bgimg-v0" src="/img/centerImg/memberLevel/v0-bg.png"></image>
+    </view>
+    <view class="member-level-v1">
+      <view class="member-level-item"></view>
+    </view>F
+  </view> -->
+  <swiper duration="500" style="height:200rpx;" display-multiple-items="{{2.3}}">
+    <block wx:for="{{swipeList}}" wx:key="key">
+      <swiper-item>
+        <view class="swipe-item">
+          <image wx:if="{{data.memberLevelName === item.level}}" class='slide-image' src='../../img/centerImg/memberLevel/swipe_bg.png' />
+          <image wx:if="{{data.memberLevelName !== item.level}}" class='slide-image' src='../../img/centerImg/memberLevel/swipe_bg2.png' />
+          <view class='text'>
+            <view class='t-title' style='font-size:28rpx;text-align:center'>{{item.title}}</view>
+            <view class='t-content'>{{item.desc}}</view>
+          </view>
+        </view>
+      </swiper-item>
+    </block>
+  </swiper>
+  <!-- 如何升级 -->
+  <view class='title'>
+    <image mode='widthFix' src='../../img/centerImg/memberLevel/title_2.png'></image>
+  </view>
+  <view class='update'>
+    <block wx:for="{{data.memberLevelRemark}}" wx:key="{{index}}">
+      <view class="up-level-flex">
+        <view class="up-level-point"></view>
+        <view class="up-level-text">{{item}}</view>
+      </view>
+    </block>
+  </view>
+  <view class='child-title'>
+    <text>会员等级权益</text>
+  </view>
+  <view class='table'>
+    <view class='tr table-head'>
+      <view class='td' style="width:140rpx">会员等级</view>
+      <view class='td' style="width:200rpx">成长值范围</view>
+      <view class='td' style="flex:1">会员权益</view>
+    </view>
+    <view class='tr' wx:for="{{memberLevelEquityList}}" wx:key="{{item.id}}">
+      <view class='td col_1'>{{item.levelName}}</view>
+      <view class='td col_2'>{{item.growths}}</view>
+      <view class='td col_3'>
+        <view wx:for="{{item.equity}}"><text>{{item}}</text></view>
+      </view>
+    </view>
+    <!-- <view class='tr' wx:for="{{data.memberLevelAll.content}}" wx:key="{{item.id}}">
+      <view class='td col_1'>{{item.memberLevel.levelName}}</view>
+      <view class='td col_2'>{{item.memberLevel.startGrowth}}~{{item.memberLevel.endGrowth}}</view>
+      <view class='td col_3'>自买省：3%</view>
+    </view> -->
+  </view>
+  <view class='child-title'>
+    <text>如何获取成长值?</text>
+  </view>
+  <view class='growth-value'>
+    <view class='tr' wx:for="{{getGrowthsList}}" wx:key="{{item}}">
+      <view class='td td_title'>{{item.description}}</view>
+      <view class='td td_value'>+{{item.value}}</view>
+    </view>
+  </view>
+  <view class='title'>
+    <image mode='widthFix' src='../../img/centerImg/memberLevel/title_3.png'></image>
+  </view>
+  <view class='goods-list'>
+    <view class='goods-item' wx:for="{{goodsList}}" wx:key="{{item.goodsId}}">
+      <view class='img'>
+        <image src='{{item.goodsMainUrl}}'></image>
+      </view>
+      <view class='goods-name'>{{item.goodsName}}</view>
+      <view class='price'>￥{{numFr.getNum(item.goodsPrices[0].selectedPrice)}}</view>
+      <view class='buy' data-id='{{item.goodsId}}' bindtap='buyNow'>立即购买</view>
+    </view>
+  </view>
+</view>
+<!--回到顶部-->
+<view class='goTop' bindtap="goTop">回到顶部</view>

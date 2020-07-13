@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>函数式编程范式</title>
+</head>
+<body>
+	
+</body>
+</html>
+<script>
+//http://www.ruanyifeng.com/blog/2017/02/fp-tutorial.html
+//范畴论
+class Category{
+	constructor(val){
+		this.val=val;
+	}
+	addOne(x){
+		return x+1;
+	}
+}
+let category=new Category();
+const compose=function(f,g){
+	return function(x){
+		return f(g(x))
+	}
+}
+</script>

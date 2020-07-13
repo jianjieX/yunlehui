@@ -1,0 +1,653 @@
+// 购物车
+
+const app = getApp()
+
+import Api from '/../../utils/config/Api/shopCar.js';
+
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+
+Page({
+  data: {
+    // 购物车列表
+    carts: [],
+    // 选中的列表
+    cartsChecked: [],
+    // 列表是否有数据
+    hasList: false,
+    // 全选状态，默认不选
+    selectAllStatus: false,
+    // 总价
+    total: 0,
+    // 会员礼包列表
+    goodsList: [],
+    // 会员礼包列表当前页
+    currentPage: 1,
+    // 门店id
+    shopId: '',
+    // 优惠金额
+    economicalMoney: 0,
+    // 优惠金额
+    specialPrice: 0,
+    // 开卡状态
+    openCardFlag: false,
+    // 开卡遮罩
+    showCardModalStatus: false
+  },
+
+  onShow() {
+
+    this.init()
+
+    this.accredit()
+
+    this.checkOpenCardFlag()
+
+  },
+
+  /**
+   * 初始化
+   */
+  init() {
+    this.setData({
+      total: 0,
+      specialPrice: 0,
+      economicalMoney: 0,
+      selectAllStatus: false,
+      currentPage: 1,
+      shopId: wx.getStorageSync('shopId')
+    })
+
+  },
+  /**
+   * 授权
+   */
+  accredit() {
+
+    if (app.data.decryptDataFlag) {
+      if (app.data.flag === 0) {
+        wx.showModal({
+          title: '提示',
+          content: '绑定手机号后查看',
+          success(res) {
+            if (res.confirm) {
+              wx.navigateTo({
+                url: '../confirmation/confirmation',
+              })
+            } else if (res.cancel) {
+              wx.switchTab({
+                url: '../shopHome/shopHome',
+              })
+            }
+          }
+        })
+      } else {
+        this.getShopCarList()
+      }
+    } else {
+      wx.navigateTo({
+        url: '../confirmation/confirmation?type=1',
+      })
+    }
+
+  },
+
+  /**
+   * 获取购物车列表
+   */
+  getShopCarList() {
+
+    let that = this;
+    wx.showLoading({
+      title: '加载中',
+    })
+    let params = {
+      shopId: this.data.shopId
+    }
+    Api.getShopCarList(params).then(res => {
+      console.log('购物车数据------',res)
+      if (res.data.status == '0000') {
+        if (res.data.data.length !== 0) {
+          that.setData({
+            hasList: true,
+            carts: res.data.data,
+          })
+        } else {
+          that.data.goodsList = []
+          that.getVipGoodsList()
+          that.setData({
+            hasList: false,
+            carts: res.data.data,
+          })
+        }
+        wx.hideLoading()
+        // 隐藏导航栏加载框
+        wx.hideNavigationBarLoading();
+        // 停止下拉动作
+        wx.stopPullDownRefresh();
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((err) => {
+      alertModal("请求服务失败")
+    })
+
+  },
+
+  /**
+   * 供应商选择
+   */
+  selectShop(e) {
+
+    let index = e.currentTarget.dataset.index; // 获取data- 传进来的index
+    let carts = this.data.carts; // 获取购物车列表
+    let selected = carts[index].selected; // 获取当前商品的选中状态
+    let selectAllStatus = this.data.selectAllStatus;
+
+    // 只允许选择一个门店
+    for (let i = 0; i < carts.length; i++) {
+      for (let j = 0; j < carts[i].cminiShopCarList.length; j++) {
+        if (carts[i].cminiShopCarList[j].selected && carts[i].merchantName !== carts[index].merchantName) {
+          alertModal1('只能选择同一商家商品')
+          return
+        }
+      }
+    }
+
+    carts[index].selected = !selected; // 改变状态
+    carts[index].cminiShopCarList.map(item => {
+      item.selected = carts[index].selected;
+    })
+    let selectTempArr = []
+    for (let i = 0; i < carts.length; i++) {
+      if (carts[i].selected) {
+        selectTempArr.push(carts[i])
+      }
+    }
+    if (selectTempArr.length === carts.length) {
+      selectAllStatus = true;
+    } else {
+      selectAllStatus = false;
+    }
+
+    this.setData({
+      carts: carts,
+      selectAllStatus: selectAllStatus
+    });
+    this.sum()
+  },
+
+  /**
+   * 点击选中
+   */
+  selectList(e) {
+
+    let selectAllStatus = this.data.selectAllStatus;
+    let index = e.currentTarget.dataset.index; // 获取data- 传进来的index
+    let shopIndex = e.currentTarget.dataset.shop; // 获取data- 传进来的商铺index
+    let carts = this.data.carts; // 获取购物车列表
+    let cartsChecked = this.data.cartsChecked // 选中列表
+    let selected = carts[shopIndex].cminiShopCarList[index].selected; // 获取当前商铺的选中状态
+
+    // 只允许选择一个门店
+    for (let i = 0; i < carts.length; i++) {
+      for (let j = 0; j < carts[i].cminiShopCarList.length; j++) {
+        if (carts[i].cminiShopCarList[j].selected && carts[i].merchantName !== carts[shopIndex].merchantName) {
+          alertModal1('只能选择同一商家商品')
+          return
+        }
+      }
+    }
+
+    carts[shopIndex].cminiShopCarList[index].selected = !selected; // 改变状态
+
+    // 全选中 自动全选
+    let tempArr = [];
+    for (let i = 0; i < carts[shopIndex].cminiShopCarList.length; i++) {
+
+      if (carts[shopIndex].cminiShopCarList[i].selected) {
+        tempArr.push(carts[shopIndex].cminiShopCarList[i])
+      }
+    }
+    if (tempArr.length === carts[shopIndex].cminiShopCarList.length) {
+      carts[shopIndex].selected = true
+    } else {
+      carts[shopIndex].selected = false
+    }
+    let selectTempArr = []
+    for (let i = 0; i < carts.length; i++) {
+      if (carts[i].selected) {
+        selectTempArr.push(carts[i])
+      }
+    }
+    if (selectTempArr.length === carts.length) {
+      selectAllStatus = true;
+    } else {
+      selectAllStatus = false;
+    }
+    this.setData({
+      carts: carts,
+      selectAllStatus: selectAllStatus
+    });
+    this.sum()
+  },
+
+  /**
+   * 点击全选
+   */
+  selectAll(e) {
+
+    let selectAllStatus = this.data.selectAllStatus; // 是否全选状态
+    selectAllStatus = !selectAllStatus;
+    let carts = this.data.carts;
+    for (let i = 0; i < carts.length; i++) {
+      for (let j = 0; j < carts[i].cminiShopCarList.length; j++) {
+        carts[i].cminiShopCarList[j].selected = selectAllStatus;
+      }
+      carts[i].selected = selectAllStatus;
+    }
+    this.setData({
+      carts: carts,
+      selectAllStatus: selectAllStatus
+    });
+    this.sum()
+  },
+
+  /**
+   * 加减数量
+   */
+  bindMinus(e) {
+
+    let that = this;
+    let index = e.currentTarget.dataset.index;
+    let shopIndex = e.currentTarget.dataset.shop; // 获取data- 传进来的商铺index
+    let carts = this.data.carts; //获取购物车列表
+    let num = carts[shopIndex].cminiShopCarList[index].num
+    num--;
+    // 如果小于1，提示删除
+    if (num < 1) {
+      num = 1
+      wx.showModal({
+        title: '删除商品',
+        content: '确认删除此商品？',
+        success(res) {
+          if (res.confirm) {
+            that.deleteGoods(e.currentTarget.dataset.id)
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        }
+      })
+
+    }
+    // 如果大于1时，才可以减
+    if (num >= 1) {
+      carts[shopIndex].cminiShopCarList[index].num = num
+      that.setData({
+        carts: carts
+      })
+      that.sum()
+      let params = {
+        id: carts[shopIndex].cminiShopCarList[index].id,
+        num: num
+      }
+      that.updateShopCarNum(params)
+    }
+
+  },
+
+  /**
+   * 增加数量 
+   */
+  bindPlus(e) {
+
+    let that = this;
+    let index = e.currentTarget.dataset.index;
+    let shopIndex = e.currentTarget.dataset.shop; // 获取data- 传进来的商铺index
+    let carts = this.data.carts; //获取购物车列表
+    let num = carts[shopIndex].cminiShopCarList[index].num;
+    let shopCarId = carts[shopIndex].cminiShopCarList[index].id;
+    let goodsId = e.currentTarget.dataset.goods.goodsId
+    let goodsSpec = e.currentTarget.dataset.goods.spec
+    let validInfo = {
+      num: num + 1,
+      id: goodsId,
+      goodsSpecs: goodsSpec,
+      shopCarId: shopCarId
+    }
+    Api.validGoodsSpecs(validInfo).then(res => {
+      if (res.data.data) {
+        // 有库存
+        num++;
+        carts[shopIndex].cminiShopCarList[index].num = num
+        that.setData({
+          carts: carts
+        })
+        that.sum()
+        let params = {
+          id: carts[shopIndex].cminiShopCarList[index].id,
+          num: num
+        }
+        that.updateShopCarNum(params)
+      } else {
+        wx.showToast({
+          title: '没有更多库存了',
+          icon: 'none'
+        })
+      }
+    })
+  },
+
+  /**
+   * 更新购物车数量
+   */
+  updateShopCarNum(params) {
+
+    let that = this;
+    Api.updateShopCarNum(params).then(res => {
+      if (res.data.status === '0000') {
+        that.sum()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 删除购物车商品
+   */
+  deleteGoods(id) {
+
+    let that = this
+    let params = {
+      shopCarId: id
+    }
+    Api.deleteShopCar(params).then(res => {
+      if (res.data.status == "0000") {
+        that.getShopCarList()
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+
+  },
+
+  /**
+   * 计算金额
+   */
+  sum() {
+
+    //数据列表————计算总金额————写回经过点击后填充上
+    let carts = this.data.carts;
+    let that = this
+    // 计算总金额
+    let total = 0;
+    let economicalMoney = 0
+    let specialPrice = 0
+    for (let i = 0; i < carts.length; i++) {
+      for (let j = 0; j < carts[i].cminiShopCarList.length; j++) {
+        if (carts[i].cminiShopCarList[j].selected) {
+          total += carts[i].cminiShopCarList[j].num * carts[i].cminiShopCarList[j].price;
+          // 乐享权益
+          economicalMoney += carts[i].cminiShopCarList[j].num * carts[i].cminiShopCarList[j].economicalMoney;
+          specialPrice += carts[i].cminiShopCarList[j].num * carts[i].cminiShopCarList[j].specialPrice;
+        }
+      }
+    }
+
+    total = total.toFixed(2);
+    // 没开卡economicalMoney为0
+    if (!that.data.openCardFlag) {
+      economicalMoney = 0
+    }
+    // 写回经点击修改后的数组
+    this.setData({
+      total: total,
+      economicalMoney,
+      specialPrice
+    });
+  },
+
+  /**
+   * 结算
+   */
+  submitOrder(e) {
+
+    let cartList = JSON.parse(JSON.stringify(this.data.carts));
+    for (let i = cartList.length - 1; i >= 0; i--) {
+      for (let j = cartList[i].cminiShopCarList.length - 1; j >= 0; j--) {
+        if (!cartList[i].cminiShopCarList[j].selected) {
+          cartList[i].cminiShopCarList.splice(j, 1)
+        }
+      }
+      if (cartList[i].cminiShopCarList.length === 0) {
+        cartList.splice(i, 1)
+      }
+    }
+    this.setData({
+      cartsChecked: cartList
+    })
+
+    let cartsChecked = JSON.parse(JSON.stringify(this.data.cartsChecked));
+    for (let i = 0; i < cartsChecked.length; i++) {
+      cartsChecked[i].totalAmount = 0;
+      cartsChecked[i].payAmount = 0;
+      cartsChecked[i].freightAmount = 0;
+      let freight = 0
+      for (let j = 0; j < cartsChecked[i].cminiShopCarList.length; j++) {
+        //商品数量
+        let num = cartsChecked[i].cminiShopCarList[j].num;
+        //商品价格
+        let price = cartsChecked[i].cminiShopCarList[j].price
+        //买省
+        let buy = cartsChecked[i].cminiShopCarList[j].buyToProvinceValue
+        // 运费
+        // 取最大运费
+        freight = cartsChecked[i].cminiShopCarList[0].freight;
+        if (cartsChecked[i].cminiShopCarList[j].freight >= freight) {
+          freight = cartsChecked[i].cminiShopCarList[j].freight;
+        }
+        cartsChecked[i].freightAmount = freight;
+        cartsChecked[i].merchantId = cartsChecked[i].cminiShopCarList[0].merchantId
+        cartsChecked[i].merchantName = cartsChecked[i].cminiShopCarList[0].merchantName
+        //店铺小计
+        cartsChecked[i].totalAmount += price * num;
+        console.log('totalAmount', cartsChecked[i].totalAmount)
+        if (cartsChecked[i].cminiShopCarList[j].buyToProvinceValue) {
+          //实际应付 有买省
+          cartsChecked[i].payAmount += price * num - buy * num
+        } else { //无买省
+          cartsChecked[i].payAmount += price * num;
+        }
+      }
+      cartsChecked[i].totalAmount += freight;
+      cartsChecked[i].payAmount += freight;
+    }
+
+    if (this.data.total == '0') {
+      wx.showToast({
+        title: '请选择商品',
+        duration: 1000,
+        icon: 'none',
+        mask: true
+      })
+    } else {
+      // 跳转结算
+      app.data.chooseAddressFlag = false
+      let tempStr = JSON.stringify(cartsChecked).replace(/\&/g, '@')
+      wx.navigateTo({
+        url: '/pages/shopSubmitOrder/shopSubmitOrder?orderInfo=' + tempStr
+      })
+    }
+
+  },
+
+  /**
+   * 返回首页
+   */
+  toIndexPage() {
+
+    wx.switchTab({
+      url: '/pages/strictShop/strictShop',
+    })
+  },
+  showToast() {
+
+    wx.showToast({
+      title: '登陆成功',
+      icon: 'none'
+    })
+
+  },
+
+  /**
+   * 下拉刷新
+   */
+  onPullDownRefresh() {
+
+    this.data.currentPage = 1;
+    this.getShopCarList()
+
+  },
+
+  /**
+   * 跳转商品详情
+   */
+  goGoodsDetail(e) {
+
+    let goodsId = e.currentTarget.dataset.goods;
+    wx.navigateTo({
+      url: `../shopDetail/shopDetail?goodsId=${goodsId}`,
+    })
+
+  },
+
+  /**
+   * 获取会员礼包商品列表
+   */
+  getVipGoodsList() {
+
+    let that = this
+    let params = {
+      currentPage: that.data.currentPage,
+      enablePage: true,
+      pageSize: 10,
+      type: 1
+    }
+    Api.getVipGoodsList(params).then(res => {
+      if (res.data.status === '0000') {
+        if (res.data.data) {
+          that.setData({
+            goodsList: [...that.data.goodsList, ...res.data.data.content]
+          })
+        }
+      } else {
+        alertModal1(res.data.msg)
+      }
+    })
+  },
+
+  /**
+   * 加载更多 
+   */
+  onReachBottom() {
+
+    let that = this
+    if (that.data.carts.length === 0) {
+      let currentPage = that.data.currentPage
+      currentPage++
+      that.setData({
+        currentPage
+      })
+      that.getVipGoodsList()
+    }
+
+  },
+
+  /**
+   * 页面分享
+   */
+  onShareAppMessage() {
+
+    return app.onShare();
+
+  },
+
+  /**
+   * 打开对话窗函数
+   */
+  showOpenCardDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    animation.translateY(300).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+      openCardDialogFlag: true,
+      showCardModalStatus: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      that.setData({
+        openDialogAnimation: animation.export()
+      })
+    }, 100)
+
+  },
+
+  /**
+   * 关闭对话窗函数
+   */
+  closeOpenCardDialog() {
+
+    let that = this
+
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(300).step()
+    this.setData({
+      openDialogAnimation: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        openDialogAnimation: animation.export(),
+        openCardDialogFlag: false,
+        showCardModalStatus: false
+      })
+    }.bind(this), 200)
+
+  },
+
+  /**
+   * 查询开卡状态
+   */
+  checkOpenCardFlag() {
+
+    let that = this
+
+    Api.checkOpenCardFlag().then(res => {
+      if (res.data.status === '0000') {
+        that.setData({
+          openCardFlag: res.data.data
+        })
+      } else {
+        alertModal1(res.data.msg)
+      }
+    }).catch((res) => {
+      alertModal1('请求服务失败')
+    })
+
+  }
+
+})

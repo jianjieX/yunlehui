@@ -1,0 +1,106 @@
+/* pages/shopAddressList/shopAddressList.wxss */
+
+.address-list {
+  width: 100%;
+}
+
+.address-item {
+  width: 100%;
+  height: 180rpx;
+  background: #fff;
+  box-sizing: border-box;
+  padding: 30rpx 20rpx;
+  display: flex;
+  border-bottom: 1px solid #ededed;
+  align-items: center;
+}
+
+.address-item .info {
+  flex: 1;
+}
+
+.address-item .checked {
+  margin-right: 16rpx;
+}
+
+.address-item .name {
+  margin-right: 20rpx;
+  display: inline-block;
+  color: #222;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.address-item .phone {
+  margin-right: 24rpx;
+  display: inline-block;
+}
+
+.address-item .edit {
+  width: 50rpx;
+  height: 50rpx;
+  text-align: center;
+  line-height: 50rpx;
+  display: inline-block;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.address-item .isDefault {
+  display: inline-block;
+  width: 60rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  font-size: 20rpx;
+  background: rgba(255, 88, 80, 0.2);
+  border-radius: 1px;
+  color: #ff5850;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.address-item .edit image {
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.address-item .address {
+  width: 560rpx;
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  color: #222;
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+.newAddress {
+  width: 100%;
+  height: 96rpx;
+  line-height: 96rpx;
+  color: #fff;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  font-size: 36rpx;
+  background: rgba(250, 190, 0, 1);
+  z-index: 999;
+}
+
+.add {
+  display: inline-block;
+  width: 30rpx;
+  height: 30rpx;
+  border: 1px solid #ff5850;
+  color: #ff5850;
+  text-align: center;
+  line-height: 30rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}

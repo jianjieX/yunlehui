@@ -1,0 +1,88 @@
+import MyHttp from '../request.js';
+
+const ALL_API = {
+  getAccountInfo(data) { //c端我的账户信息查询
+    let result = {};
+    result.method = "POST";
+    result.url = '/money/getAccountInfo';
+    return result
+  },
+
+  getAccountDetail(data) { //c端账户信息查询
+    let result = {};
+    result.method = "POST";
+    result.url = '/money/getAccountDetail';
+    return result
+  },
+
+  getWithdrawalList(data) { //c端提现记录列表
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/getCminiWithdrawalList';
+    return result
+  },
+
+  getBankCard(data) { //c端银行卡信息
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/getBankCard';
+    return result
+  },
+  addBankCard(data) { // 添加银行卡
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/addBankCard';
+    return result
+  },
+  getAllWithdrawalPrice(data) { // 获取全部可提现余额
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/getAllWithdrawalPrice';
+    return result
+  },
+  getWithdrawalInfo(data) { // 判断是否可以提现
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/checkWithdrawalPrice';
+    return result
+  },
+  getWithdrawRules() { // 获取提现规则
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/withdrawalRules';
+    return result
+  },
+  cashOut(data) { // 提现
+    let result = {};
+    result.method = "POST";
+    result.url = '/cmini/addWithdrawal';
+    return result
+  },
+  getSignUrl(data) { //电签绑定
+    let result = {};
+    result.method = "get";
+    result.url = '/cmini/cat/getSignUrl';
+    return result
+  },
+  getSignStatus(data) { //綁定后返回
+    let result = {};
+    result.method = "get";
+    result.url = '/cmini/cat/getSignStatus';
+    return result
+  },
+  checkCminiPrivateBankCard(data) { //检查C端商户是否有私卡和是否签约工猫
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/checkCminiPrivateBankCard';
+    return result
+  },
+  send(data) { //发送
+    let result = {};
+    result.method = "GET";
+    result.url = '/cmini/cat/send';
+    return result
+  },
+}
+const Api = new MyHttp(ALL_API);
+
+export default Api;

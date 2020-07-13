@@ -1,0 +1,304 @@
+/**
+ * @fileoverview 授权页面
+ * @author liyujie
+ */
+
+// 引入全局app
+const app = getApp();
+// 引入api
+import commonApi from '/../../utils/config/Api/common.js';
+import myInformApi from '../../utils/config/Api/myInform.js';
+// 引入表情转码方法
+import tools from '../../utils/tools/util.js'
+let utf16toEntities = tools.utf16toEntities // emojy 转字符
+let uncodeUtf16 = tools.uncodeUtf16
+// 引入toast提示方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal = alert.alertModal;
+let alertModal1 = alert.alertModal1;
+
+Page({
+
+  /**
+   * 页面的初始数据
+   */
+  data: {
+    // 头部适配样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    // 微信名
+    nickName: "",
+    // 头像
+    avatarUrl: "",
+    // 门店头像
+    shopHeader: "",
+    // 门店名
+    shopName: "",
+    // 按钮type（1.授权用户信息，2.获取微信手机号）
+    buttonType: 1,
+    selected: true,
+    // 页面进入type
+    type: 0
+  },
+
+  //弹出层
+  alert(name) {
+    wx.showToast({
+      title: name,
+      icon: 'none',
+      duration: 2000,
+      mask: true
+    })
+  },
+
+  onLoad(options) {
+    this.init(options);
+  },
+
+  //初始化
+  init(options) {
+    let _this = this
+    // 头部适配
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+      type: options.type
+    })
+  },
+
+  onShow() {
+
+    let _this = this;
+    if (app.data.decryptDataFlag) {
+      console.log('已经授权')
+      app.data.isAuthorization = true
+      _this.showPhone();
+    } else {
+      app.data.isAuthorization = false
+      _this.showPhone();
+    }
+  },
+
+  /**
+   * 获取用户信息
+   */
+  onGotUserInfo(e) {
+    console.log('获取用户信息@@@@@@@@@@@@@@@@@@@@@',e)
+    var _this = this;
+    wx.showLoading({
+      title: '登录中',
+      mask: true
+    })
+    console.log(e.detail.userInfo)
+    if (e.detail.userInfo == undefined) {
+      wx.hideLoading();
+      _this.userDoesNotWantAuthorization();
+      return;
+    }
+    app.data.isAuthorization = true;
+    let nickName = uncodeUtf16(e.detail.userInfo.nickName)
+    let province = e.detail.userInfo.province
+    let city = e.detail.userInfo.city
+    let country = e.detail.userInfo.country
+    console.log(nickName)
+    // 发送 iv等
+    let params = {
+      encryptedData: e.detail.encryptedData,
+      iv: e.detail.iv,
+      nickName: nickName,
+      province: province,
+      city: city,
+      country: country
+    }
+
+    wx.checkSession({　　　　
+      success: function(res) {　　　　　　
+        console.log("处于登录态", res);　
+        //session_key 未过期，
+        commonApi.decryptData(params).then(res => {
+          console.log(res)
+          console.log('--------------授权完成')
+          //授权完成
+          app.data.flag = 1;
+          app.data.decryptDataFlag = true;
+          //获取用户信息
+          _this.queryUserInfo();
+          wx.hideLoading();
+          if (app.data.userPhone) {
+            wx.navigateBack({
+              delta: 1
+            })
+          } else {
+            _this.setData({
+              buttonType: 2
+            })
+          }
+        })　　　
+      },
+      　fail: function(res) {　　　　　　
+        console.log("需要重新登录", res);　　　　　　
+        // session_key 已经失效，需要重新执行登录流程
+         this.init(options);
+      }　　
+    })
+
+  },
+
+
+  // 获取用户信息
+  queryUserInfo() {
+    let that = this;
+    myInformApi.originatorDetail().then(res => {
+      if (res.data.status === "0000") {
+        //用户昵称转码
+
+        let nickName, signature, avatarUrl, gender, userPhone;
+        if (res.data.data.nickName != null && res.data.data.nickName != undefined) {
+          nickName = uncodeUtf16(res.data.data.nickName)
+          app.data.userInfo.nickName = nickName
+        }
+        //用户签名转码
+        if (res.data.data.signature != null && res.data.data.signature != undefined) {
+          signature = res.data.data.signature
+          app.data.userInfo.signature = signature
+        }
+        //用户头像
+        if (res.data.data.avatarUrl != null && res.data.data.avatarUrl != undefined) {
+          avatarUrl = res.data.data.avatarUrl
+          app.data.userInfo.avatarUrl = avatarUrl
+        }
+        //用户年龄
+        if (res.data.data.gender != null && res.data.data.gender != undefined) {
+          gender = res.data.data.gender
+          app.data.userInfo.gender = gender
+        }
+        //用户手机号
+        if (res.data.data.userPhone != null && res.data.data.userPhone != undefined) {
+          userPhone = res.data.data.userPhone
+          app.data.userInfo.userPhone = userPhone
+        }
+
+      }
+
+    })
+  },
+  //授权后显示手机号授权
+  showPhone() {
+    let _this = this
+    if (app.data.isAuthorization) {
+      console.log('已经授权')
+      _this.setData({
+        buttonType: 2
+      })
+    }
+  },
+
+  /**
+   * 用户一直不授权
+   */
+  userDoesNotWantAuthorization() {
+    wx.switchTab({
+      url: '../shopHome/shopHome',
+    })
+  },
+
+  /**
+   * 返回首页
+   */
+  goHome() {
+    if (this.data.type == 0) {
+      wx.navigateBack({
+        delta: 1
+      })
+    } else {
+      wx.switchTab({
+        url: '../shopHome/shopHome',
+      })
+    }
+  },
+
+  /**
+   * 获取手机号授权，手机号解码
+   */
+  getPhoneNumber(e) {
+    console.log('获取手机号$$$$$$$$$$$$$$$$$$$$$$',e)
+    var encryptedData = e.detail.encryptedData;
+    var iv = e.detail.iv;
+    let that = this;
+    if (encryptedData == undefined || iv == undefined) {
+      alertModal("未获取手机号码授权");
+    } else {
+      let _parms = {
+        encryptedData: encryptedData,
+        iv: iv
+      }
+      commonApi.decryptPhone(_parms).then((res) => {
+        console.log("授权手机结果", res)
+        app.data.userInfo.userPhone = res.data.data.userPhone
+        if (res.data.status == '0000') {
+          if (res.data.data != null) {
+            app.userLogin().then(res => {
+
+              wx.navigateBack({
+                detal: 1
+              })
+            });
+          }
+        } else {
+          alertModal(res.data.msg)
+        }
+      }).catch(err => {
+        alertModal1("请求失败")
+        console.log("错误信息", err)
+      })
+    }
+  },
+
+  /**
+   * 同意协议
+   */
+  selected() {
+    let selected = this.data.selected;
+    selected = !selected;
+    this.setData({
+      selected: selected
+    })
+  },
+
+  /**
+   * 跳转协议页面
+   */
+  goAgreementPage() {
+    wx.navigateTo({
+      url: '../agreement/agreement?type=2',
+    })
+  },
+
+  /**
+   * 返回后同意协议
+   */
+  agreeTo() {
+    this.setData({
+      selected: true
+    })
+  },
+
+  onUnload() {
+
+    let _this = this;
+    wx.getSetting({
+      success: res => {
+        //'scope.userInfo'用户授权
+        if (!res.authSetting['scope.userInfo']) {
+          if (_this.data.type == 1) {
+            _this.goHome();
+          }
+        }
+      }
+    })
+  }
+})

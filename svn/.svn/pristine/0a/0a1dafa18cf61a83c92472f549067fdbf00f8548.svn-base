@@ -1,0 +1,36 @@
+/* pages/withdrawalResult/withdrawalResult.wxss */
+
+page {
+  background: #fff;
+}
+
+.success-view {
+  text-align: center;
+  margin-top:200rpx;
+}
+
+.success-text {
+  display: flex;
+  flex-direction: row;
+  font-size: 24rpx;
+  justify-content: center;
+  margin-top: 72rpx;
+  color: #666666;
+}
+
+.success-text .success-text1 {
+  color: #fabe00;
+  font-family: PingFang-SC-Semibold;
+}
+
+.success-button {
+  width: 236rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  background: #fabe00;
+  margin: 48rpx auto 0 auto;
+  font-size: 28rpx;
+  font-family: PingFang-SC-Regular;
+  font-weight: 500;
+  color: #333;
+}

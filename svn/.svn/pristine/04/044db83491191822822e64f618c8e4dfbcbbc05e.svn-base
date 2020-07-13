@@ -1,0 +1,388 @@
+/**
+ * 服务详情页面
+ */
+// 引入全局app对象
+const app = getApp();
+// 引入wxParse
+import WxParse from '../../wxParse/wxParse.js'
+// 引入WxValidate
+import WxValidate from '../../wxValidate/wxValidate.js'
+// 引入分享朋友圈 canvas相关
+import Poster from '../../components/miniprogram_dist/poster/poster';
+// 引入接口api
+import Api from '/../../utils/config/Api/activity.js';
+// 引入toast相关方法
+let alert = require('../../utils/tools/alert.js');
+let alertModal1 = alert.alertModal1;
+let alertModal = alert.alertModal;
+// 引入解码表情方法
+let utils = require('../../utils/tools/util.js')
+let uncodeUtf16 = utils.uncodeUtf16
+
+Page({
+  data: {
+    // id
+    id: '',
+    options: '',
+    list: [],
+    // 头部自适应样式
+    navigationStyle: '',
+    statusBarStyle: '',
+    navigationBarStyle: '',
+    menuStyle: '',
+    //导航条名字
+    navigateName: '',
+    //导航条名字
+    navigateTarget: '',
+    // 使用data数据对象设置样式名
+    minusStatus: 'disabled',
+    // 画布配置,分享
+    posterConfig: {},
+    // 分享的图片
+    shareImage: '',
+    localImg: '',
+    //弹出动画
+    animationPlus: {},
+    showModalStatus: false,
+    showSpecModalStatus: false,
+    isGoTopShow: false,
+    // tab切换
+    currentTab: 1,
+    // 是否分享进入
+    shareType: 0,
+    // 页面遮罩层
+    pageMask: false,
+    // 地图名称
+    mapName: '北京',
+    //地图经度纬度
+    latitude: 39.9075,
+    longitude: 116.39723,
+    //活动报名信息
+    signParams: {
+      memberName: '',
+      mobile: '',
+      memberRemark: '',
+      joinNumber: 1
+    },
+    // 主图
+    mainImage: '',
+    // 头像
+    publisherPortrait: '',
+    // 姓名
+    publisher: '',
+    //浏览量
+    pageView: 0,
+    // 地址
+    address: '',
+    // 电话
+    contactNumber: '',
+    // 商品id
+    goodsId: '',
+    //活动方式   ONLYREAD 仅可阅读  COMMITFORM 提交表单 BUYPRODUCT 购买商品 IMMEDIATELY 立即预约
+    joinMode: '',
+    // 操作
+    joinModeName: '',
+    //是否显示
+    joinModeStatus: '',
+    // 是否可编辑
+    joinModeVaild: '',
+    // 活动开始时间
+    startTime: '',
+    endTime: '',
+    //防止连续触发
+    buttonClicked: false
+  },
+
+  onLoad(options) {
+    this.init(options);
+    this.dealStyle();
+    this.initValidate(); //验证规则函数
+  },
+
+  init(options) {
+    let that = this;
+    that.setData({
+      id: options.id,
+      options: options
+    })
+    wx.showLoading({
+      title: '加载中',
+    })
+
+    this.searchData()
+  },
+  // 头部适配  初始化数据
+  dealStyle() {
+    this.setData({
+      navigationStyle: app.data.navigationStyle,
+      statusBarStyle: app.data.statusBarStyle,
+      navigationBarStyle: app.data.navigationBarStyle,
+      menuStyle: app.data.menuStyle,
+    })
+  },
+  onShow() {
+    console.log('-------app.data------', app.data)
+    this.setData({
+      pageMask: false
+    })
+  },
+
+  /**
+   * 验证函数
+   */
+  initValidate() {
+    const rules = {
+      memberName: {
+        required: true,
+      },
+      mobile: {
+        required: true,
+        tel: true
+
+      },
+      memberRemark: {
+        required: false,
+        minlength: 0,
+        maxlength: 51
+      },
+
+    }
+    const messages = {
+      memberName: {
+        required: '请先授权获取昵称',
+      },
+      mobile: {
+        required: '请先授权获取手机号',
+        tel: '手机号格式有误'
+      },
+      memberRemark: {
+        minlength: '请正确填写备注',
+        maxlength: '请正确填写备注'
+
+      }
+    }
+    this.WxValidate = new WxValidate(rules, messages)
+  },
+
+  /**
+   * 查询活动详细
+   */
+  searchData() {
+    let that = this;
+    let params = {
+      id: that.data.options.id
+    }
+    Api.searchServeDetail(params).then((res) => {
+      if (res.data.status === '0000') {
+        if (res.data.data) {
+          let data = res.data.data;
+          that.setData({
+            mainImage: data.mainImage,
+            publisherPortrait: data.publisherPortrait,
+            address: data.address,
+            publisher: data.publisher,
+            latitude: data.lat,
+            longitude: data.lng,
+            content: data.content,
+            title: data.title,
+            pageView: data.pageView,
+            goodsId: data.goodsId,
+            contactNumber: data.contactNumber,
+            joinMode: data.joinMode,
+            joinModeName: data.joinModeName,
+            joinModeStatus: data.joinModeStatus,
+            joinModeVaild: data.joinModeVaild,
+            startTime: data.startTime,
+            endTime: data.startTime
+          })
+        }
+        let content = uncodeUtf16(that.data.content);
+        // wxParse解析html富文本
+        WxParse.wxParse('article', 'html', content, that, 5);
+      }
+    }).catch((res) => {
+      alertModal(res)
+    })
+  },
+
+  /**
+   * 打开地图
+   */
+  openMap() {
+    const name = this.data.address;
+    const latitude = Number(this.data.latitude);
+    const longitude = Number(this.data.longitude);
+    wx.openLocation({
+      name: name,
+      latitude: latitude,
+      longitude: longitude,
+      scale: 18
+    })
+  },
+  /**
+   * 打开电话
+   */
+  openPhone() {
+    let that = this;
+    wx.makePhoneCall({
+      phoneNumber: that.data.contactNumber
+    })
+  },
+
+
+  /**
+   * 打开关闭
+   */
+  showDialog(e) {
+    utils.buttonClicked(this);
+    console.log('app...', app.data)
+    //购买商品
+    if (e.currentTarget.dataset.mode == 'BUYPRODUCT') {
+
+      let goodsId = this.data.goodsId;
+      wx.navigateTo({
+        url: `../../pages/shopDetail/shopDetail?goodsId=${goodsId}`,
+      })
+      //提交表单
+    } else {
+      //表单提交先授权
+      this.accredit();
+    }
+
+  },
+
+  /**
+   * 授权
+   */
+  accredit() {
+    let that = this;
+    app.accredit().then((res) => {
+      // 弹窗动画
+      this.showModal();
+      that.setData({
+        ['signParams.memberName']: app.data.userInfo.nickName,
+        ['signParams.mobile']: app.data.userInfo.userPhone,
+      });
+    })
+  },
+
+  /**
+   * 表单提交
+   */
+  formSubmit(e) {
+    let that = this;
+    let params = e.detail.value
+
+    params.activityId = this.data.id
+
+    //校验表单parseInt(params.joinNumber)
+    if (!this.WxValidate.checkForm(params)) {
+      const error = this.WxValidate.errorList[0]
+      alertModal1(error.msg)
+      return false
+    }
+
+    if (parseInt(params.joinNumber) >= 1 && parseInt(params.joinNumber) <= 100) {
+      Api.submitServeSubscribe(params).then((res) => {
+        if (res.data.status === '0000') {
+          alertModal1('提交成功')
+          that.hideDialog();
+          that.searchData();
+
+        } else {
+          alertModal1(res.data.msg)
+        }
+      }).catch((res) => {
+        alertModal("请求服务失败")
+      })
+      return;
+    } else {
+      wx.showToast({
+        icon: 'none',
+        title: '请正确输入参与人数',
+      })
+      return;
+    }
+
+
+
+
+
+    this.hideDialog()
+  },
+
+  /**
+   * 分享
+   */
+  share() {
+
+    let that = this
+    // 检查授权和绑定手机状态
+    app.accredit().then((res) => {
+      that.showModal()
+    });
+  },
+
+
+  hideDialog: function() {
+    this.hideModal()
+  },
+
+  /**
+   * 弹窗动画
+   */
+  showModal() {
+
+    // 显示遮罩层
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(450).step()
+    this.setData({
+      animationData: animation.export(),
+      showSpecModalStatus: true
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        animationData: animation.export()
+      })
+    }.bind(this), 200)
+  },
+
+  hideModal() {
+    let animation = wx.createAnimation({
+      duration: 200,
+      timingFunction: "linear",
+      delay: 0
+    })
+    this.animation = animation
+    animation.translateY(450).step()
+    this.setData({
+      animationData: animation.export(),
+    })
+    setTimeout(function() {
+      animation.translateY(0).step()
+      this.setData({
+        animationData: animation.export(),
+        showSpecModalStatus: false
+      })
+    }.bind(this), 200)
+  },
+
+
+  /**
+   * 富文本超链接
+   */
+  wxParseTagATap(e) {
+
+    let href = e.currentTarget.dataset.src;
+    console.log(href);
+    wx.navigateTo({
+      url: `../webviewPage/webviewPage?url=${href}`
+    })
+  }
+})

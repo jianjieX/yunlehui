@@ -1,0 +1,112 @@
+<!--pages/applyAfterSale/applyAfterSale.wxml-->
+<wxs module="numFr" src="../../filter/numFr.wxs"></wxs>
+<!-- 申请售后页面 -->
+<view class="page">
+  <view class="head">
+    本次售后服务将由
+    <text class="head-text">{{orderDetail.merchantName}}</text>为您提供
+  </view>
+  <!-- 商品列表 -->
+  <view class="page-item">
+    <view class="goods-item" wx:for="{{orderDetail.orderResList}}" wx:key="{{index}}">
+      <view class="goods-img">
+        <image src="{{item.productPic}}"></image>
+      </view>
+      <view class="goods-info">
+        <view class="goods-title">
+          <view class='title'>{{item.productName}}</view>
+          <view class='desc'>{{item.specs}}</view>
+        </view>
+        <view class="price-num-view">
+          <view class='price'>￥{{numFr.getNum(item.productPrice)}}</view>
+          <view class='num'>x{{item.productQuantity}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class='total-price'>
+      <view class='no'>共1件小计：</view>
+      <view>￥
+        <text class='price'>{{numFr.getNum(orderDetail.payAmount)}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 售后方式 -->
+
+  <view class='after-detail'>
+    <view class="modes">
+      <view class='title'>售后方式</view>
+      <view class="mode">退货退款</view>
+    </view>
+
+    <view class="total">
+      <view class='title'>退款金额</view>
+      <view class="price">￥{{numFr.getNum(orderDetail.payAmount)}}</view>
+    </view>
+  </view>
+
+
+  <!-- 退款原因 -->
+  <view class="after-reason">
+    <view class="reason">
+      <view class='title'>退款原因</view>
+      <view class='detail'>
+        <picker style="display:inline-block" bindchange="bindPickerChange" range-key="name" range="{{cancelReasonList}}">
+          <view class="reason-text" wx:if="{{cancelReasonName !== ''}}">
+            {{cancelReasonName}}
+            <view class="arrow"></view>
+          </view>
+          <view wx:if="{{cancelReasonName === ''}}">
+            请选择
+            <view class="arrow"></view>
+          </view>
+        </picker>
+      </view>
+
+    </view>
+    <textarea class='texat' placeholder="请输入退款的具体原因，300字以内" maxlength="300" bindinput="userInput" data-type="{{3}}">
+      <view class="input-count">{{inputCount}}/300</view>
+    </textarea>
+
+  </view>
+
+  <!-- 售后凭证 -->
+  <view class="after-image">
+    <view class="title">
+      <view>售后凭证</view>
+    </view>
+
+    <!-- 上传1-5张图片 -->
+    <view class='UpPick'>
+
+      <view class='addPics' bindtap='uploadImg' wx:if='{{returnPicList.length<5}}'>
+        <image class="camera" src="/img/others/camera.png"></image>
+        <view class='smal'>售后凭证</view>
+        <view class='moresmal'>可上传1-5张</view>
+      </view>
+      <view class='addPicPic' wx:for="{{returnPicList}}" wx:key="item">
+        <image class="cancel" src="/img/others/cancel.png" color="#222" catchtap="close" data-index='{{index}}'></image>
+        <image src="{{item.returnPicUrl}}" class="slide-pic" bindtap="previewImage" data-src="{{item.returnPicUrl}}"></image>
+      </view>
+
+
+    </view>
+  </view>
+
+  <!-- 联系方式 -->
+  <view class="contact">
+
+    <view class="person">
+      <view class='title'>联系人</view>
+      <input class='name' placeholder="请输入联系人" maxlength="10" bindinput="userInput" data-type="{{1}}"></input>
+    </view>
+
+    <view class="mobile">
+      <view class='title'>联系电话</view>
+      <input class='num' placeholder="请输入联系电话" maxlength="11" bindinput="userInput" data-type="{{2}}"></input>
+    </view>
+  </view>
+
+  <view class="submit-btn" bindtap="submit">提交申请</view>
+</view>
